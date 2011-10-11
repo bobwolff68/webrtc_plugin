@@ -1,0 +1,3 @@
+[submodule "third_party/FireBreath"]
+	path = third_party/FireBreath
+	url = https://github.com/firebreath/FireBreath.git
