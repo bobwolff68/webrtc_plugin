@@ -15,6 +15,8 @@ set(SOURCES
 list(APPEND SOURCES
      TestPeerConnectionClient.h
      TestPeerConnectionClient.cpp
+     TestPeerConnectionObserver.cpp
+     TestPeerConnectionObserver.h
      TestDefaults.h
      TestDefaults.cpp
      TestSocketServer.h
@@ -23,6 +25,9 @@ list(APPEND SOURCES
 
 set(WEBRTCDIR
     ../../../third_party/webrtc/trunk)
+
+list(APPEND SOURCES
+     ${WEBRTCDIR}/third_party/libjingle/source/talk/session/phone/devicemanager_mac.mm)
 
 include_directories(${WEBRTCDIR}/third_party/libjingle/source)
 include_directories(${WEBRTCDIR}/third_party_mods/libjingle/source)
@@ -36,11 +41,199 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+    add_definitions(-DWEBRTC_TARGET_MAC_INTEL)
+    add_definitions(-DWEBRTC_MAC_INTEL)
+    add_definitions(-DWEBRTC_MAC)
+    add_definitions(-DWEBRTC_THREAD_RR)
+    add_definitions(-DWEBRTC_CLOCK_TYPE_REALTIME)
+    add_definitions(-DOSX)
+    add_definitions(-DUSE_COCOA_THREADING)
+
+    find_library(LIBJINGLE_APP
+                 libjingle_app.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBJSONCPP
+                 libjsoncpp.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBVIDEO_CAPTURE_MODULE
+                 libvideo_capture_module.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBWEBRTC_UTILITY
+                 libwebrtc_utility.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBAUDIO_CODING_MODULE
+		 libaudio_coding_module.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBCNG
+                 libCNG.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBSPL
+                 libspl.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBG711
+                 libG711.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBG722
+                 libG722.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBILBC
+                 libiLBC.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBISAC
+                 libiSAC.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBISACFIX
+                 libiSACFix.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+    
+    find_library(LIBPCM16B
+                 libPCM16B.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBNETEQ
+                 libNetEq.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBRESAMPLER
+                 libresampler.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBVAD
+                 libvad.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBSYSTEM_WRAPPERS
+                 libsystem_wrappers.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBWEBRTC_VIDEO_CODING
+                 libwebrtc_video_coding.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBWEBRTC_I420
+                 libwebrtc_i420.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBWEBRTC_VP8
+                 libwebrtc_vp8.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBVPX
+                 libvpx.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBWEBRTC_VPLIB
+                 libwebrtc_vplib.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBVIDEO_RENDER_MODULE
+                 libvideo_render_module.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBVIDEO_ENGINE_CORE
+                 libvideo_engine_core.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBWEBRTC_JPEG
+                 libwebrtc_jpeg.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBJPEG_TURBO
+                 libjpeg_turbo.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBMEDIA_FILE
+                 libmedia_file.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBRTP_RTCP
+                 librtp_rtcp.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+   
+    find_library(LIBSRTP
+                 libsrtp.a
+                 ${WEBRTCDIR}/third_party/libsrtp)
+ 
+    find_library(LIBUDP_TRANSPORT
+                 libudp_transport.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBVIDEO_PROCESSING
+                 libvideo_processing.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBVOICE_ENGINE_CORE
+                 libvoice_engine_core.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBAUDIO_CONFERENCE_MIXER
+                 libaudio_conference_mixer.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBAUDIO_DEVICE
+                 libaudio_device.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBAUDIO_PROCESSING
+                 libaudio_processing.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBAEC
+                 libaec.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBAPM_UTIL
+                 libapm_util.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBAECM
+                 libaecm.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBAGC
+                 libagc.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBNS
+                 libns.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBPROTOBUF_LITE
+                 libprotobuf_lite.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
+    find_library(LIBJINGLE_P2P
+                 libjingle_p2p.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
     find_library(LIBJINGLE
                  libjingle.a
                  ${WEBRTCDIR}/xcodebuild/Debug)
 
+    find_library(LIBEXPAT
+                 libexpat.a
+                 ${WEBRTCDIR}/xcodebuild/Debug)
+
     find_library(FWCORESERVICES CoreServices)
+    find_library(FWCOREAUDIO CoreAudio)
+    find_library(FWCOREVIDEO CoreVideo)
+    find_library(FWQTKIT QTKit)
+    find_library(FWOPENGL OpenGL)
+    find_library(FWAUDIOTOOLBOX AudioToolbox)
+    find_library(FWAPPLICATIONSERVICES ApplicationServices)
+    find_library(FWFOUNDATION Foundation)
+    find_library(FWAPPKIT AppKit)
 
     set(COMPILE_FLAGS
         "-m32 -arch i386")
@@ -68,10 +261,61 @@ add_executable(cmdline_audio_peer
                ${SOURCES})
 
 target_link_libraries(cmdline_audio_peer
+                      ${LIBJINGLE_APP}
+                      ${LIBJSONCPP}
+                      ${LIBVIDEO_CAPTURE_MODULE}
+                      ${LIBWEBRTC_UTILITY}
+                      ${LIBAUDIO_CODING_MODULE}
+                      ${LIBCNG}
+                      ${LIBSPL}
+                      ${LIBG711}
+                      ${LIBG722}
+                      ${LIBILBC}
+                      ${LIBISAC}
+                      ${LIBISACFIX}
+                      ${LIBPCM16B}
+                      ${LIBNETEQ}
+                      ${LIBRESAMPLER}
+                      ${LIBVAD}
+                      ${LIBSYSTEM_WRAPPERS}
+                      ${LIBWEBRTC_VIDEO_CODING}
+                      ${LIBWEBRTC_I420}
+                      ${LIBWEBRTC_VP8}
+                      ${LIBVPX}
+                      ${LIBWEBRTC_VPLIB}
+                      ${LIBVIDEO_RENDER_MODULE}
+                      ${LIBVIDEO_ENGINE_CORE}
+                      ${LIBWEBRTC_JPEG}
+                      ${LIBJPEG_TURBO}
+                      ${LIBMEDIA_FILE}
+                      ${LIBRTP_RTCP}
+                      ${LIBSRTP}
+                      ${LIBUDP_TRANSPORT}
+                      ${LIBVIDEO_PROCESSING}
+                      ${LIBVOICE_ENGINE_CORE}
+                      ${LIBAUDIO_CONFERENCE_MIXER}
+                      ${LIBAUDIO_DEVICE}
+                      ${LIBAUDIO_PROCESSING}
+                      ${LIBAEC}
+                      ${LIBAPM_UTIL}
+                      ${LIBAECM}
+                      ${LIBAGC}
+                      ${LIBNS}
+                      ${LIBPROTOBUF_LITE}
+                      ${LIBJINGLE_P2P}
                       ${LIBJINGLE}
+                      ${LIBEXPAT}
                       -lpthread)
 
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
     target_link_libraries(cmdline_audio_peer
-                          ${FWCORESERVICES})
+                          ${FWCORESERVICES}
+                          ${FWCOREAUDIO}
+                          ${FWCOREVIDEO}
+                          ${FWQTKIT}
+                          ${FWOPENGL}
+                          ${FWAUDIOTOOLBOX}
+                          ${FWAPPLICATIONSERVICES}
+                          ${FWFOUNDATION}
+                          ${FWAPPKIT})
 endif()

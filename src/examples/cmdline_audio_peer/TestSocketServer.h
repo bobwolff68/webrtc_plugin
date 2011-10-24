@@ -15,6 +15,7 @@
 #include "talk/base/thread.h"
 #include "talk/base/physicalsocketserver.h"
 #include "TestPeerConnectionClient.h"
+#include "TestPeerConnectionObserver.h"
 
 class ThreadSafeMessageQueue
 {

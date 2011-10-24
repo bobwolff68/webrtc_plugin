@@ -56,7 +56,7 @@ class ThreadSingle {
 public:
 	ThreadSingle()
         {
-          int ret;
+          int ret = 0;
           isRunning = false;
           isStopRequested = false;
 

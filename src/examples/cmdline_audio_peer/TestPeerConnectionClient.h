@@ -17,6 +17,8 @@
 
 typedef std::map<int, std::string> Peers;
 
+class TestPeerConnectionObserver;
+
 class TestPeerConnectionClient : public sigslot::has_slots<> {
 public:
     enum State {
@@ -33,7 +35,9 @@ public:
     int id() const;
     bool is_connected() const;
     const Peers& peers() const;
+    TestPeerConnectionObserver* GetPeerConnectionObserver(void) const;
     
+    void RegisterPeerConnectionObserver(TestPeerConnectionObserver* pObserver);
     bool Connect(const std::string& server, int port,
                  const std::string& client_name);
     bool SendToPeer(int peer_id, const std::string& message);
@@ -41,6 +45,7 @@ public:
     bool IsSendingMessage();
     
     bool SignOut();
+    
     
 protected:
     void Close();
@@ -81,6 +86,7 @@ protected:
     std::string onconnect_data_;
     std::string control_data_;
     std::string notification_data_;
+    TestPeerConnectionObserver* m_pObserver;
     Peers peers_;
     State state_;
     int my_id_;

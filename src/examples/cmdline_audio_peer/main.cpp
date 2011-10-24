@@ -25,6 +25,9 @@ int main (int argc, const char * argv[])
     TestPeerConnectionClient testClient;
     socket_server.SetTestPeerConnectionClient(&testClient);
     
+    //Create peer connection observer
+    TestPeerConnectionObserver testObserver(&testClient);
+    
     //Run client shell
     TestClientShell shell(&mq);
     shell.startThread();

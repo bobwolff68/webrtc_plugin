@@ -8,7 +8,7 @@
 
 #include <iostream>
 #include "TestPeerConnectionClient.h"
-
+#include "TestPeerConnectionObserver.h"
 #include "TestDefaults.h"
 #include "talk/base/common.h"
 #include "talk/base/nethelpers.h"
@@ -51,7 +51,7 @@ my_id_(-1)
     control_socket_->SignalConnectEvent.connect(this,&TestPeerConnectionClient::OnConnect);
     hanging_get_->SignalConnectEvent.connect(this,&TestPeerConnectionClient::OnHangingGetConnect);
     control_socket_->SignalReadEvent.connect(this,&TestPeerConnectionClient::OnRead);
-    hanging_get_->SignalReadEvent.connect(this,&TestPeerConnectionClient::OnHangingGetRead);    
+    hanging_get_->SignalReadEvent.connect(this,&TestPeerConnectionClient::OnHangingGetRead);
 }
 
 TestPeerConnectionClient::~TestPeerConnectionClient()
@@ -223,6 +223,7 @@ void TestPeerConnectionClient::OnHangingGetConnect(talk_base::AsyncSocket* socke
 void TestPeerConnectionClient::OnMessageFromPeer(int peer_id,const std::string& message)
 {
     std::cout << "Peer(" << peer_id << "): " << message << std::endl;
+    m_pObserver->OnMessageFromRemotePeer(peer_id, message);
 }
 
 bool TestPeerConnectionClient::GetHeaderValue(const std::string& data,size_t eoh,
@@ -479,4 +480,14 @@ void TestPeerConnectionClient::OnClose(talk_base::AsyncSocket* socket, int err)
         LOG(WARNING) << "Failed to connect to the server";
         Close();
     }
+}
+
+void TestPeerConnectionClient::RegisterPeerConnectionObserver(TestPeerConnectionObserver *pObserver)
+{
+    m_pObserver = pObserver;
+}
+
+TestPeerConnectionObserver* TestPeerConnectionClient::GetPeerConnectionObserver(void) const
+{
+    return m_pObserver;
 }

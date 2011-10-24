@@ -117,6 +117,28 @@ bool TestSocketServer::Wait(int cms, bool process_io)
             }
         }
     }
+    else if(nextMessage.find("connect") != std::string::npos)
+    {
+        int toPeerId;
+        char dummy[10];
+        sscanf(nextMessage.c_str(), "%d-%s",&toPeerId,dummy);
+        
+        for(Peers::const_iterator it = m_pClient->peers().begin();
+            it!=m_pClient->peers().end();
+            it++)
+        {
+            if(it->first == toPeerId)
+            {
+                m_pClient->GetPeerConnectionObserver()->ConnectToPeer(toPeerId);
+                break;
+            }
+        }
+
+    }
+    else if(nextMessage == "hangup")
+    {
+        m_pClient->GetPeerConnectionObserver()->DisconnectFromCurrentPeer();
+    }
 
     if(!m_pClient)
     {
