@@ -245,9 +245,173 @@ if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
         "-m32 -arch i386 -fno-rtti")   
 else()
     if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-        find_library(LIBJINGLE
-                     libjingle.a
-                     ${WEBRTCDIR}/out/Debug/obj.target/third_party_mods/libjingle)
+    find_library(LIBJINGLE_APP
+                 libjingle_app.a
+                 ${WEBRTCDIR}/out/obj.target/third_party_mods/libjingle)
+
+    find_library(LIBJSONCPP
+                 libjsoncpp.a
+                 ${WEBRTCDIR}/out/obj.target/third_party_mods/libjingle)
+
+    find_library(LIBVIDEO_CAPTURE_MODULE
+                 libvideo_capture_module.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+
+    find_library(LIBWEBRTC_UTILITY
+                 libwebrtc_utility.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+
+    find_library(LIBAUDIO_CODING_MODULE
+		 libaudio_coding_module.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+
+    find_library(LIBCNG
+                 libCNG.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+
+    find_library(LIBSPL
+                 libspl.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+
+    find_library(LIBG711
+                 libG711.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+
+    find_library(LIBG722
+                 libG722.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+
+    find_library(LIBILBC
+                 libiLBC.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+
+    find_library(LIBISAC
+                 libiSAC.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+
+    find_library(LIBISACFIX
+                 libiSACFix.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+    
+    find_library(LIBPCM16B
+                 libPCM16B.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+
+    find_library(LIBNETEQ
+                 libNetEq.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+
+    find_library(LIBRESAMPLER
+                 libresampler.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+
+    find_library(LIBVAD
+                 libvad.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+
+    find_library(LIBSYSTEM_WRAPPERS
+                 libsystem_wrappers.a
+                 ${WEBRTCDIR}/out/obj.target/src/system_wrappers/source)
+
+    find_library(LIBWEBRTC_VIDEO_CODING
+                 libwebrtc_video_coding.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+
+    find_library(LIBWEBRTC_I420
+                 libwebrtc_i420.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+
+    find_library(LIBWEBRTC_VP8
+                 libwebrtc_vp8.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+
+    find_library(LIBVPX
+                 libvpx.a
+                 ${WEBRTCDIR}/out/obj.target/third_party/libvpx)
+
+    find_library(LIBWEBRTC_VPLIB
+                 libwebrtc_vplib.a
+                 ${WEBRTCDIR}/out/obj.target/src/common_video)
+
+    find_library(LIBVIDEO_RENDER_MODULE
+                 libvideo_render_module.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+
+    find_library(LIBVIDEO_ENGINE_CORE
+                 libvideo_engine_core.a
+                 ${WEBRTCDIR}/out/obj.target/src/video_engine)
+
+    find_library(LIBWEBRTC_JPEG
+                 libwebrtc_jpeg.a
+                 ${WEBRTCDIR}/out/obj.target/src/common_video)
+
+    find_library(LIBJPEG_TURBO
+                 libjpeg_turbo.a
+                 ${WEBRTCDIR}/out/obj.target/third_party/libjpeg_turbo)
+
+    find_library(LIBMEDIA_FILE
+                 libmedia_file.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+
+    find_library(LIBRTP_RTCP
+                 librtp_rtcp.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+   
+    find_library(LIBUDP_TRANSPORT
+                 libudp_transport.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+
+    find_library(LIBVIDEO_PROCESSING
+                 libvideo_processing.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+
+    find_library(LIBVOICE_ENGINE_CORE
+                 libvoice_engine_core.a
+                 ${WEBRTCDIR}/out/obj.target/src/voice_engine)
+
+    find_library(LIBAUDIO_CONFERENCE_MIXER
+                 libaudio_conference_mixer.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+
+    find_library(LIBAUDIO_DEVICE
+                 libaudio_device.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+
+    find_library(LIBAUDIO_PROCESSING
+                 libaudio_processing.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+
+    find_library(LIBAEC
+                 libaec.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+
+    find_library(LIBAPM_UTIL
+                 libapm_util.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+
+    find_library(LIBAECM
+                 libaecm.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+
+    find_library(LIBAGC
+                 libagc.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+
+    find_library(LIBNS
+                 libns.a
+                 ${WEBRTCDIR}/out/obj.target/src/modules)
+
+    find_library(LIBPROTOBUF_LITE
+                 libprotobuf_lite.a
+                 ${WEBRTCDIR}/out/obj.target/third_party/protobuf)
+
+    find_library(LIBJINGLE_P2P
+                 libjingle_p2p.a
+                 ${WEBRTCDIR}/out/obj.target/third_part_mods/libjingle)
+
+    find_library(LIBJINGLE
+                 libjingle.a
+                 ${WEBRTCDIR}/out/obj.target/third_party_mods/libjingle)
 
         set(CMAKE_CXX_FLAGS
             "-fno-rtti")
@@ -288,8 +452,14 @@ target_link_libraries(cmdline_audio_peer
                       ${LIBWEBRTC_JPEG}
                       ${LIBJPEG_TURBO}
                       ${LIBMEDIA_FILE}
-                      ${LIBRTP_RTCP}
-                      ${LIBSRTP}
+                      ${LIBRTP_RTCP})
+
+if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+    target_link_libraries(cmdline_audio_peer
+                          ${LIBSRTP})
+endif()
+
+target_link_libraries(cmdline_audio_peer
                       ${LIBUDP_TRANSPORT}
                       ${LIBVIDEO_PROCESSING}
                       ${LIBVOICE_ENGINE_CORE}
@@ -303,8 +473,14 @@ target_link_libraries(cmdline_audio_peer
                       ${LIBNS}
                       ${LIBPROTOBUF_LITE}
                       ${LIBJINGLE_P2P}
-                      ${LIBJINGLE}
-                      ${LIBEXPAT}
+                      ${LIBJINGLE})
+
+if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+    target_link_libraries(cmdline_audio_peer
+                          ${LIBEXPAT})
+endif()
+
+target_link_libraries(cmdline_audio_peer
                       -lpthread)
 
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
