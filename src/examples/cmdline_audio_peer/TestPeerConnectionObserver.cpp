@@ -169,7 +169,7 @@ void TestPeerConnectionObserver::OnMessageFromRemotePeer(int peerId, const std::
     
     if(NULL == m_pPeerConnection.get())
     {
-        ASSERT(-1 == m_pPeerId);
+        ASSERT(-1 == m_PeerId);
         m_PeerId = peerId;
         
         std::cout << "Call request from peer: " << peerId << std::endl;

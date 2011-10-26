@@ -1,5 +1,8 @@
 project(cmdline_audio_peer)
 
+-- CURRENTLY USING GYP_CHROMIUM TO BUILD PROJECT --
+
+
 cmake_minimum_required(VERSION 2.6)
 
 if(COMMAND cmake_policy)
@@ -26,11 +29,14 @@ list(APPEND SOURCES
 set(WEBRTCDIR
     ../../../third_party/webrtc/trunk)
 
-list(APPEND SOURCES
-     ${WEBRTCDIR}/third_party/libjingle/source/talk/session/phone/devicemanager_mac.mm)
+if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+    list(APPEND SOURCES
+         ${WEBRTCDIR}/third_party/libjingle/source/talk/session/phone/devicemanager_mac.mm)
+endif()
 
 include_directories(${WEBRTCDIR}/third_party/libjingle/source)
 include_directories(${WEBRTCDIR}/third_party_mods/libjingle/source)
+include_directories(${WEBRTCDIR}/src)
 
 if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
     add_definitions(-DPOSIX)
@@ -38,6 +44,17 @@ endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
     add_definitions(-DLINUX)
+    add_definitions(-DWEBRTC_TARGET_PC)
+    add_definitions(-DWEBRTC_LINUX)
+    add_definitions(-DWEBRTC_THREAD_RR)
+    add_definitions(-DWEBRTC_RELATIVE_PATH)
+    add_definitions(-DNO_HEAPCHECKER)
+    add_definitions(-DCHROMIUM_BUILD)
+    add_definitions(-DUSE_NSS=1)
+    add_definitions(-DENABLE_P2P_APIS=1)
+    add_definitions(-DENABLE_CONFIGURATION_POLICY)
+    add_definitions(-DENABLE_INPUT_SPEECH)
+    add_definitions(-DUSE_SKIA)
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
@@ -247,171 +264,171 @@ else()
     if(CMAKE_SYSTEM_NAME MATCHES "Linux")
     find_library(LIBJINGLE_APP
                  libjingle_app.a
-                 ${WEBRTCDIR}/out/obj.target/third_party_mods/libjingle)
+                 ${WEBRTCDIR}/out/Debug/obj.target/third_party_mods/libjingle)
 
     find_library(LIBJSONCPP
                  libjsoncpp.a
-                 ${WEBRTCDIR}/out/obj.target/third_party_mods/libjingle)
+                 ${WEBRTCDIR}/out/Debug/obj.target/third_party_mods/libjingle)
 
     find_library(LIBVIDEO_CAPTURE_MODULE
                  libvideo_capture_module.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/modules)
 
     find_library(LIBWEBRTC_UTILITY
                  libwebrtc_utility.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/modules)
 
     find_library(LIBAUDIO_CODING_MODULE
 		 libaudio_coding_module.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/modules)
 
     find_library(LIBCNG
                  libCNG.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/modules)
 
     find_library(LIBSPL
                  libspl.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/common_audio)
 
     find_library(LIBG711
                  libG711.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/modules)
 
     find_library(LIBG722
                  libG722.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/modules)
 
     find_library(LIBILBC
                  libiLBC.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/modules)
 
     find_library(LIBISAC
                  libiSAC.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/modules)
 
     find_library(LIBISACFIX
                  libiSACFix.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/modules)
     
     find_library(LIBPCM16B
                  libPCM16B.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/modules)
 
     find_library(LIBNETEQ
                  libNetEq.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/modules)
 
     find_library(LIBRESAMPLER
                  libresampler.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/common_audio)
 
     find_library(LIBVAD
                  libvad.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/common_audio)
 
     find_library(LIBSYSTEM_WRAPPERS
                  libsystem_wrappers.a
-                 ${WEBRTCDIR}/out/obj.target/src/system_wrappers/source)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/system_wrappers/source)
 
     find_library(LIBWEBRTC_VIDEO_CODING
                  libwebrtc_video_coding.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/modules)
 
     find_library(LIBWEBRTC_I420
                  libwebrtc_i420.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/modules)
 
     find_library(LIBWEBRTC_VP8
                  libwebrtc_vp8.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/modules)
 
     find_library(LIBVPX
                  libvpx.a
-                 ${WEBRTCDIR}/out/obj.target/third_party/libvpx)
+                 ${WEBRTCDIR}/out/Debug/obj.target/third_party/libvpx)
 
     find_library(LIBWEBRTC_VPLIB
                  libwebrtc_vplib.a
-                 ${WEBRTCDIR}/out/obj.target/src/common_video)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/common_video)
 
     find_library(LIBVIDEO_RENDER_MODULE
                  libvideo_render_module.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/modules)
 
     find_library(LIBVIDEO_ENGINE_CORE
                  libvideo_engine_core.a
-                 ${WEBRTCDIR}/out/obj.target/src/video_engine)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/video_engine)
 
     find_library(LIBWEBRTC_JPEG
                  libwebrtc_jpeg.a
-                 ${WEBRTCDIR}/out/obj.target/src/common_video)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/common_video)
 
     find_library(LIBJPEG_TURBO
                  libjpeg_turbo.a
-                 ${WEBRTCDIR}/out/obj.target/third_party/libjpeg_turbo)
+                 ${WEBRTCDIR}/out/Debug/obj.target/third_party/libjpeg_turbo)
 
     find_library(LIBMEDIA_FILE
                  libmedia_file.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/modules)
 
     find_library(LIBRTP_RTCP
                  librtp_rtcp.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/modules)
    
     find_library(LIBUDP_TRANSPORT
                  libudp_transport.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/modules)
 
     find_library(LIBVIDEO_PROCESSING
                  libvideo_processing.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/modules)
 
     find_library(LIBVOICE_ENGINE_CORE
                  libvoice_engine_core.a
-                 ${WEBRTCDIR}/out/obj.target/src/voice_engine)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/voice_engine)
 
     find_library(LIBAUDIO_CONFERENCE_MIXER
                  libaudio_conference_mixer.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/modules)
 
     find_library(LIBAUDIO_DEVICE
                  libaudio_device.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/modules)
 
     find_library(LIBAUDIO_PROCESSING
                  libaudio_processing.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/modules)
 
     find_library(LIBAEC
                  libaec.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/modules)
 
     find_library(LIBAPM_UTIL
                  libapm_util.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/modules)
 
     find_library(LIBAECM
                  libaecm.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/modules)
 
     find_library(LIBAGC
                  libagc.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/modules)
 
     find_library(LIBNS
                  libns.a
-                 ${WEBRTCDIR}/out/obj.target/src/modules)
+                 ${WEBRTCDIR}/out/Debug/obj.target/src/modules)
 
     find_library(LIBPROTOBUF_LITE
                  libprotobuf_lite.a
-                 ${WEBRTCDIR}/out/obj.target/third_party/protobuf)
+                 ${WEBRTCDIR}/out/Debug/obj.target/third_party/protobuf)
 
     find_library(LIBJINGLE_P2P
                  libjingle_p2p.a
-                 ${WEBRTCDIR}/out/obj.target/third_part_mods/libjingle)
+                 ${WEBRTCDIR}/out/Debug/obj.target/third_party_mods/libjingle)
 
     find_library(LIBJINGLE
                  libjingle.a
-                 ${WEBRTCDIR}/out/obj.target/third_party_mods/libjingle)
+                 ${WEBRTCDIR}/out/Debug/obj.target/third_party_mods/libjingle)
 
         set(CMAKE_CXX_FLAGS
             "-fno-rtti")
@@ -482,6 +499,16 @@ endif()
 
 target_link_libraries(cmdline_audio_peer
                       -lpthread)
+
+if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+    target_link_libraries(cmdline_audio_peer
+                          -lexpat
+                          -lX11
+                          -lasound
+                          -ldl
+                          -lrt
+                          -lm)
+endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
     target_link_libraries(cmdline_audio_peer
