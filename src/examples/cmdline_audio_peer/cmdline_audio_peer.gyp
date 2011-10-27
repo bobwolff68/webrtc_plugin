@@ -24,6 +24,7 @@
                 'TestDefaults.cpp',
                 'TestSocketServer.h',
                 'TestSocketServer.cpp',
+                'TestClientShell.h'
                 'ThreadSingle.h',
             ],
             'dependencies': [
