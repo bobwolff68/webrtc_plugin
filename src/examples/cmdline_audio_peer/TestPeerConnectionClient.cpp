@@ -124,7 +124,7 @@ bool TestPeerConnectionClient::SendToPeer(int peer_id, const std::string& messag
         return false;
     
     ASSERT(is_connected());
-    ASSERT(control_socket_->GetState() == talk_base::Socket::CS_CLOSED);
+    //ASSERT(control_socket_->GetState() == talk_base::Socket::CS_CLOSED);
     if (!is_connected() || peer_id == -1)
         return false;
     
@@ -141,7 +141,7 @@ bool TestPeerConnectionClient::SendToPeer(int peer_id, const std::string& messag
 }
 
 bool TestPeerConnectionClient::SendHangUp(int peer_id) 
-{
+{ 
     return SendToPeer(peer_id, kByeMessage);
 }
 
@@ -191,7 +191,10 @@ void TestPeerConnectionClient::Close()
 
 bool TestPeerConnectionClient::ConnectControlSocket() 
 {
-    ASSERT(control_socket_->GetState() == talk_base::Socket::CS_CLOSED);
+    //ASSERT(control_socket_->GetState() == talk_base::Socket::CS_CLOSED);
+    if(control_socket_->GetState() != talk_base::Socket::CS_CLOSED)
+        return true;
+
     int err = control_socket_->Connect(server_address_);
     if (err == SOCKET_ERROR) {
         Close();

@@ -7,6 +7,7 @@
 //
 
 #include <iostream>
+#include <stdio.h>
 #include "TestSocketServer.h"
 #include "TestDefaults.h"
 
@@ -138,6 +139,18 @@ bool TestSocketServer::Wait(int cms, bool process_io)
     else if(nextMessage == "hangup")
     {
         m_pClient->GetPeerConnectionObserver()->DisconnectFromCurrentPeer();
+    }
+    else if(!nextMessage.empty())
+    {
+        int peerId;
+        std::string peerIdStr = nextMessage.substr(0,nextMessage.find('/'));
+        std::string peerMsg = nextMessage.substr(nextMessage.find('/')+1);	
+
+        sscanf(peerIdStr.c_str(),"%d",&peerId);
+
+        std::cout << "To Peer: " << peerId << std::endl;
+        std::cout << "Msg: " << peerMsg << std::endl;
+        m_pClient->SendToPeer(peerId,peerMsg);
     }
 
     if(!m_pClient)

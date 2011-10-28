@@ -7,14 +7,17 @@
 //
 
 #include <iostream>
+#include <sstream>
 #include "TestDefaults.h"
 #include "TestPeerConnectionObserver.h"
 #include "TestPeerConnectionClient.h"
+#include "TestSocketServer.h"
 #include "talk/base/common.h"
 #include "talk/p2p/client/basicportallocator.h"
 
-TestPeerConnectionObserver::TestPeerConnectionObserver(TestPeerConnectionClient* pClient):
+TestPeerConnectionObserver::TestPeerConnectionObserver(TestPeerConnectionClient* pClient,ThreadSafeMessageQueue* pMsgQ):
 m_pClient(pClient),
+m_pMsgQ(pMsgQ),
 m_PeerId(-1),
 m_bAudioStreamShared(false)
 {
@@ -130,11 +133,16 @@ void TestPeerConnectionObserver::OnSignalingMessage(const std::string& msg)
         return;
     }
     
-    std::cout << "PeerConnection says: " << msg << std::endl;
-    std::cout << "Forwarding to peer: " << m_PeerId << std::endl;
+    //std::cout << "PeerConnection says: " << msg << std::endl;
+    //std::cout << "Forwarding to peer: " << m_PeerId << std::endl;
     
     //Send message from peer connection to destination peer
-    m_pClient->SendToPeer(m_PeerId, msg);
+    //m_pClient->SendToPeer(m_PeerId, msg);
+    std::stringstream sstrm;
+    sstrm << m_PeerId;
+    std::string peerMsg = sstrm.str() + "/";
+    peerMsg += msg;
+    m_pMsgQ->PostMessage(peerMsg);
 }
 
 void TestPeerConnectionObserver::OnAddStream(const std::string &streamId, bool video)
@@ -153,7 +161,8 @@ void TestPeerConnectionObserver::OnRemoveStream(const std::string &streamId, boo
     std::cout << "Peerconnection removed remote stream: " 
               << streamId
               << std::endl;
-    m_pClient->SendHangUp(m_PeerId);
+    //m_pClient->SendHangUp(m_PeerId);
+    m_pMsgQ->PostMessage("hangup");
     DeletePeerConnection();
 }
 
@@ -169,7 +178,7 @@ void TestPeerConnectionObserver::OnMessageFromRemotePeer(int peerId, const std::
     
     if(NULL == m_pPeerConnection.get())
     {
-        ASSERT(-1 == m_pPeerId);
+        ASSERT(-1 == m_PeerId);
         m_PeerId = peerId;
         
         std::cout << "Call request from peer: " << peerId << std::endl;
@@ -220,6 +229,7 @@ void TestPeerConnectionObserver::ShareLocalAudioStream(void)
 
 void TestPeerConnectionObserver::DisconnectFromCurrentPeer(void)
 {
-    m_pClient->SendHangUp(m_PeerId);
+    //m_pClient->SendHangUp(m_PeerId);
+    m_pMsgQ->PostMessage("hangup");
     DeletePeerConnection();
 }
