@@ -151,6 +151,7 @@
       ['OS=="mac"', {
         'defines': [
           'OSX',
+	  'SRTP_RELATIVE_PATH',
         ],
         'include_dirs': [
             '../../third_party/libsrtp/include',
@@ -439,8 +440,6 @@
         }],
         ['os_posix == 1', {
           'sources': [
-            '<(libjingle_orig)/source/talk/base/latebindingsymboltable.cc',
-            '<(libjingle_orig)/source/talk/base/latebindingsymboltable.h',
             '<(libjingle_orig)/source/talk/base/sslstreamadapter.cc',
             '<(libjingle_orig)/source/talk/base/sslstreamadapter.h',
             '<(libjingle_orig)/source/talk/base/unixfilesystem.cc',
@@ -449,6 +448,8 @@
         }],
         ['OS=="linux"', {
           'sources': [
+            '<(libjingle_orig)/source/talk/base/latebindingsymboltable.cc',
+            '<(libjingle_orig)/source/talk/base/latebindingsymboltable.h',
             '<(libjingle_orig)/source/talk/base/linux.cc',
             '<(libjingle_orig)/source/talk/base/linux.h',
           ],

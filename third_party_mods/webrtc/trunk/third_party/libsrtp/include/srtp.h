@@ -209,6 +209,8 @@ typedef struct srtp_policy_t {
   uint8_t *key;                /**< Pointer to the SRTP master key for
 				*    this stream.                        */
   struct srtp_policy_t *next;  /**< Pointer to next stream policy.       */
+  int window_size;
+  int allow_repeat_tx;
 } srtp_policy_t;
 
 
