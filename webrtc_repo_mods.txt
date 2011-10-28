@@ -1,0 +1,11 @@
+Revving up to -r 839 in webrtc - for Mac
+
+Need to continue with our diff-mods to these files in rev
+./build/common.gypi
+./third_party/libjingle/source/talk/session/phone/channelmanager.cc
+./third_party_mods/libjingle/libjingle.gyp
+
+DELETING these change-files as they are FIXED for us.
+./src/modules/video_capture/main/source/video_capture_impl.h
+./src/voice_engine/main/interface/voe_audio_processing.h
+

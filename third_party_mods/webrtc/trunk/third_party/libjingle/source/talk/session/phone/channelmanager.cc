@@ -250,24 +250,24 @@ bool ChannelManager::Init() {
                         << " speaker: " << audio_out_device_
                         << " options: " << audio_options_;
       }
-      //if (!SetVideoOptions(camera_device_) && !camera_device_.empty()) {
-      //  LOG(LS_WARNING) << "Failed to SetVideoOptions with camera: "
-      //                  << camera_device_;
-      //}
-
+/*XVS      if (!SetVideoOptions(camera_device_) && !camera_device_.empty()) {
+        LOG(LS_WARNING) << "Failed to SetVideoOptions with camera: "
+                        << camera_device_;
+      }
+*/
       // Restore the user preferences.
       audio_in_device_ = preferred_audio_in_device;
       audio_out_device_ = preferred_audio_out_device;
       camera_device_ = preferred_camera_device;
 
       // Now apply the default video codec that has been set earlier.
-      //if (default_video_encoder_config_.max_codec.id != 0) {
-      //  SetDefaultVideoEncoderConfig(default_video_encoder_config_);
-      //}
+      if (default_video_encoder_config_.max_codec.id != 0) {
+        SetDefaultVideoEncoderConfig(default_video_encoder_config_);
+      }
       // And the local renderer.
-      //if (local_renderer_) {
-      //  SetLocalRenderer(local_renderer_);
-      //}
+      if (local_renderer_) {
+        SetLocalRenderer(local_renderer_);
+      }
     }
   }
   return initialized_;
@@ -313,6 +313,10 @@ VoiceChannel* ChannelManager::CreateVoiceChannel_w(
   VoiceChannel* voice_channel = new VoiceChannel(
       worker_thread_, media_engine_.get(), media_channel,
       session, content_name, rtcp);
+  if (!voice_channel->Init()) {
+    delete voice_channel;
+    return NULL;
+  }
   voice_channels_.push_back(voice_channel);
   return voice_channel;
 }
@@ -362,6 +366,10 @@ VideoChannel* ChannelManager::CreateVideoChannel_w(
   VideoChannel* video_channel = new VideoChannel(
       worker_thread_, media_engine_.get(), media_channel,
       session, content_name, rtcp, voice_channel);
+  if (!video_channel->Init()) {
+    delete video_channel;
+    return NULL;
+  }
   video_channels_.push_back(video_channel);
   return video_channel;
 }
