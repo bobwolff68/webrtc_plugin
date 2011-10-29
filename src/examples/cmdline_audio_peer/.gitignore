@@ -1,3 +1,11 @@
 /build/
 /*.target.mk
 /*.Makefile
+/bin/
+/CMakeFiles/
+/CMakeScripts/
+/cmdline_audio_peer.build/
+/cmdline_audio_peer.xcodeproj/
+/CMakeCache.txt
+/cmake_install.cmake
+/.DS_Store
