@@ -19,6 +19,10 @@ cd ../../..
 echo Resetting/Rebuilding project files...
 python trunk/build/gyp_chromium --depth=trunk ../../src/examples/cmdline_audio_peer/cmdline_audio_peer.gyp
 
+cd ../../src/examples/cmdline_audio_peer
+xcodebuild -project cmdline_audio_peer.xcodeproj -target cmdline_audio_peer
+cd ../../..
+
 echo third_party/webrtc/trunk contains webrtc.xcodeproj for XCode.
 echo NOTE: Be sure to MODERNIZE all projects.
 echo This can be done by selecting target 'All (webrtc project)' and
