@@ -20,7 +20,7 @@ class TestPeerConnectionObserver : public webrtc::PeerConnectionObserver
 {
 public:
     //Constructor and destructor
-    TestPeerConnectionObserver(TestPeerConnectionClient* pClient, ThreadSafeMessageQueue* pMsgQ);
+    TestPeerConnectionObserver(ThreadSafeMessageQueue* pMsgQ);
     ~TestPeerConnectionObserver();
     
     //Get functions
@@ -51,7 +51,6 @@ protected:
     virtual void ShareLocalAudioStream(void);
     
 protected:
-    TestPeerConnectionClient* m_pClient;
     ThreadSafeMessageQueue* m_pMsgQ;
     talk_base::scoped_ptr<webrtc::PeerConnection> m_pPeerConnection;
     talk_base::scoped_ptr<webrtc::PeerConnectionFactory> m_pPeerConnectionFactory;

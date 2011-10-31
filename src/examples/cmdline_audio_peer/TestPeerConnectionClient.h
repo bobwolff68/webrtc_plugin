@@ -16,6 +16,7 @@
 #include "talk/base/physicalsocketserver.h"
 
 typedef std::map<int, std::string> Peers;
+typedef std::map<std::string, std::string> ParsedCommand;
 
 class TestPeerConnectionObserver;
 
@@ -30,6 +31,9 @@ public:
     };
     
     TestPeerConnectionClient();
+    TestPeerConnectionClient(const std::string& peerName,
+                             const std::string& serverLocation,
+                             const int serverPort);
     ~TestPeerConnectionClient();
     
     int id() const;
@@ -42,10 +46,11 @@ public:
                  const std::string& client_name);
     bool SendToPeer(int peer_id, const std::string& message);
     bool SendHangUp(int peer_id);
-    bool IsSendingMessage();
-    
+    bool IsSendingMessage();    
     bool SignOut();
-    
+
+    bool ExecuteNextCommand(ParsedCommand& cmd);
+
     
 protected:
     void Close();
@@ -90,6 +95,11 @@ protected:
     Peers peers_;
     State state_;
     int my_id_;
+    
+protected:
+    std::string m_PeerName;
+    std::string m_ServerLocation;
+    int m_ServerPort;    
 };
 
 #endif

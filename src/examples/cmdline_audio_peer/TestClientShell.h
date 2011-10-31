@@ -42,7 +42,7 @@ private:
         {
             std::cout << GetPeerName() << "> " << std::flush;
             std::cin >> shellCmd;
-            m_pQueue->PostMessage(shellCmd);
+            //m_pQueue->PostMessage(shellCmd);
             
         } while(shellCmd != "signout");
    

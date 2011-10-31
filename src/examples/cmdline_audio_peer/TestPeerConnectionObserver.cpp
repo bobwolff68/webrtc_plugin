@@ -15,13 +15,12 @@
 #include "talk/base/common.h"
 #include "talk/p2p/client/basicportallocator.h"
 
-TestPeerConnectionObserver::TestPeerConnectionObserver(TestPeerConnectionClient* pClient,ThreadSafeMessageQueue* pMsgQ):
-m_pClient(pClient),
+TestPeerConnectionObserver::TestPeerConnectionObserver(ThreadSafeMessageQueue* pMsgQ):
 m_pMsgQ(pMsgQ),
 m_PeerId(-1),
 m_bAudioStreamShared(false)
 {
-    m_pClient->RegisterPeerConnectionObserver(this);
+    //m_pClient->RegisterPeerConnectionObserver(this);
 }
 
 TestPeerConnectionObserver::~TestPeerConnectionObserver()
@@ -114,7 +113,7 @@ void TestPeerConnectionObserver::DeletePeerConnection(void)
 
 void TestPeerConnectionObserver::Close(void)
 {
-    m_pClient->SignOut();
+    //m_pClient->SignOut();
     DeletePeerConnection();
 }
 
@@ -142,7 +141,7 @@ void TestPeerConnectionObserver::OnSignalingMessage(const std::string& msg)
     sstrm << m_PeerId;
     std::string peerMsg = sstrm.str() + "/";
     peerMsg += msg;
-    m_pMsgQ->PostMessage(peerMsg);
+    //m_pMsgQ->PostMessage(peerMsg);
 }
 
 void TestPeerConnectionObserver::OnAddStream(const std::string &streamId, bool video)
@@ -162,7 +161,7 @@ void TestPeerConnectionObserver::OnRemoveStream(const std::string &streamId, boo
               << streamId
               << std::endl;
     //m_pClient->SendHangUp(m_PeerId);
-    m_pMsgQ->PostMessage("hangup");
+    //m_pMsgQ->PostMessage("hangup");
     DeletePeerConnection();
 }
 
@@ -230,6 +229,6 @@ void TestPeerConnectionObserver::ShareLocalAudioStream(void)
 void TestPeerConnectionObserver::DisconnectFromCurrentPeer(void)
 {
     //m_pClient->SendHangUp(m_PeerId);
-    m_pMsgQ->PostMessage("hangup");
+    //m_pMsgQ->PostMessage("hangup");
     DeletePeerConnection();
 }

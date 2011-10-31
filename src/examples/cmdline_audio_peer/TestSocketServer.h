@@ -10,6 +10,7 @@
 #define TestPeerConnectionClient_TestSocketServer_h
 
 #include <deque>
+#include <map>
 #include <string>
 #include <pthread.h>
 #include "talk/base/thread.h"
@@ -19,17 +20,19 @@
 
 class ThreadSafeMessageQueue
 {
+public:
+    typedef std::map<std::string, std::string> ParsedCommand;
+    
 private:
-    std::deque<std::string> q;
+    std::deque<ParsedCommand*> cmdQ;
     pthread_mutex_t qMutex;
     
 public:
     ThreadSafeMessageQueue();
     ~ThreadSafeMessageQueue();
-    void PostMessage(const std::string& message);
-    const std::string GetNextMessage(void);
+    void PostMessage(ParsedCommand* pMsg);
+    ParsedCommand* GetNextMessage(void);
 };
-
 
 class TestSocketServer : public talk_base::PhysicalSocketServer
 {

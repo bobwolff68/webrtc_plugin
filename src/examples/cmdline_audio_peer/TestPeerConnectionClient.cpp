@@ -44,7 +44,10 @@ TestPeerConnectionClient::TestPeerConnectionClient():
 control_socket_(CreateClientSocket()),
 hanging_get_(CreateClientSocket()),
 state_(NOT_CONNECTED),
-my_id_(-1) 
+my_id_(-1),
+m_PeerName(GetPeerName()),
+m_ServerLocation(GetDefaultServerName()),
+m_ServerPort(kDefaultServerPort)
 {
     control_socket_->SignalCloseEvent.connect(this,&TestPeerConnectionClient::OnClose);
     hanging_get_->SignalCloseEvent.connect(this,&TestPeerConnectionClient::OnClose);
@@ -61,6 +64,126 @@ TestPeerConnectionClient::~TestPeerConnectionClient()
 int TestPeerConnectionClient::id() const 
 {
     return my_id_;
+}
+
+TestPeerConnectionClient::TestPeerConnectionClient(const std::string& peerName,
+                                                   const std::string& serverLocation,
+                                                   const int serverPort):
+control_socket_(CreateClientSocket()),
+hanging_get_(CreateClientSocket()),
+state_(NOT_CONNECTED),
+my_id_(-1),
+m_PeerName(peerName),
+m_ServerLocation(serverLocation),
+m_ServerPort(serverPort)
+{
+    control_socket_->SignalCloseEvent.connect(this,&TestPeerConnectionClient::OnClose);
+    hanging_get_->SignalCloseEvent.connect(this,&TestPeerConnectionClient::OnClose);
+    control_socket_->SignalConnectEvent.connect(this,&TestPeerConnectionClient::OnConnect);
+    hanging_get_->SignalConnectEvent.connect(this,&TestPeerConnectionClient::OnHangingGetConnect);
+    control_socket_->SignalReadEvent.connect(this,&TestPeerConnectionClient::OnRead);
+    hanging_get_->SignalReadEvent.connect(this,&TestPeerConnectionClient::OnHangingGetRead);
+}
+
+bool TestPeerConnectionClient::ExecuteNextCommand(ParsedCommand& cmd)
+{
+    bool bStatus = true;
+    ASSERT(false == cmd["command"].empty());
+        
+    if("signin" == cmd["command"] || "SIGNIN" == cmd["command"])
+    {
+        ASSERT(-1 == my_id_);
+        ASSERT(NOT_CONNECTED == state_);
+
+        if(NOT_CONNECTED != state_ || -1 < my_id_)
+        {
+            std::cout << "Error: Already signed in or in the process..." << std::endl;
+            return false;
+        }
+
+        if(false == cmd["server"].empty())
+        {
+            m_ServerLocation = cmd["server"];
+        }
+        
+        if(false == cmd["serverport"].empty())
+        {
+            sscanf(cmd["serverport"].c_str(),"%d",&m_ServerPort);
+        }
+        
+        std::cout << "Signing in..." << std::endl
+                  << "Server: " << m_ServerLocation << std::endl
+                  << "Port: " << m_ServerPort << std::endl;
+        
+        bStatus = Connect(m_ServerLocation, m_ServerPort, m_PeerName);
+    }
+    else if("signout" == cmd["command"] || "SIGNOUT" == cmd["command"])
+    {
+        ASSERT(-1 < my_id_);
+        ASSERT(CONNECTED == state_);
+        
+        if(CONNECTED != state_ || -1 == my_id_)
+        {
+            std::cout << "Error: Already signed out or in the process..." << std::endl;
+            return false;
+        }
+        
+        /* TODO: Check for outstanding calls and ask to hang up
+                 before attempting to sign out */
+        
+        bStatus = SignOut();
+    }
+    else if("list" == cmd["command"] || "LIST" == cmd["command"])
+    {
+        std::cout << "Online Peers:" << std::endl;
+        std::cout << "=============" << std::endl << std::endl;
+        
+        for(Peers::iterator it = peers_.begin();
+            it != peers_.end();
+            it++)
+        {
+            std::cout << it->second << std::endl;
+        }
+    }
+    else if("call" == cmd["command"] || "CALL" == cmd["command"])
+    {
+        ASSERT(CONNECTED == state_);
+        ASSERT(-1 < my_id_);
+        
+        if(CONNECTED != state_ || -1 == my_id_)
+        {
+            std::cout << "Error: Cannot call - not signed in yet..." << std::endl;
+            return false;
+        }
+        
+        for(Peers::iterator it = peers_.begin();
+            it != peers_.end();
+            it++)
+        {
+            bStatus = (it->second == cmd["peername"]);
+            if(true == bStatus)
+            {
+                std::cout << "Calling peer: " << it->second << std::endl;
+                m_pObserver->ConnectToPeer(it->first);
+                break;
+            }
+        }
+        
+        if(false == bStatus)
+        {
+            std::cout << "Cannot call - peer " << cmd["peername"]
+                      << " not online..." << std::endl;
+        }
+        
+    }
+    else if("hangup" == cmd["command"] || "HANGUP" == cmd["command"])
+    {
+        /* TODO: Check for an active call to hang up on */
+        
+        bStatus = true;
+    }
+        
+    return bStatus;
 }
 
 bool TestPeerConnectionClient::is_connected() const 
