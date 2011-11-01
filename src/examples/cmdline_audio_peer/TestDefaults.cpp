@@ -21,9 +21,9 @@
 const char kAudioLabel[] = "audio_label";
 const char kVideoLabel[] = "video_label";
 const char kStreamLabel[] = "stream_label";
-const uint16 kDefaultServerPort = 8888;
+const uint16 xkDefaultServerPort = 8888;
 
-std::string GetEnvVarOrDefault(const char* env_var_name,
+std::string xGetEnvVarOrDefault(const char* env_var_name,
                                const char* default_value)
 {
     std::string value;
@@ -37,22 +37,22 @@ std::string GetEnvVarOrDefault(const char* env_var_name,
     return value;
 }
 
-std::string GetPeerConnectionString()
+std::string xGetPeerConnectionString()
 {
-    return GetEnvVarOrDefault("WEBRTC_CONNECT", "STUN stun.l.google.com:19302");
+    return xGetEnvVarOrDefault("WEBRTC_CONNECT", "STUN stun.l.google.com:19302");
 }
 
-std::string GetDefaultServerName()
+std::string xGetDefaultServerName()
 {
-    return GetEnvVarOrDefault("WEBRTC_SERVER", "localhost");
+    return xGetEnvVarOrDefault("WEBRTC_SERVER", "localhost");
 }
 
-std::string GetPeerName()
+std::string xGetPeerName()
 {
     char computer_name[256];
     if (gethostname(computer_name, ARRAY_SIZE(computer_name)) != 0)
         strcpy(computer_name, "host");
-    std::string ret(GetEnvVarOrDefault("USERNAME", "user"));
+    std::string ret(xGetEnvVarOrDefault("USERNAME", "user"));
     ret += '@';
     ret += computer_name;
     return ret;

@@ -18,6 +18,9 @@
             'type': 'executable',
             'sources': [
                 'main.cpp',
+		'parsecmd.cpp',
+		'shell.cpp',
+		'shell.h',
                 'TestPeerConnectionClient.h',
                 'TestPeerConnectionClient.cpp',
                 'TestPeerConnectionObserver.h',
@@ -28,6 +31,7 @@
                 'TestSocketServer.cpp',
                 'TestClientShell.h',
                 'ThreadSingle.h',
+		'../../include/anyoption/anyoption.cpp',
             ],
             'dependencies': [
                 '../../../third_party/webrtc/trunk/third_party_mods/libjingle/libjingle.gyp:libjingle_app',
@@ -35,6 +39,7 @@
             'include_dirs': [
                 '../../../third_party/webrtc/trunk/third_party/libjingle/source',
                 '../../../third_party/webrtc/trunk/third_party_mods/libjingle/source',
+		'../../include',
             ],
           }, ], #targets
       }, ], #OS=="linux"
@@ -45,6 +50,9 @@
             'type': 'executable',
             'sources': [
                 'main.cpp',
+		'parsecmd.cpp',
+		'shell.cpp',
+		'shell.h',
                 'TestPeerConnectionClient.h',
                 'TestPeerConnectionClient.cpp',
                 'TestPeerConnectionObserver.h',
@@ -56,6 +64,7 @@
                 'TestClientShell.h',
                 'ThreadSingle.h',
                 '../../../third_party/webrtc/trunk/third_party/libjingle/source/talk/session/phone/devicemanager_mac.mm',
+		'../../include/anyoption/anyoption.cpp',
             ],
             'dependencies': [
                 '../../../third_party/webrtc/trunk/third_party_mods/libjingle/libjingle.gyp:libjingle_app',
@@ -63,6 +72,7 @@
             'include_dirs': [
                 '../../../third_party/webrtc/trunk/third_party/libjingle/source',
                 '../../../third_party/webrtc/trunk/third_party_mods/libjingle/source',
+		'../../include',
             ],
             'link_settings': {
                 'xcode_settings': {

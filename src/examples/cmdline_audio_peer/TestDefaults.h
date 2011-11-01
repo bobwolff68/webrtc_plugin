@@ -17,13 +17,13 @@
 extern const char kAudioLabel[];
 extern const char kVideoLabel[];
 extern const char kStreamLabel[];
-extern const uint16 kDefaultServerPort;
+extern const uint16 xkDefaultServerPort;
 
-std::string GetEnvVarOrDefault(const char* env_var_name,
+std::string xGetEnvVarOrDefault(const char* env_var_name,
                                const char* default_value);
-std::string GetPeerConnectionString();
-std::string GetDefaultServerName();
-std::string GetPeerName();
+std::string xGetPeerConnectionString();
+std::string xGetDefaultServerName();
+std::string xGetPeerName();
 
 
 #endif

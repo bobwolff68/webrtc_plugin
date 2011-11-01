@@ -22,34 +22,33 @@ ThreadSafeMessageQueue::~ThreadSafeMessageQueue()
     pthread_mutex_destroy(&qMutex);
 }
 
-void ThreadSafeMessageQueue::PostMessage(ParsedCommand* pMsg)
+void ThreadSafeMessageQueue::PostMessage(ParsedCommand& Msg)
 {
-    ASSERT(NULL != pMsg);
     int pthreadRet = pthread_mutex_lock(&qMutex);
     ASSERT(0 == pthreadRet);
     UNUSED(pthreadRet);
-    cmdQ.push_back(pMsg);
+    cmdQ.push_back(Msg);
     pthreadRet = pthread_mutex_unlock(&qMutex);
     ASSERT(0 == pthreadRet);
 }
 
-ThreadSafeMessageQueue::ParsedCommand* ThreadSafeMessageQueue::GetNextMessage(void)
+ThreadSafeMessageQueue::ParsedCommand ThreadSafeMessageQueue::GetNextMessage(void)
 {
-    ParsedCommand* pNextMsg = NULL;
+    ParsedCommand NextMsg;
     int pthreadRet = pthread_mutex_lock(&qMutex);
     ASSERT(0 == pthreadRet);
     UNUSED(pthreadRet);
     
     if(!cmdQ.empty())
     {
-        pNextMsg = cmdQ.front();
+        NextMsg = cmdQ.front();
         cmdQ.pop_front();
     }
     
     pthreadRet = pthread_mutex_unlock(&qMutex);
     ASSERT(0 == pthreadRet);
     
-    return pNextMsg;
+    return NextMsg;
 }
 
 TestSocketServer::TestSocketServer(ThreadSafeMessageQueue* pQueue):

@@ -13,11 +13,20 @@
 #include "TestSocketServer.h"
 #include "TestClientShell.h"
 
+extern bool parsecmd(int argc, char**argv);
+
 int main (int argc, const char * argv[])
 {
     talk_base::AutoThread auto_thread;
     talk_base::Thread* thread = talk_base::Thread::Current();
     ThreadSafeMessageQueue mq;
+    
+    if (!parsecmd(argc, (char**)argv))
+    {
+        std::cout << "Error parsing command line arguments." << endl;
+        exit(-1);
+    }
+    
     TestSocketServer socket_server(&mq);
     thread->set_socketserver(&socket_server);
     
@@ -26,7 +35,7 @@ int main (int argc, const char * argv[])
     socket_server.SetTestPeerConnectionClient(&testClient);
     
     //Create peer connection observer
-    TestPeerConnectionObserver testObserver(&testClient,&mq);
+    TestPeerConnectionObserver testObserver(&mq);
     
     //Run client shell
     TestClientShell shell(&mq);

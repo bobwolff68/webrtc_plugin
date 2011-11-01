@@ -19,6 +19,11 @@
 #include "talk/base/win32socketserver.h"
 #endif
 
+extern std::string peername;
+extern std::string mainserver;
+extern int mainserver_port;
+extern std::string stunserver;
+
 using talk_base::sprintfn;
 
 namespace {
@@ -45,9 +50,9 @@ control_socket_(CreateClientSocket()),
 hanging_get_(CreateClientSocket()),
 state_(NOT_CONNECTED),
 my_id_(-1),
-m_PeerName(GetPeerName()),
-m_ServerLocation(GetDefaultServerName()),
-m_ServerPort(kDefaultServerPort)
+m_PeerName(peername),
+m_ServerLocation(mainserver),
+m_ServerPort(mainserver_port)
 {
     control_socket_->SignalCloseEvent.connect(this,&TestPeerConnectionClient::OnClose);
     hanging_get_->SignalCloseEvent.connect(this,&TestPeerConnectionClient::OnClose);
@@ -212,7 +217,7 @@ bool TestPeerConnectionClient::Connect(const std::string& server, int port,
         return false;
     
     if (port <= 0)
-        port = kDefaultServerPort;
+        port = mainserver_port;
     
     server_address_.SetIP(server);
     server_address_.SetPort(port);

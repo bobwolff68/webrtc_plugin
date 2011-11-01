@@ -24,14 +24,14 @@ public:
     typedef std::map<std::string, std::string> ParsedCommand;
     
 private:
-    std::deque<ParsedCommand*> cmdQ;
+    std::deque<ParsedCommand> cmdQ;
     pthread_mutex_t qMutex;
     
 public:
     ThreadSafeMessageQueue();
     ~ThreadSafeMessageQueue();
-    void PostMessage(ParsedCommand* pMsg);
-    ParsedCommand* GetNextMessage(void);
+    void PostMessage(ParsedCommand& pMsg);
+    ParsedCommand GetNextMessage(void);
 };
 
 class TestSocketServer : public talk_base::PhysicalSocketServer
