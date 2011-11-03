@@ -19,6 +19,7 @@
 TestPeerConnectionObserver::TestPeerConnectionObserver(ThreadSafeMessageQueue* pMsgQ):
 m_pMsgQ(pMsgQ),
 m_PeerId(-1),
+m_PeerName(""),
 m_bAudioStreamShared(false)
 {
 
@@ -110,6 +111,7 @@ void TestPeerConnectionObserver::DeletePeerConnection(void)
     m_pWorkerThread.reset();
     m_pPeerConnectionFactory.reset();
     m_PeerId = -1;
+    m_PeerName = "";
 }
 
 void TestPeerConnectionObserver::OnError(void)
@@ -186,7 +188,7 @@ void TestPeerConnectionObserver::OnMessageFromRemotePeer(int peerId, const std::
     {
         if(IsConnectionActive())
         {
-            std::cout << "Remote end hung up... tearing down call..." << std::endl;
+            std::cout << m_PeerName << " hung up..." << std::endl;
             if(true == m_pPeerConnection->Close())
             {
                 DeletePeerConnection();
@@ -197,7 +199,7 @@ void TestPeerConnectionObserver::OnMessageFromRemotePeer(int peerId, const std::
             }
             else
             {
-                std::cerr << __FUNCTION__ << ": Call teardown failed..." << std::endl;
+                std::cerr << __FUNCTION__ << ": Connection teardown failed..." << std::endl;
                 return;
             }
         }
@@ -206,7 +208,7 @@ void TestPeerConnectionObserver::OnMessageFromRemotePeer(int peerId, const std::
     m_pPeerConnection->SignalingMessage(msg);
 }
 
-void TestPeerConnectionObserver::ConnectToPeer(int peerId)
+void TestPeerConnectionObserver::ConnectToPeer(int peerId, const std::string& peerName)
 {
     if(-1!=m_PeerId || NULL!=m_pPeerConnection.get())
     {
@@ -220,6 +222,7 @@ void TestPeerConnectionObserver::ConnectToPeer(int peerId)
     }
     
     m_PeerId = peerId;
+    m_PeerName = peerName;
     ShareLocalAudioStream();
 }
 

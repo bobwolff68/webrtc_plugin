@@ -28,7 +28,7 @@ public:
     
     //Class-specific functions
     virtual void OnMessageFromRemotePeer(int peerId, const std::string& msg);
-    virtual void ConnectToPeer(int peerId);
+    virtual void ConnectToPeer(int peerId, const std::string& peerName);
     virtual bool DisconnectFromCurrentPeer(void);
 
 protected:
@@ -52,6 +52,7 @@ protected:
     talk_base::scoped_ptr<webrtc::PeerConnectionFactory> m_pPeerConnectionFactory;
     talk_base::scoped_ptr<talk_base::Thread> m_pWorkerThread;
     int m_PeerId;
+    std::string m_PeerName;
     bool m_bAudioStreamShared;
 };
 

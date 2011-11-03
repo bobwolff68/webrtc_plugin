@@ -185,7 +185,7 @@ bool TestPeerConnectionClient::ExecuteNextCommand(void)
             {
                 std::cout << std::endl << "Calling peer: " << it->second << std::endl;
                 m_pObserver = new TestPeerConnectionObserver(m_pMsgQ);
-                m_pObserver->ConnectToPeer(it->first);
+                m_pObserver->ConnectToPeer(it->first,it->second);
                 break;
             }
         }
