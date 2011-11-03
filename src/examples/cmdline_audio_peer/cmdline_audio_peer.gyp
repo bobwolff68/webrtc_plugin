@@ -68,6 +68,10 @@
                 'TestClientShell.h',
                 'ThreadSingle.h',
                 '../../../third_party/webrtc/trunk/third_party/libjingle/source/talk/session/phone/devicemanager_mac.mm',
+                'ThreadSafeMessageQueue.h',
+                'ThreadSafeMessageQueue.cpp',
+                '../../include/rtc_common.h',
+                '../../include/anyoption/anyoption.h',
 		'../../include/anyoption/anyoption.cpp',
             ],
             'dependencies': [

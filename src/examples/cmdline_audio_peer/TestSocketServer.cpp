@@ -36,8 +36,8 @@ bool TestSocketServer::Wait(int cms, bool process_io)
     bool bStatus = m_pClient->ExecuteNextCommand();    
     if(false == bStatus)
     {
-        //error
-        ;
+        std::cout << "Quitting..." << std::endl;
+        m_pThread->Quit();
     }
     
     return talk_base::PhysicalSocketServer::Wait(1000, process_io);

@@ -231,6 +231,11 @@ bool TestPeerConnectionClient::ExecuteNextCommand(void)
         delete m_pObserver;
         m_pObserver = NULL;
     }
+    else if("quit" == cmd["command"] || "QUIT" == cmd["command"] ||
+            "exit" == cmd["command"] || "EXIT" == cmd["command"])
+    {
+        return false;
+    }
         
     return bStatus;
 }
