@@ -11,51 +11,11 @@
 #include "TestSocketServer.h"
 #include "TestDefaults.h"
 
-ThreadSafeMessageQueue::ThreadSafeMessageQueue()
+TestSocketServer::TestSocketServer():
+m_pThread(talk_base::Thread::Current()),
+m_pClient(NULL)
 {
-    pthread_mutex_init(&qMutex, NULL);
-}
 
-ThreadSafeMessageQueue::~ThreadSafeMessageQueue()
-{
-    
-    pthread_mutex_destroy(&qMutex);
-}
-
-void ThreadSafeMessageQueue::PostMessage(ParsedCommand& Msg)
-{
-    int pthreadRet = pthread_mutex_lock(&qMutex);
-    ASSERT(0 == pthreadRet);
-    UNUSED(pthreadRet);
-    cmdQ.push_back(Msg);
-    pthreadRet = pthread_mutex_unlock(&qMutex);
-    ASSERT(0 == pthreadRet);
-}
-
-ThreadSafeMessageQueue::ParsedCommand ThreadSafeMessageQueue::GetNextMessage(void)
-{
-    ParsedCommand NextMsg;
-    int pthreadRet = pthread_mutex_lock(&qMutex);
-    ASSERT(0 == pthreadRet);
-    UNUSED(pthreadRet);
-    
-    if(!cmdQ.empty())
-    {
-        NextMsg = cmdQ.front();
-        cmdQ.pop_front();
-    }
-    
-    pthreadRet = pthread_mutex_unlock(&qMutex);
-    ASSERT(0 == pthreadRet);
-    
-    return NextMsg;
-}
-
-TestSocketServer::TestSocketServer(ThreadSafeMessageQueue* pQueue):
-m_pQueue(pQueue)
-{
-    m_pThread = talk_base::Thread::Current();
-    m_pClient = NULL;
 }
 
 TestSocketServer::~TestSocketServer()
@@ -71,10 +31,14 @@ void TestSocketServer::SetTestPeerConnectionClient(TestPeerConnectionClient *pCl
 
 bool TestSocketServer::Wait(int cms, bool process_io)
 {
-    ASSERT(NULL != m_pQueue);
     ASSERT(NULL != m_pThread);
     
-    //Execute next command
+    bool bStatus = m_pClient->ExecuteNextCommand();    
+    if(false == bStatus)
+    {
+        //error
+        ;
+    }
     
     return talk_base::PhysicalSocketServer::Wait(1000, process_io);
 }

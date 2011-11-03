@@ -340,7 +340,8 @@ bool Shell::processCommand(string& cmd, string& subcmd)
 			return true;
 
 		if (cmd=="EXIT" || cmd=="QUIT")
-			exit(0);
+            return true;
+			//exit(0);
 
         if (cmd=="SIGNIN")
         {
@@ -392,6 +393,21 @@ bool Shell::processCommand(string& cmd, string& subcmd)
                 return true;
             }
             
+        }
+        
+        if(cmd=="LIST")
+        {
+            return true;
+        }
+        
+        if(cmd=="SIGNOUT")
+        {
+            return true;
+        }
+        
+        if(cmd=="HANGUP")
+        {
+            return true;
         }
 
 //	default:

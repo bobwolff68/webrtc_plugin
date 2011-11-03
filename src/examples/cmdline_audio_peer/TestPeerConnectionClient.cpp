@@ -10,6 +10,7 @@
 #include "TestPeerConnectionClient.h"
 #include "TestPeerConnectionObserver.h"
 #include "TestDefaults.h"
+#include "rtc_common.h"
 #include "talk/base/common.h"
 #include "talk/base/nethelpers.h"
 #include "talk/base/logging.h"
@@ -48,6 +49,8 @@ namespace {
 TestPeerConnectionClient::TestPeerConnectionClient(): 
 control_socket_(CreateClientSocket()),
 hanging_get_(CreateClientSocket()),
+m_pObserver(NULL),
+m_pMsgQ(NULL),
 state_(NOT_CONNECTED),
 my_id_(-1),
 m_PeerName(peername),
@@ -71,11 +74,14 @@ int TestPeerConnectionClient::id() const
     return my_id_;
 }
 
-TestPeerConnectionClient::TestPeerConnectionClient(const std::string& peerName,
+TestPeerConnectionClient::TestPeerConnectionClient(ThreadSafeMessageQueue* pMsgQ,
+                                                   const std::string& peerName,
                                                    const std::string& serverLocation,
                                                    const int serverPort):
 control_socket_(CreateClientSocket()),
 hanging_get_(CreateClientSocket()),
+m_pObserver(NULL),
+m_pMsgQ(pMsgQ),
 state_(NOT_CONNECTED),
 my_id_(-1),
 m_PeerName(peerName),
@@ -90,10 +96,15 @@ m_ServerPort(serverPort)
     hanging_get_->SignalReadEvent.connect(this,&TestPeerConnectionClient::OnHangingGetRead);
 }
 
-bool TestPeerConnectionClient::ExecuteNextCommand(ParsedCommand& cmd)
+bool TestPeerConnectionClient::ExecuteNextCommand(void)
 {
     bool bStatus = true;
-    ASSERT(false == cmd["command"].empty());
+    ParsedCommand cmd = m_pMsgQ->GetNextMessage();
+    
+    if(true == cmd["command"].empty())
+    {
+        return true;
+    }
         
     if("signin" == cmd["command"] || "SIGNIN" == cmd["command"])
     {
@@ -116,7 +127,7 @@ bool TestPeerConnectionClient::ExecuteNextCommand(ParsedCommand& cmd)
             sscanf(cmd["serverport"].c_str(),"%d",&m_ServerPort);
         }
         
-        std::cout << "Signing in..." << std::endl
+        std::cout << std::endl << "Signing in..." << std::endl
                   << "Server: " << m_ServerLocation << std::endl
                   << "Port: " << m_ServerPort << std::endl;
         
@@ -133,14 +144,17 @@ bool TestPeerConnectionClient::ExecuteNextCommand(ParsedCommand& cmd)
             return false;
         }
         
-        /* TODO: Check for outstanding calls and ask to hang up
-                 before attempting to sign out */
+        if(NULL != m_pObserver)
+        {
+            std::cerr << __FUNCTION__ << ": Cannot sign out, call in progress..." << std::endl;
+            return false;
+        }
         
         bStatus = SignOut();
     }
     else if("list" == cmd["command"] || "LIST" == cmd["command"])
     {
-        std::cout << "Online Peers:" << std::endl;
+        std::cout << std::endl << "Online Peers:" << std::endl;
         std::cout << "=============" << std::endl << std::endl;
         
         for(Peers::iterator it = peers_.begin();
@@ -161,6 +175,7 @@ bool TestPeerConnectionClient::ExecuteNextCommand(ParsedCommand& cmd)
             return false;
         }
         
+        cmd["peername"] = TOLOWERSTR(cmd["peername"]);
         for(Peers::iterator it = peers_.begin();
             it != peers_.end();
             it++)
@@ -168,7 +183,8 @@ bool TestPeerConnectionClient::ExecuteNextCommand(ParsedCommand& cmd)
             bStatus = (it->second == cmd["peername"]);
             if(true == bStatus)
             {
-                std::cout << "Calling peer: " << it->second << std::endl;
+                std::cout << std::endl << "Calling peer: " << it->second << std::endl;
+                m_pObserver = new TestPeerConnectionObserver(m_pMsgQ);
                 m_pObserver->ConnectToPeer(it->first);
                 break;
             }
@@ -181,11 +197,39 @@ bool TestPeerConnectionClient::ExecuteNextCommand(ParsedCommand& cmd)
         }
         
     }
+    else if("sendtopeer" == cmd["command"] || "SENDTOPEER" == cmd["command"])
+    {
+        std::stringstream sstrm;
+        int peerid;
+        
+        sstrm << cmd["peerid"];
+        sstrm >> peerid;
+        
+        std::cout << std::endl << "Sending to peer: " << peerid << std::endl;
+        std::cout << "Message: " << cmd["message"] << std::endl;
+        SendToPeer(peerid, cmd["message"]);
+    }
     else if("hangup" == cmd["command"] || "HANGUP" == cmd["command"])
     {
-        /* TODO: Check for an active call to hang up on */
-        
-        bStatus = true;
+        if(m_pObserver->IsConnectionActive())
+        {
+            bStatus = m_pObserver->DisconnectFromCurrentPeer();
+            if(true == bStatus)
+            {
+                delete m_pObserver;
+                m_pObserver = NULL;
+            }
+        }
+        else
+        {
+            std::cerr << __FUNCTION__ << ": No active call to hang up..." << std::endl;
+            return false;
+        }
+    }
+    else if("deleteobserver" == cmd["command"] || "DELETEOBSERVER" == cmd["command"])
+    {
+        delete m_pObserver;
+        m_pObserver = NULL;
     }
         
     return bStatus;
@@ -353,7 +397,11 @@ void TestPeerConnectionClient::OnHangingGetConnect(talk_base::AsyncSocket* socke
 
 void TestPeerConnectionClient::OnMessageFromPeer(int peer_id,const std::string& message)
 {
-    std::cout << "Peer(" << peer_id << "): " << message << std::endl;
+    if(NULL == m_pObserver)
+    {
+        m_pObserver = new TestPeerConnectionObserver(m_pMsgQ);
+    }
+    
     m_pObserver->OnMessageFromRemotePeer(peer_id, message);
 }
 
@@ -457,7 +505,7 @@ void TestPeerConnectionClient::OnRead(talk_base::AsyncSocket* socket)
                         if (ParseEntry(control_data_.substr(pos, eol - pos), &name, &id,
                                        &connected) && id != my_id_) {
                             peers_[id] = name;
-                            std::cout << "PeerId(" << id << "): Online" << std::endl;
+                            std::cout << "Peer["<< name << "] Online..." << std::endl;
                         }
                         pos = eol + 1;
                     }
@@ -506,10 +554,10 @@ void TestPeerConnectionClient::OnHangingGetRead(talk_base::AsyncSocket* socket)
                                &connected)) {
                     if (connected) {
                         peers_[id] = name;
-                        std::cout << "Peer(" << id << "): Online" << std::endl;
+                        std::cout << "Peer[" << name << "] Online..." << std::endl;
                     } else {
                         peers_.erase(id);
-                        std::cout << "Peer(" << id << "): Offline" << std::endl;
+                        std::cout << "Peer[" << name << "]: Offline..." << std::endl;
                     }
                 }
             } else {

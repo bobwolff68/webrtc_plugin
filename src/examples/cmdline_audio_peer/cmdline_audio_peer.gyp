@@ -31,6 +31,10 @@
                 'TestSocketServer.cpp',
                 'TestClientShell.h',
                 'ThreadSingle.h',
+                'ThreadSafeMessageQueue.h',
+                'ThreadSafeMessageQueue.cpp',
+                '../../include/rtc_common.h',
+                '../../include/anyoption/anyoption.h',
 		'../../include/anyoption/anyoption.cpp',
             ],
             'dependencies': [

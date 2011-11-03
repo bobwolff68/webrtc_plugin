@@ -83,7 +83,17 @@ bool parsecmd(int argc, char**argv)
     if (opt->getValue("server"))
     {
         cout << "New main server is " << opt->getValue("server") << endl;
-        mainserver = opt->getValue("server");
+        
+        string serverloc = opt->getValue("server");
+        size_t colonpos = serverloc.find(':');
+        mainserver = serverloc.substr(0,colonpos);
+        
+        if(colonpos != string::npos)
+        {
+            stringstream sstrm;
+            sstrm << serverloc.substr(colonpos+1);
+            sstrm >> mainserver_port;
+        }
     }
 
     if (opt->getValue("stun"))

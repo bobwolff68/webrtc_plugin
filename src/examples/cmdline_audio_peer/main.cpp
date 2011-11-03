@@ -13,6 +13,9 @@
 #include "TestSocketServer.h"
 #include "TestClientShell.h"
 
+extern std::string peername;
+extern std::string mainserver;
+extern int mainserver_port;
 extern bool parsecmd(int argc, char**argv);
 
 int main (int argc, const char * argv[])
@@ -27,15 +30,15 @@ int main (int argc, const char * argv[])
         exit(-1);
     }
     
-    TestSocketServer socket_server(&mq);
+    TestSocketServer socket_server;
     thread->set_socketserver(&socket_server);
     
     //Declare client only after set_socketserver()
-    TestPeerConnectionClient testClient;
+    TestPeerConnectionClient testClient(&mq, peername, mainserver, mainserver_port);
     socket_server.SetTestPeerConnectionClient(&testClient);
     
     //Create peer connection observer
-    TestPeerConnectionObserver testObserver(&mq);
+    //TestPeerConnectionObserver testObserver(&testClient, &mq);
     
     //Run client shell
     TestClientShell shell(&mq);

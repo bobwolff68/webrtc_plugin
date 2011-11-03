@@ -12,6 +12,7 @@
 #include "TestPeerConnectionObserver.h"
 #include "TestPeerConnectionClient.h"
 #include "TestSocketServer.h"
+#include "rtc_common.h"
 #include "talk/base/common.h"
 #include "talk/p2p/client/basicportallocator.h"
 
@@ -20,7 +21,7 @@ m_pMsgQ(pMsgQ),
 m_PeerId(-1),
 m_bAudioStreamShared(false)
 {
-    //m_pClient->RegisterPeerConnectionObserver(this);
+
 }
 
 TestPeerConnectionObserver::~TestPeerConnectionObserver()
@@ -111,12 +112,6 @@ void TestPeerConnectionObserver::DeletePeerConnection(void)
     m_PeerId = -1;
 }
 
-void TestPeerConnectionObserver::Close(void)
-{
-    //m_pClient->SignOut();
-    DeletePeerConnection();
-}
-
 void TestPeerConnectionObserver::OnError(void)
 {
     std::cerr << __FUNCTION__ << ": Unknown error" << std::endl;
@@ -132,16 +127,14 @@ void TestPeerConnectionObserver::OnSignalingMessage(const std::string& msg)
         return;
     }
     
-    //std::cout << "PeerConnection says: " << msg << std::endl;
-    //std::cout << "Forwarding to peer: " << m_PeerId << std::endl;
-    
     //Send message from peer connection to destination peer
-    //m_pClient->SendToPeer(m_PeerId, msg);
+    ParsedCommand sendCmd;
     std::stringstream sstrm;
     sstrm << m_PeerId;
-    std::string peerMsg = sstrm.str() + "/";
-    peerMsg += msg;
-    //m_pMsgQ->PostMessage(peerMsg);
+    sendCmd["command"] = "sendtopeer";
+    sendCmd["message"] = msg;
+    sendCmd["peerid"] = sstrm.str();
+    m_pMsgQ->PostMessage(sendCmd);
 }
 
 void TestPeerConnectionObserver::OnAddStream(const std::string &streamId, bool video)
@@ -160,9 +153,8 @@ void TestPeerConnectionObserver::OnRemoveStream(const std::string &streamId, boo
     std::cout << "Peerconnection removed remote stream: " 
               << streamId
               << std::endl;
-    //m_pClient->SendHangUp(m_PeerId);
-    //m_pMsgQ->PostMessage("hangup");
-    DeletePeerConnection();
+
+    m_bAudioStreamShared = false;
 }
 
 void TestPeerConnectionObserver::OnMessageFromRemotePeer(int peerId, const std::string& msg)
@@ -170,21 +162,17 @@ void TestPeerConnectionObserver::OnMessageFromRemotePeer(int peerId, const std::
     ASSERT(m_PeerId==peerId || -1==m_PeerId);
     ASSERT(false == msg.empty());
     
-    if(msg == "hi there")
-    {
-        return;
-    }
-    
     if(NULL == m_pPeerConnection.get())
     {
         ASSERT(-1 == m_PeerId);
         m_PeerId = peerId;
         
-        std::cout << "Call request from peer: " << peerId << std::endl;
-        std::cout << "Offer: " << msg << std::endl;
+        std::cout << "From peer: " << peerId << std::endl;
+        std::cout << "Message: " << msg << std::endl;
 
         if(false == InitPeerConnection())
         {
+            std::cerr << __FUNCTION__ << ": Failed to init peer connection..." << std::endl;
             return;
         }
     }
@@ -193,6 +181,26 @@ void TestPeerConnectionObserver::OnMessageFromRemotePeer(int peerId, const std::
         ASSERT(-1 != m_PeerId);
         std::cerr << __FUNCTION__ << ": Local peer busy..." << std::endl;
         return;
+    }
+    else if(msg == "bye")
+    {
+        if(IsConnectionActive())
+        {
+            std::cout << "Remote end hung up... tearing down call..." << std::endl;
+            if(true == m_pPeerConnection->Close())
+            {
+                DeletePeerConnection();
+                ParsedCommand cmd;
+                cmd["command"] = "deleteobserver";
+                m_pMsgQ->PostMessage(cmd);
+                return;
+            }
+            else
+            {
+                std::cerr << __FUNCTION__ << ": Call teardown failed..." << std::endl;
+                return;
+            }
+        }
     }
 
     m_pPeerConnection->SignalingMessage(msg);
@@ -226,9 +234,22 @@ void TestPeerConnectionObserver::ShareLocalAudioStream(void)
     }
 }
 
-void TestPeerConnectionObserver::DisconnectFromCurrentPeer(void)
+bool TestPeerConnectionObserver::DisconnectFromCurrentPeer(void)
 {
-    //m_pClient->SendHangUp(m_PeerId);
-    //m_pMsgQ->PostMessage("hangup");
-    DeletePeerConnection();
+    std::cout << "Hanging up..." << std::endl;
+    int remotePeerId = m_PeerId;
+    
+    if(true == m_pPeerConnection->Close())
+    {
+        DeletePeerConnection();
+        ParsedCommand cmd;
+        cmd["command"] = "sendtopeer";
+        cmd["peerid"] = ToString(remotePeerId);
+        cmd["message"] = "bye";
+        m_pMsgQ->PostMessage(cmd);
+        return true;
+    }
+
+    std::cerr << __FUNCTION__ << ": Peer connection close error..." << std::endl;
+    return false;
 }

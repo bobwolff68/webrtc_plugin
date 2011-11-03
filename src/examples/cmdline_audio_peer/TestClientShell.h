@@ -53,9 +53,9 @@ private:
                 m_pQueue->PostMessage(cmdshell.getPairs());
         } while(cmd_ok && !bBreakReceived);
    
-        map<std::string, std::string> exitpairs;
+        /*map<std::string, std::string> exitpairs;
         exitpairs["command"] = "QUIT";
-        m_pQueue->PostMessage(exitpairs);
+        m_pQueue->PostMessage(exitpairs);*/
         
 //        std::cout << "Exiting Shell Thread - workerBee()" << endl;
         return 0;
