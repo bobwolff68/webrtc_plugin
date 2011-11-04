@@ -26,6 +26,10 @@ public:
     //Get functions
     bool IsConnectionActive(void) const;
     
+    //Set functions
+    void SetPeerId(int peerId) { m_PeerId = peerId; }
+    void SetPeerName(const std::string& peerName) { m_PeerName = peerName; }
+    
     //Class-specific functions
     virtual void OnMessageFromRemotePeer(int peerId, const std::string& msg);
     virtual void ConnectToPeer(int peerId, const std::string& peerName);

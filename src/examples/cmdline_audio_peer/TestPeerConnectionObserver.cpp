@@ -121,15 +121,6 @@ void TestPeerConnectionObserver::OnError(void)
 
 void TestPeerConnectionObserver::OnSignalingMessage(const std::string& msg)
 {
-    if(-1 == m_PeerId)
-    {
-        std::cerr << __FUNCTION__ 
-                  << ": Not connected to any peer yet"
-                  << std::endl;
-        return;
-    }
-    
-    //Send message from peer connection to destination peer
     ParsedCommand sendCmd;
     std::stringstream sstrm;
     sstrm << m_PeerId;
@@ -161,47 +152,37 @@ void TestPeerConnectionObserver::OnRemoveStream(const std::string &streamId, boo
 
 void TestPeerConnectionObserver::OnMessageFromRemotePeer(int peerId, const std::string& msg)
 {
-    ASSERT(m_PeerId==peerId || -1==m_PeerId);
-    ASSERT(false == msg.empty());
-    
-    if(NULL == m_pPeerConnection.get())
-    {
-        ASSERT(-1 == m_PeerId);
-        m_PeerId = peerId;
-        
-        std::cout << "From peer: " << peerId << std::endl;
-        std::cout << "Message: " << msg << std::endl;
-
-        if(false == InitPeerConnection())
-        {
-            std::cerr << __FUNCTION__ << ": Failed to init peer connection..." << std::endl;
-            return;
-        }
-    }
-    else if(peerId != m_PeerId)
-    {
-        ASSERT(-1 != m_PeerId);
-        std::cerr << __FUNCTION__ << ": Local peer busy..." << std::endl;
-        return;
-    }
-    else if(msg == "bye")
+    if(msg == "bye")
     {
         if(IsConnectionActive())
         {
             std::cout << m_PeerName << " hung up..." << std::endl;
+            int peerId = m_PeerId;
             if(true == m_pPeerConnection->Close())
             {
                 DeletePeerConnection();
                 ParsedCommand cmd;
                 cmd["command"] = "deleteobserver";
+                cmd["peerid"] = ToString(peerId);
                 m_pMsgQ->PostMessage(cmd);
-                return;
             }
             else
             {
                 std::cerr << __FUNCTION__ << ": Connection teardown failed..." << std::endl;
-                return;
             }
+        }
+        
+        return;
+    }
+    
+    if(NULL == m_pPeerConnection.get())
+    {
+        std::cout << m_PeerName << " on the line..." << std::endl;
+        
+        if(false == InitPeerConnection())
+        {
+            std::cerr << __FUNCTION__ << ": Failed to init peer connection..." << std::endl;
+            return;
         }
     }
 
@@ -210,7 +191,7 @@ void TestPeerConnectionObserver::OnMessageFromRemotePeer(int peerId, const std::
 
 void TestPeerConnectionObserver::ConnectToPeer(int peerId, const std::string& peerName)
 {
-    if(-1!=m_PeerId || NULL!=m_pPeerConnection.get())
+    if(NULL != m_pPeerConnection.get())
     {
         std::cerr << __FUNCTION__ << ": Local peer busy..." << std::endl;
         return;

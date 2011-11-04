@@ -40,5 +40,5 @@ bool TestSocketServer::Wait(int cms, bool process_io)
         m_pThread->Quit();
     }
     
-    return talk_base::PhysicalSocketServer::Wait(1000, process_io);
+    return talk_base::PhysicalSocketServer::Wait(100, process_io);
 }

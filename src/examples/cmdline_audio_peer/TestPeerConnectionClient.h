@@ -12,6 +12,7 @@
 #include <map>
 #include <string>
 #include "ThreadSafeMessageQueue.h"
+#include "Call.h"
 #include "talk/base/sigslot.h"
 #include "talk/base/scoped_ptr.h"
 #include "talk/base/physicalsocketserver.h"
@@ -31,7 +32,6 @@ public:
         SIGNING_OUT,
     };
     
-    TestPeerConnectionClient();
     TestPeerConnectionClient(ThreadSafeMessageQueue* pMsgQ,
                              const std::string& peerName,
                              const std::string& serverLocation,
@@ -41,13 +41,12 @@ public:
     int id() const;
     bool is_connected() const;
     const Peers& peers() const;
-    TestPeerConnectionObserver* GetPeerConnectionObserver(void) const;
+    //TestPeerConnectionObserver* GetPeerConnectionObserver(void) const;
     
-    void RegisterPeerConnectionObserver(TestPeerConnectionObserver* pObserver);
+    //void RegisterPeerConnectionObserver(TestPeerConnectionObserver* pObserver);
     bool Connect(const std::string& server, int port,
                  const std::string& client_name);
     bool SendToPeer(int peer_id, const std::string& message);
-    bool SendHangUp(int peer_id);
     bool IsSendingMessage();    
     bool SignOut();
 
@@ -93,7 +92,8 @@ protected:
     std::string onconnect_data_;
     std::string control_data_;
     std::string notification_data_;
-    TestPeerConnectionObserver* m_pObserver;
+    //TestPeerConnectionObserver* m_pObserver;
+    Call* m_pCall;
     ThreadSafeMessageQueue* m_pMsgQ;
     Peers peers_;
     State state_;
