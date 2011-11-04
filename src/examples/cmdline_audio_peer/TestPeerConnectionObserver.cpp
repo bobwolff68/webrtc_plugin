@@ -171,11 +171,15 @@ void TestPeerConnectionObserver::OnMessageFromRemotePeer(int peerId, const std::
                 std::cerr << __FUNCTION__ << ": Connection teardown failed..." << std::endl;
             }
         }
+        else
+        {
+            std::cerr << __FUNCTION__ << ": Peerconnection already deleted..." << std::endl;
+        }
         
         return;
     }
     
-    if(NULL == m_pPeerConnection.get())
+    if(false == IsConnectionActive())
     {
         std::cout << m_PeerName << " on the line..." << std::endl;
         

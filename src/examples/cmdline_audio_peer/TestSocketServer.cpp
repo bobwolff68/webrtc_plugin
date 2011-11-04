@@ -33,8 +33,10 @@ bool TestSocketServer::Wait(int cms, bool process_io)
 {
     ASSERT(NULL != m_pThread);
     
-    bool bStatus = m_pClient->ExecuteNextCommand();    
-    if(false == bStatus)
+    bool bQuitCommand = false;
+    bool bStatus = m_pClient->ExecuteNextCommand(bQuitCommand);    
+    
+    if(true == bQuitCommand && true == bStatus)
     {
         std::cout << "Quitting..." << std::endl;
         m_pThread->Quit();

@@ -323,10 +323,11 @@ bool Shell::processCommand(string& cmd, string& subcmd)
             << "STUN <stun-name:portnum>   (sets the stun server - only valid while signed OUT." << endl
             << endl
             << "LIST        (list all logged-in peers)" << endl
+            << "CALLLIST    (list of peers on the current call)" << endl
             << endl
-            << "HANGUP" << endl
+            << "HANGUP <peername>" << endl
             << endl
-            << "CALL peer          - Implies 'adding a person' to an existing call as well as" << endl
+            << "CALL <peername>          - Implies 'adding a person' to an existing call as well as" << endl
             << "                     initiating a call if one is not in progress." << endl
             << endl
             << "HELP|?" << endl
@@ -400,6 +401,11 @@ bool Shell::processCommand(string& cmd, string& subcmd)
             return true;
         }
         
+        if(cmd=="CALLLIST")
+        {
+            return true;
+        }
+        
         if(cmd=="SIGNOUT")
         {
             return true;
@@ -407,7 +413,14 @@ bool Shell::processCommand(string& cmd, string& subcmd)
         
         if(cmd=="HANGUP")
         {
-            return true;
+            if(subcmd != "")
+            {
+                namevalues["peername"] = subcmd;
+                return true;
+            }
+            
+            cout << "No peer specified for hangup" << endl;
+            return false;
         }
 
 //	default:

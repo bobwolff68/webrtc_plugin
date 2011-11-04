@@ -7,6 +7,7 @@
 //
 
 #include <iostream>
+#include <unistd.h>
 #include "TestPeerConnectionClient.h"
 #include "TestDefaults.h"
 #include "rtc_common.h"
@@ -76,9 +77,11 @@ m_ServerPort(serverPort)
     hanging_get_->SignalReadEvent.connect(this,&TestPeerConnectionClient::OnHangingGetRead);
 }
 
-bool TestPeerConnectionClient::ExecuteNextCommand(void)
+bool TestPeerConnectionClient::ExecuteNextCommand(bool& bQuitCommand)
 {
     bool bStatus = true;
+    
+    bQuitCommand = false;
     ParsedCommand cmd = m_pMsgQ->GetNextMessage();
     
     if(true == cmd["command"].empty())
@@ -153,6 +156,10 @@ bool TestPeerConnectionClient::ExecuteNextCommand(void)
             std::cout << it->second << std::endl;
         }
     }
+    else if("calllist" == cmd["command"] || "CALLLIST" == cmd["command"])
+    {
+        m_pCall->ListParticipants();
+    }
     else if("call" == cmd["command"] || "CALL" == cmd["command"])
     {
         ASSERT(CONNECTED == state_);
@@ -164,7 +171,9 @@ bool TestPeerConnectionClient::ExecuteNextCommand(void)
             return false;
         }
         
+        bStatus = false;
         cmd["peername"] = TOLOWERSTR(cmd["peername"]);
+        
         for(Peers::iterator it = peers_.begin();
             it != peers_.end();
             it++)
@@ -207,7 +216,20 @@ bool TestPeerConnectionClient::ExecuteNextCommand(void)
     {
         if(true == m_pCall->IsActive())
         {
-            bStatus = m_pCall->Hangup();
+            bStatus = false;            
+            cmd["peername"] = TOLOWERSTR(cmd["peername"]);
+
+            for(Peers::iterator it = peers_.begin();
+                it != peers_.end();
+                it++)
+            {
+                if(cmd["peername"] == it->second)
+                {
+                    std::cout << "Hanging up on " << it->second << "..." << std::endl;
+                    bStatus = m_pCall->RemoveParticipant(it->first, false);
+                    break;
+                }
+            }
             
             if(false == bStatus)
             {
@@ -235,7 +257,17 @@ bool TestPeerConnectionClient::ExecuteNextCommand(void)
     else if("quit" == cmd["command"] || "QUIT" == cmd["command"] ||
             "exit" == cmd["command"] || "EXIT" == cmd["command"])
     {
-        return false;
+        bQuitCommand = true;
+        
+        if(is_connected())
+        {
+            std::cerr << __FUNCTION__ << ": Cannot quit - still signed in..." << std::endl;
+            bStatus = false;
+        }
+        else
+        {
+            bStatus = true;
+        }
     }
         
     return bStatus;
@@ -316,12 +348,6 @@ bool TestPeerConnectionClient::SendToPeer(int peer_id, const std::string& messag
     onconnect_data_ = headers;
     onconnect_data_ += message;
     return ConnectControlSocket();
-}
-
-bool TestPeerConnectionClient::IsSendingMessage()
-{
-    return state_ == CONNECTED &&
-    control_socket_->GetState() != talk_base::Socket::CS_CLOSED;
 }
 
 bool TestPeerConnectionClient::SignOut() 

@@ -71,11 +71,15 @@ bool Call::RemoveParticipant(int peerId, bool bRemoteHangup)
         m_Participants.erase(peerId);
         ListParticipants();
     }
+    else
+    {
+        std::cerr << __FUNCTION__ << ": DisconnectFromCurrentPeer() error..." << std::endl;
+    }
     
     return bStatus;
 }
 
-bool Call::Hangup(void)
+/*bool Call::Hangup(void)
 {
     bool bStatus = false;
     
@@ -88,11 +92,11 @@ bool Call::Hangup(void)
         {
             std::cerr << __FUNCTION__ << ": Error removing participant..." << std::endl;
             break;
-        }
+        }        
     }
     
     return bStatus;
-}
+}*/
 
 bool Call::IsActive(void) const
 {

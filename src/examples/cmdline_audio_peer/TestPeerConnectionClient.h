@@ -41,16 +41,13 @@ public:
     int id() const;
     bool is_connected() const;
     const Peers& peers() const;
-    //TestPeerConnectionObserver* GetPeerConnectionObserver(void) const;
     
-    //void RegisterPeerConnectionObserver(TestPeerConnectionObserver* pObserver);
     bool Connect(const std::string& server, int port,
                  const std::string& client_name);
     bool SendToPeer(int peer_id, const std::string& message);
-    bool IsSendingMessage();    
     bool SignOut();
 
-    bool ExecuteNextCommand(void);
+    bool ExecuteNextCommand(bool& bQuitCommand);
 
     
 protected:
