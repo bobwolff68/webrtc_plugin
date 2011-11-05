@@ -21,7 +21,7 @@ class TestPeerConnectionObserver : public webrtc::PeerConnectionObserver
 public:
     //Constructor and destructor
     TestPeerConnectionObserver(ThreadSafeMessageQueue* pMsgQ);
-    ~TestPeerConnectionObserver();
+    virtual ~TestPeerConnectionObserver();
     
     //Get functions
     bool IsConnectionActive(void) const;

@@ -36,7 +36,7 @@ public:
                              const std::string& peerName,
                              const std::string& serverLocation,
                              const int serverPort);
-    ~TestPeerConnectionClient();
+    virtual ~TestPeerConnectionClient();
     
     int id() const;
     bool is_connected() const;
