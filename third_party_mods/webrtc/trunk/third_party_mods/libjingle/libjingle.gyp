@@ -649,6 +649,8 @@
             '<(libjingle_orig)/source/talk/session/phone/channel.cc',
             '<(libjingle_orig)/source/talk/session/phone/channel.h',
             '<(libjingle_orig)/source/talk/session/phone/mediasession.cc',
+            '<(libjingle_orig)/source/talk/session/phone/mediasession.h',
+            '<(libjingle_orig)/source/talk/session/phone/sourceparams.h',            
           ],
         }], # peer_connection_dev
       ],  # conditions
@@ -716,20 +718,17 @@
             '<(libjingle_mods)/source/talk/app/webrtc_dev/peerconnection.h',
             '<(libjingle_mods)/source/talk/app/webrtc_dev/peerconnectionimpl.cc',
             '<(libjingle_mods)/source/talk/app/webrtc_dev/peerconnectionimpl.h',
-            '<(libjingle_mods)/source/talk/app/webrtc_dev/peerconnectionmanagerimpl.cc',
-            '<(libjingle_mods)/source/talk/app/webrtc_dev/peerconnectionmanagerimpl.h',
+            '<(libjingle_mods)/source/talk/app/webrtc_dev/peerconnectionfactoryimpl.cc',
+            '<(libjingle_mods)/source/talk/app/webrtc_dev/peerconnectionfactoryimpl.h',
             '<(libjingle_mods)/source/talk/app/webrtc_dev/peerconnectionmessage.cc',
             '<(libjingle_mods)/source/talk/app/webrtc_dev/peerconnectionmessage.h',
             '<(libjingle_mods)/source/talk/app/webrtc_dev/peerconnectionsignaling.cc',
             '<(libjingle_mods)/source/talk/app/webrtc_dev/peerconnectionsignaling.h',
-            
             '<(libjingle_mods)/source/talk/app/webrtc_dev/sessiondescriptionprovider.h'
             '<(libjingle_mods)/source/talk/app/webrtc_dev/streamcollectionimpl.h',            
             '<(libjingle_mods)/source/talk/app/webrtc_dev/videorendererimpl.cc',
             '<(libjingle_mods)/source/talk/app/webrtc_dev/videotrackimpl.cc',
             '<(libjingle_mods)/source/talk/app/webrtc_dev/videotrackimpl.h',
-            '<(libjingle_mods)/source/talk/app/webrtc_dev/webrtc_devicemanager.h',
-            '<(libjingle_mods)/source/talk/app/webrtc_dev/webrtc_devicemanager.cc',
             '<(libjingle_mods)/source/talk/app/webrtc_dev/webrtcjson.cc',
             '<(libjingle_mods)/source/talk/app/webrtc_dev/webrtcjson.h',
             '<(libjingle_mods)/source/talk/app/webrtc_dev/webrtcsessionobserver',
@@ -776,12 +775,14 @@
             }],
           ], #conditions             
           'sources': [
+            '<(libjingle_mods)/source/talk/app/webrtc_dev/test/filevideocapturemodule.cc',
             '<(libjingle_mods)/source/talk/app/webrtc_dev/mediastream_unittest.cc',
-            '<(libjingle_mods)/source/talk/app/webrtc_dev/mediastreamhandler_unittest.cc',                       
-            '<(libjingle_mods)/source/talk/app/webrtc_dev/peerconnection_unittest.cc',
+            '<(libjingle_mods)/source/talk/app/webrtc_dev/mediastreamhandler_unittest.cc', 
+            # // TODO (henrike): Re add when there is no dependency to foreman.yuv            
+            #'<(libjingle_mods)/source/talk/app/webrtc_dev/peerconnection_unittest.cc',
             '<(libjingle_mods)/source/talk/app/webrtc_dev/peerconnection_unittests.cc',
             '<(libjingle_mods)/source/talk/app/webrtc_dev/peerconnectionimpl_unittest.cc',
-            '<(libjingle_mods)/source/talk/app/webrtc_dev/peerconnectionmanager_unittest.cc',
+            '<(libjingle_mods)/source/talk/app/webrtc_dev/peerconnectionfactory_unittest.cc',
             '<(libjingle_mods)/source/talk/app/webrtc_dev/peerconnectionmessage_unittest.cc',
             '<(libjingle_mods)/source/talk/app/webrtc_dev/peerconnectionsignaling_unittest.cc',
             '<(libjingle_mods)/source/talk/app/webrtc_dev/webrtcsession_unittest.cc',

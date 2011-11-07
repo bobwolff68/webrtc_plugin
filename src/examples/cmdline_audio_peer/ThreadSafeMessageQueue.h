@@ -25,7 +25,7 @@ private:
     
 public:
     ThreadSafeMessageQueue();
-    ~ThreadSafeMessageQueue();
+    virtual ~ThreadSafeMessageQueue();
     void PostMessage(ParsedCommand& msg);
     ParsedCommand GetNextMessage(void);
 };

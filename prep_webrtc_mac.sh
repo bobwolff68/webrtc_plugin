@@ -6,18 +6,20 @@ cd third_party/webrtc
 
 echo Getting webrtc from its repo into third_party/webrtc
 gclient config http://webrtc.googlecode.com/svn/trunk
-gclient sync -r 839 --force
+gclient sync -r 888 --force
 
 #echo Replacing standard files with our modified versions from third_party_mods
 cp -R ../../third_party_mods/webrtc ../../third_party
 # patch up the libsrtp by config'ing it in preparation for later build steps.
+# Only necessary (still safe though) when NOT copying full-blown third_party_mods (like when up-revving)
+cp -R ../../third_party_mods/webrtc/trunk/third_party/libsrtp ../../third_party/webrtc/trunk/third_party/
 cd trunk/third_party/libsrtp
 ./configure CFLAGS="-m32 -arch i386" LDFLAGS="-m32 -arch i386"
 make
 cd ../../..
 
 echo Resetting/Rebuilding project files...
-python trunk/build/gyp_chromium --depth=trunk ../../src/examples/cmdline_audio_peer/cmdline_audio_peer.gyp
+python trunk/build/gyp_chromium --depth=trunk ../../src/examples/cmdline_audio_peer/cmdline_audio_peer.gyp -Dclang=1
 
 cd ../../src/examples/cmdline_audio_peer
 xcodebuild -project cmdline_audio_peer.xcodeproj -target cmdline_audio_peer
