@@ -110,6 +110,11 @@ bool TestPeerConnectionClient::ExecuteNextCommand(bool& bQuitCommand)
             sscanf(cmd["serverport"].c_str(),"%d",&m_ServerPort);
         }
         
+        if(false == cmd["peername"].empty())
+        {
+            m_PeerName = cmd["peername"];
+        }
+        
         std::cout << std::endl << "Signing in..." << std::endl
                   << "Server: " << m_ServerLocation << std::endl
                   << "Port: " << m_ServerPort << std::endl;
