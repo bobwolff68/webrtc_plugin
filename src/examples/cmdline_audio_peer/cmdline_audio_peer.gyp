@@ -92,9 +92,13 @@
                 '../../include/anyoption/anyoption.h',
 		'../../include/anyoption/anyoption.cpp',
             ],
-            'dependencies': [
-                '../../../third_party/webrtc/trunk/third_party_mods/libjingle/libjingle.gyp:libjingle_app',
-            ],
+		'defines': [
+			'POSIX',
+			'WEBRTC_MAC',
+		],
+#            'dependencies': [
+#                '../../../third_party/webrtc/trunk/third_party_mods/libjingle/libjingle.gyp:libjingle_app',
+#            ],
             'include_dirs': [
                 '../../../third_party/webrtc/trunk/third_party/libjingle/source',
                 '../../../third_party/webrtc/trunk/third_party_mods/libjingle/source',
@@ -104,6 +108,10 @@
                 'xcode_settings': {
                   'OTHER_LDFLAGS': [
                     '-L../../../third_party/webrtc/trunk/third_party/libsrtp',
+			'-L../../../third_party/webrtc/trunk/xcodebuild/Debug',
+			'-lwebrtc_Debug',
+			'-ldl',
+			'-lpthread',
                     '-lsrtp',
                     '-framework CoreServices',
                     '-framework CoreAudio',
