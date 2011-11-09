@@ -39,14 +39,29 @@
                 '../../include/anyoption/anyoption.h',
 		'../../include/anyoption/anyoption.cpp',
             ],
-            'dependencies': [
-                '../../../third_party/webrtc/trunk/third_party_mods/libjingle/libjingle.gyp:libjingle_app',
-            ],
+		'defines': [
+			'POSIX',
+			'WEBRTC_LINUX',
+		],
+#            'dependencies': [
+#                '../../../third_party/webrtc/trunk/third_party_mods/libjingle/libjingle.gyp:libjingle_app',
+#            ],
             'include_dirs': [
                 '../../../third_party/webrtc/trunk/third_party/libjingle/source',
                 '../../../third_party/webrtc/trunk/third_party_mods/libjingle/source',
 		'../../include',
             ],
+		'link_settings': {
+			'libraries': [
+				'../../../third_party/webrtc/trunk/out/Debug/libwebrtc_Debug.a',
+				'-lexpat',
+				'-lX11',
+				'-ldl',
+				'-lrt',
+				'-lpthread',
+				'-lGL',
+			],
+		},
           }, ], #targets
       }, ], #OS=="linux"
       ['OS=="mac"', {
