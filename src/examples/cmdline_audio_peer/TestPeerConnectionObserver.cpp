@@ -195,7 +195,7 @@ void TestPeerConnectionObserver::OnMessageFromRemotePeer(int peerId, const std::
 
 void TestPeerConnectionObserver::ConnectToPeer(int peerId, const std::string& peerName)
 {
-    if(NULL != m_pPeerConnection.get())
+    if(IsConnectionActive())
     {
         std::cerr << __FUNCTION__ << ": Local peer busy..." << std::endl;
         return;

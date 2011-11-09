@@ -613,7 +613,12 @@
           'cflags': [
              '<!@(pkg-config --cflags gtk+-2.0)',
           ],
-        }],        
+        }],
+	['OS=="mac"', {
+	  'sources': [
+            '<(libjingle_orig)/source/talk/session/phone/devicemanager_mac.mm',
+          ],
+        }], 
         ['inside_chromium_build==1', {
           'dependencies': [
             '../../third_party/webrtc/modules/modules.gyp:audio_device',

@@ -84,7 +84,6 @@
                 'TestSocketServer.cpp',
                 'TestClientShell.h',
                 'ThreadSingle.h',
-                '../../../third_party/webrtc/trunk/third_party/libjingle/source/talk/session/phone/devicemanager_mac.mm',
                 'ThreadSafeMessageQueue.h',
                 'ThreadSafeMessageQueue.cpp',
                 'Call.h',
