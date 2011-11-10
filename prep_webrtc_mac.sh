@@ -23,8 +23,11 @@ cp -R ../../third_party_mods/webrtc/trunk/third_party/libsrtp ../../third_party/
 cd trunk/third_party/libsrtp
 ./configure CFLAGS="-m32 -arch i386" LDFLAGS="-m32 -arch i386"
 make
+# back up to third_party/webrtc
 cd ../../..
 
+# back up to root
+cd ../..
 ./rebuild_webrtc.sh clean
 
 echo third_party/webrtc/trunk contains webrtc.xcodeproj for XCode.
