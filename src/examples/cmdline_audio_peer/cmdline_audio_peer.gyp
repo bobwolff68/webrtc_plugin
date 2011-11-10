@@ -39,13 +39,46 @@
                 '../../include/anyoption/anyoption.h',
 		'../../include/anyoption/anyoption.cpp',
             ],
+           'dependencies': [
+                '../../../third_party/webrtc/trunk/third_party_mods/libjingle/libjingle.gyp:libjingle_app',
+            ],
+            'include_dirs': [
+                '../../../third_party/webrtc/trunk/third_party/libjingle/source',
+                '../../../third_party/webrtc/trunk/third_party_mods/libjingle/source',
+		'../../include',
+            ],
+         }, 
+          {
+	# Now for the version which doesn't use gyp's monster deps, but instead links the monolithic libwebrtc.a
+            'target_name': 'cmdline_audio_peer_monolithic',
+            'type': 'executable',
+            'sources': [
+                'main.cpp',
+		'parsecmd.cpp',
+		'shell.cpp',
+		'shell.h',
+                'TestPeerConnectionClient.h',
+                'TestPeerConnectionClient.cpp',
+                'TestPeerConnectionObserver.h',
+                'TestPeerConnectionObserver.cpp',
+                'TestDefaults.h',
+                'TestDefaults.cpp',
+                'TestSocketServer.h',
+                'TestSocketServer.cpp',
+                'TestClientShell.h',
+                'ThreadSingle.h',
+                'ThreadSafeMessageQueue.h',
+                'ThreadSafeMessageQueue.cpp',
+                'Call.h',
+                'Call.cpp',
+                '../../include/rtc_common.h',
+                '../../include/anyoption/anyoption.h',
+		'../../include/anyoption/anyoption.cpp',
+            ],
 		'defines': [
 			'POSIX',
 			'WEBRTC_LINUX',
 		],
-#            'dependencies': [
-#                '../../../third_party/webrtc/trunk/third_party_mods/libjingle/libjingle.gyp:libjingle_app',
-#            ],
             'include_dirs': [
                 '../../../third_party/webrtc/trunk/third_party/libjingle/source',
                 '../../../third_party/webrtc/trunk/third_party_mods/libjingle/source',
@@ -53,6 +86,7 @@
             ],
 		'link_settings': {
 			'libraries': [
+# TODO - use _Release here if release build.
 				'../../../third_party/webrtc/trunk/out/Debug/libwebrtc_Debug.a',
 				'-lexpat',
 				'-lX11',
@@ -62,7 +96,8 @@
 				'-lGL',
 			],
 		},
-          }, ], #targets
+          }, 
+	], #targets
       }, ], #OS=="linux"
       ['OS=="mac"', {
         'targets': [
@@ -92,13 +127,63 @@
                 '../../include/anyoption/anyoption.h',
 		'../../include/anyoption/anyoption.cpp',
             ],
+            'dependencies': [
+                '../../../third_party/webrtc/trunk/third_party_mods/libjingle/libjingle.gyp:libjingle_app',
+            ],
+            'include_dirs': [
+                '../../../third_party/webrtc/trunk/third_party/libjingle/source',
+                '../../../third_party/webrtc/trunk/third_party_mods/libjingle/source',
+		'../../include',
+            ],
+            'link_settings': {
+                'xcode_settings': {
+                  'OTHER_LDFLAGS': [
+                    '-L../../../third_party/webrtc/trunk/third_party/libsrtp',
+                    '-lsrtp',
+                    '-framework CoreServices',
+                    '-framework CoreAudio',
+                    '-framework CoreVideo',
+                    '-framework QtKit',
+                    '-framework OpenGL',
+                    '-framework AudioToolbox',
+                    '-framework ApplicationServices',
+                    '-framework Foundation',
+                    '-framework AppKit',
+                  ],
+                },
+            },
+        }, 
+# Now for the monolithic version - links to the libwebrtc_Debug.a big library.
+        {
+            'target_name': 'cmdline_audio_peer_monolithic',
+            'type': 'executable',
+            'sources': [
+                'main.cpp',
+		'parsecmd.cpp',
+		'shell.cpp',
+		'shell.h',
+                'TestPeerConnectionClient.h',
+                'TestPeerConnectionClient.cpp',
+                'TestPeerConnectionObserver.h',
+                'TestPeerConnectionObserver.cpp',
+                'TestDefaults.h',
+                'TestDefaults.cpp',
+                'TestSocketServer.h',
+                'TestSocketServer.cpp',
+                'TestClientShell.h',
+                'ThreadSingle.h',
+                'ThreadSafeMessageQueue.h',
+                'ThreadSafeMessageQueue.cpp',
+                'Call.h',
+                'Call.cpp',
+                '../../include/rtc_common.h',
+                '../../include/anyoption/anyoption.h',
+		'../../include/anyoption/anyoption.cpp',
+            ],
 		'defines': [
 			'POSIX',
 			'WEBRTC_MAC',
 		],
-#            'dependencies': [
-#                '../../../third_party/webrtc/trunk/third_party_mods/libjingle/libjingle.gyp:libjingle_app',
-#            ],
             'include_dirs': [
                 '../../../third_party/webrtc/trunk/third_party/libjingle/source',
                 '../../../third_party/webrtc/trunk/third_party_mods/libjingle/source',
@@ -109,6 +194,7 @@
                   'OTHER_LDFLAGS': [
                     '-L../../../third_party/webrtc/trunk/third_party/libsrtp',
 			'-L../../../third_party/webrtc/trunk/xcodebuild/Debug',
+# TODO - use _Release here if release build.
 			'-lwebrtc_Debug',
 			'-ldl',
 			'-lpthread',
@@ -125,7 +211,8 @@
                   ],
                 },
             },
-        }, ], #targets
+        }, 
+	], #targets
       }, ] #OS=="mac"
   ], #conditions
 }

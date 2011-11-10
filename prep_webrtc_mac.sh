@@ -1,4 +1,11 @@
 #!/bin/sh
+
+if [ `uname` != "Darwin" ]
+then
+  echo Wrong platform. Expecting uname to return 'Darwin'
+  exit
+fi
+
 # TODO - Need to check that gclient exists.
 # TODO - Make sure wget is present
 mkdir -p third_party/webrtc
@@ -18,12 +25,7 @@ cd trunk/third_party/libsrtp
 make
 cd ../../..
 
-echo Resetting/Rebuilding project files...
-python trunk/build/gyp_chromium --depth=trunk ../../src/examples/cmdline_audio_peer/cmdline_audio_peer.gyp -Dclang=1
-
-cd ../../src/examples/cmdline_audio_peer
-xcodebuild -project cmdline_audio_peer.xcodeproj -target cmdline_audio_peer
-cd ../../..
+./rebuild_webrtc.sh clean
 
 echo third_party/webrtc/trunk contains webrtc.xcodeproj for XCode.
 echo NOTE: Be sure to MODERNIZE all projects.

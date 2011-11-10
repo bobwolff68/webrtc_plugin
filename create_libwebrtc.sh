@@ -1,10 +1,11 @@
 #!/bin/bash
 #
-# This script creates a few large .a files for simplifying linkage in projects which utilize webrtc.
-# Note - webrtc has conflicts in .o filenames making a single monolithic .a file impossible at this
-#        time. So, there is a part1 and a part2. Additionally, linkage of 2 others is required:
-#        - libjingle.a
-#        - libvpx.a
+# This script creates a monolithic (large!) static library out of the required static libraries
+# which are created when building the webrtc project. This library does NOT contain any test
+# libraries. It was derived from those items required to build cmdline_audio_peer which was
+# derived in nature from peerconnection_client
+#
+# ASSUMPTION - webrtc libraries have already been built by prep*.sh script and rebuild*.sh.
 #
 
 PLATFORM=`uname`
