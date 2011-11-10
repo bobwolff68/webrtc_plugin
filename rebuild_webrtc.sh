@@ -16,6 +16,14 @@ then
   fi
 
   make cmdline_audio_peer
+  if [ $? != 0 ]
+  then
+	echo ; echo 'make cmdline_audio_peer' failed. Exiting early.
+	echo
+	exit 1
+  fi
+
+  cd ../../..
 fi
 
 # Now for Darwin's build.
@@ -40,7 +48,19 @@ fi
 
 # Now do the build for Debug and release.
 xcodebuild -project cmdline_audio_peer.xcodeproj -target cmdline_audio_peer -configuration Debug
+if [ $? != 0 ]
+then
+	echo ; echo 'xcodebuild (Debug) cmdline_audio_peer' failed. Exiting early.
+	echo
+	exit 1
+fi
 xcodebuild -project cmdline_audio_peer.xcodeproj -target cmdline_audio_peer -configuration Release
+if [ $? != 0 ]
+then
+	echo ; echo 'xcodebuild (Release) cmdline_audio_peer' failed. Exiting early.
+	echo
+	exit 1
+fi
 cd ../../..
 
 fi
