@@ -13,12 +13,20 @@ then
   if [ "$1" = "clean" ]
   then
     make clean
+    make BUILDTYPE=Release clean
   fi
 
   make cmdline_audio_peer
   if [ $? != 0 ]
   then
-	echo ; echo 'make cmdline_audio_peer' failed. Exiting early.
+	echo ; echo 'make (Debug) cmdline_audio_peer' failed. Exiting early.
+	echo
+	exit 1
+  fi
+  make BUILDTYPE=Release cmdline_audio_peer
+  if [ $? != 0 ]
+  then
+	echo ; echo 'make (Release) cmdline_audio_peer' failed. Exiting early.
 	echo
 	exit 1
   fi

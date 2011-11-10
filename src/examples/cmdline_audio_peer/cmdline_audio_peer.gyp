@@ -47,6 +47,12 @@
                 '../../../third_party/webrtc/trunk/third_party_mods/libjingle/source',
 		'../../include',
             ],
+		'link_settings': {
+			'libraries': [
+				'-lX11',
+				'-lXext',
+			],
+		},
          }, 
           {
 	# Now for the version which doesn't use gyp's monster deps, but instead links the monolithic libwebrtc.a
