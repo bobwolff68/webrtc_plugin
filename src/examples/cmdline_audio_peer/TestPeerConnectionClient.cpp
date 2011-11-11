@@ -20,10 +20,10 @@
 #include "talk/base/win32socketserver.h"
 #endif
 
-std::string peername = "defaultpeer";
-std::string mainserver = "50.18.56.81";
-int mainserver_port = 8888;
-std::string stunserver = "stun.l.google.com";
+extern std::string peername;
+extern std::string mainserver;
+extern int mainserver_port;
+extern std::string stunserver;
 
 using talk_base::sprintfn;
 
