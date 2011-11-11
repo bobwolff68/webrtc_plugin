@@ -19,7 +19,6 @@ file (GLOB GENERAL RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 include_directories(${PLUGIN_INCLUDE_DIRS})
 include_directories(../../../../third_party/webrtc/trunk/third_party/libjingle/source)
 include_directories(../../../../third_party/webrtc/trunk/third_party_mods/libjingle/source)
-include_directories(../../../examples/cmdline_audio_peer)
 include_directories(../../../include)
  
 
