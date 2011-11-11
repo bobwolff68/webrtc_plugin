@@ -52,6 +52,8 @@ public:
                 const std::string& serverIP,
                 const int serverPort);
     void Signout(void);
+    void Call(const std::string& peerName);
+    void Hangup(const std::string& peerName);
     
     // Event helpers
     FB_JSAPI_EVENT(fired, 3, (const FB::variant&, bool, int));

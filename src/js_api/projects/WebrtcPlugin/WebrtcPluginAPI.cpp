@@ -53,7 +53,9 @@ WebrtcPluginAPI::WebrtcPluginAPI(const WebrtcPluginPtr& plugin, const FB::Browse
     registerMethod("testEvent", make_method(this, &WebrtcPluginAPI::testEvent));
     registerMethod("Signin", make_method(this, &WebrtcPluginAPI::Signin));
     registerMethod("Signout", make_method(this, &WebrtcPluginAPI::Signout));
-
+    registerMethod("Call", make_method(this, &WebrtcPluginAPI::Call));
+    registerMethod("Hangup", make_method(this, &WebrtcPluginAPI::Hangup));
+    
     // Read-write property
     registerProperty("testString",
                      make_property(this,
@@ -149,5 +151,23 @@ void WebrtcPluginAPI::Signout(void)
     ParsedCommand cmd;
     
     cmd["command"] = "signout";
+    m_pMsgQ->PostMessage(cmd);
+}
+
+void WebrtcPluginAPI::Call(const std::string &peerName)
+{
+    ParsedCommand cmd;
+    
+    cmd["command"] = "call";
+    cmd["peername"] = peerName;
+    m_pMsgQ->PostMessage(cmd);
+}
+
+void WebrtcPluginAPI::Hangup(const std::string &peerName)
+{
+    ParsedCommand cmd;
+    
+    cmd["command"] = "hangup";
+    cmd["peername"] = peerName;
     m_pMsgQ->PostMessage(cmd);
 }
