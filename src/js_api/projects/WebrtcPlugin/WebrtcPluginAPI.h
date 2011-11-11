@@ -68,6 +68,7 @@ private:
     FB::BrowserHostPtr m_host;
 
     std::string m_testString;
+    PluginMainThread* m_pMainThread;
     projectname::ThreadSafeMessageQueue* m_pMsgQ;
 };
 

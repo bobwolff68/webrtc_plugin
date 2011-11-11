@@ -9,7 +9,7 @@
 #ifndef TestPeerConnectionClient_TestSocketServer_h
 #define TestPeerConnectionClient_TestSocketServer_h
 
-#include "ThreadSafeMessageQueue.h"
+#include "WPLThreadSafeMessageQueue.h"
 #include "talk/base/thread.h"
 #include "talk/base/physicalsocketserver.h"
 #include "WPLPeerConnectionClient.h"

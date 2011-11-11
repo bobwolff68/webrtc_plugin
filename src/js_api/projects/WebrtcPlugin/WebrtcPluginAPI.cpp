@@ -70,8 +70,8 @@ WebrtcPluginAPI::WebrtcPluginAPI(const WebrtcPluginPtr& plugin, const FB::Browse
     m_testString = "Hello World";
     
     m_pMsgQ = new (projectname::ThreadSafeMessageQueue)();
-    PluginMainThread *pmt = new PluginMainThread(m_pMsgQ);
-    pmt->startThread();
+    m_pMainThread = new PluginMainThread(m_pMsgQ);
+    m_pMainThread->startThread();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -83,6 +83,14 @@ WebrtcPluginAPI::WebrtcPluginAPI(const WebrtcPluginPtr& plugin, const FB::Browse
 ///////////////////////////////////////////////////////////////////////////////
 WebrtcPluginAPI::~WebrtcPluginAPI()
 {
+    ParsedCommand cmd;
+    
+    cmd["command"] = "quit";
+    m_pMsgQ->PostMessage(cmd);
+    m_pMainThread->stopThread();
+    
+    delete m_pMsgQ;
+    delete m_pMainThread;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

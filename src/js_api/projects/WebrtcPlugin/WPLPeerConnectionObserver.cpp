@@ -8,7 +8,6 @@
 
 #include <iostream>
 #include <sstream>
-#include "TestDefaults.h"
 #include "WPLPeerConnectionObserver.h"
 #include "WPLPeerConnectionClient.h"
 #include "WPLSocketServer.h"
