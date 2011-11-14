@@ -121,10 +121,15 @@ WebrtcPluginAPI::WebrtcPluginAPI(const WebrtcPluginPtr& plugin, const FB::Browse
 WebrtcPluginAPI::~WebrtcPluginAPI()
 {
     ParsedCommand cmd;
+    ParsedCommand event;
     
     cmd["command"] = "quit";
     m_pMsgQ->PostMessage(cmd);
     m_pMainThread->stopThread();
+    
+    event["type"] = "quit";
+    m_pEvtQ->PostMessage(event);
+    m_pNotificationsThread->stopThread();
     
     delete m_pMsgQ;
     delete m_pEvtQ;
