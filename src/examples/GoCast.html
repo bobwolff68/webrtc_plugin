@@ -1,0 +1,128 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>GoCast Voice Chat</title>
+        <script type="text/javascript">
+            var OnlinePeers = new Array();
+            var OnCallWithPeer = new Array();
+            
+            function AddEvent(obj, name, func)
+            {
+                if (window.addEventListener)
+                {
+                    obj.addEventListener(name, func, false); 
+                } 
+                else 
+                {
+                    obj.attachEvent("on"+name, func);
+                }
+            }
+
+            function Signin()
+            {
+                var GoCastPlugin = document.getElementById("GoCastPlugin");
+                var userName = document.getElementById("username").value;
+                var serverIp = document.getElementById("serverip").value;
+                var serverPort = parseInt(document.getElementById("serverport").value);
+                GoCastPlugin.Signin(userName,serverIp,serverPort);
+            }
+            
+            function CallOrHangup(peername)
+            {   
+                if(false == OnCallWithPeer[peername])
+                {
+                    document.getElementById("GoCastPlugin").Call(peername);
+                    OnCallWithPeer[peername] = true;
+                    LoadCallPage();
+                }
+                else
+                {
+                    document.getElementById("GoCastPlugin").Hangup(peername);
+                    OnCallWithPeer[peername] = false;
+                    LoadCallPage();
+                }
+            }
+            
+            function Signout()
+            {
+                document.getElementById("GoCastPlugin").Signout();
+                LoadSigninPage();
+            }
+            
+            function OnPluginLoad()
+            {
+                var GoCastPlugin = document.getElementById("GoCastPlugin");
+                
+                AddEvent(GoCastPlugin,"SignedIn",function(message)
+                         {OnlinePeers=message.split(':');
+                         OnlinePeers.splice((OnlinePeers.length-1),1);
+                         for(i=0; i<OnlinePeers.length; i++) 
+                             OnCallWithPeer[OnlinePeers[i]] = false;
+                         LoadCallPage();});
+                
+                AddEvent(GoCastPlugin,"PeerOnline",function(message)
+                         {OnlinePeers.push(message); 
+                         OnCallWithPeer[OnlinePeers[i]] = false;
+                         LoadCallPage();});
+                
+                AddEvent(GoCastPlugin,"PeerOffline",function(message)
+                         {OnlinePeers.splice(OnlinePeers.indexOf(message),1);
+                         LoadCallPage();});
+                
+                AddEvent(GoCastPlugin,"RemotePeerCall",function(message)
+                         {OnCallWithPeer[message] = true; LoadCallPage();});
+
+                AddEvent(GoCastPlugin,"RemotePeerHangup",function(message)
+                         {OnCallWithPeer[message] = false; LoadCallPage();});
+
+                LoadSigninPage();
+            }
+            
+            function LoadCallPage()
+            {
+                var pageLocation = document.getElementById("pagelocation");
+                pageLocation.innerHTML = 'online peers:<br/>';
+                
+                for(i=0; i<OnlinePeers.length; i++)
+                {
+                    pageLocation.innerHTML += OnlinePeers[i];
+                    
+                    if(false == OnCallWithPeer[OnlinePeers[i]])
+                    {
+                        pageLocation.innerHTML += '<a href="#" onclick="javascript:CallOrHangup(\''
+                        +(OnlinePeers[i]+'\')">Call</a><br/>');
+                    }
+                    else
+                    {
+                        pageLocation.innerHTML += '<a href="#" onclick="javascript:CallOrHangup(\''
+                        +(OnlinePeers[i]+'\')">Hang Up</a><br/>');                        
+                    }
+                }
+                
+                pageLocation.innerHTML += '<button id="signoutbutton" size="10"\
+onclick="javascript:Signout()"/>Sign Out</button>';
+            }
+            
+            function LoadSigninPage()
+            {
+                var pageLocation = document.getElementById("pagelocation");
+                pageLocation.innerHTML = '<table>\
+<tr><td>username:&nbsp;</td><td><input type="text" id="username" size="10"/></td></tr>\
+<tr><td>serverip:&nbsp;</td><td><input type="text" id="serverip" size="10"/></td></tr>\
+<tr><td>serverport:</td><td> <input type="text" id="serverport" size="10"/> </td></tr>\
+<tr><td><button id="signinbutton" size="10" onclick="javascript:Signin()">Sign In</button></td>\</tr>\
+            </table>';
+        }
+        </script>
+    </head>
+    <body>
+        <h1>
+            GoCast Voice Chat
+        </h1>
+        <object id="GoCastPlugin" type="application/x-webrtcplugin">
+            <param name="onload" value="OnPluginLoad" />
+        </object><br/>
+        <pre id="pagelocation">
+        </pre>
+    </body>
+</html>

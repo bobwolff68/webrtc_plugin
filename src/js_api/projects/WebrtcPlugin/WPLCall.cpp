@@ -12,8 +12,10 @@
 
 namespace projectname
 {
-    Call::Call(ThreadSafeMessageQueue* pMsgQ):
-    m_pMsgQ(pMsgQ)
+    Call::Call(ThreadSafeMessageQueue* pMsgQ,
+               ThreadSafeMessageQueue* pEvtQ):
+    m_pMsgQ(pMsgQ),
+    m_pEvtQ(pEvtQ)
     {
         
     }
@@ -41,6 +43,11 @@ namespace projectname
         {
             m_Observers[peerId]->SetPeerId(peerId);
             m_Observers[peerId]->SetPeerName(peerName);
+            
+            ThreadSafeMessageQueue::ParsedCommand event;
+            event["type"] = "RemotePeerCall";
+            event["message"] = peerName;
+            m_pEvtQ->PostMessage(event);
         }
         
         ListParticipants();
@@ -60,6 +67,11 @@ namespace projectname
         if(true == bRemoteHangup)
         {
             bStatus = true;
+
+            ThreadSafeMessageQueue::ParsedCommand event;
+            event["type"] = "RemotePeerHangup";
+            event["message"] = m_Participants[peerId];
+            m_pEvtQ->PostMessage(event);
         }
         else
         {

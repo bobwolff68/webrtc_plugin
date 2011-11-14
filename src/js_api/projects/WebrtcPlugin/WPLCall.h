@@ -23,11 +23,11 @@ namespace projectname
         typedef std::map<int,PeerConnectionObserver*> Observers;
         
     public:
-        Call(ThreadSafeMessageQueue* pMsgQ);
+        Call(ThreadSafeMessageQueue* pMsgQ,
+             ThreadSafeMessageQueue* pEvtQ);
         ~Call();
         bool AddParticipant(int peerId, std::string& peerName, bool bRemoteCall);
         bool RemoveParticipant(int peerId, bool bRemoteHangup);
-        //bool Hangup(void);
         bool IsActive(void) const;
         bool HasParticipant(int peerId) const;
         void OnMessageFromPeer(int peerId, const std::string& msg);
@@ -37,6 +37,7 @@ namespace projectname
         Participants m_Participants;
         Observers m_Observers;
         ThreadSafeMessageQueue* m_pMsgQ;
+        ThreadSafeMessageQueue* m_pEvtQ;
     };
 }
 

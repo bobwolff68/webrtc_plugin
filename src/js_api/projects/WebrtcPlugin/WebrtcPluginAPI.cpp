@@ -28,7 +28,7 @@ int PluginMainThread::workerBee(void)
     projectname::SocketServer socketServer;
     talk_base::Thread::Current()->set_socketserver(&socketServer);
     
-    projectname::PeerConnectionClient testClient(m_pMsgQ, "", "", -1);
+    projectname::PeerConnectionClient testClient(m_pMsgQ, m_pEvtQ, "", "", -1);
     socketServer.SetPeerConnectionClient(&testClient);
 
     talk_base::Thread::Current()->Run();
@@ -36,6 +36,40 @@ int PluginMainThread::workerBee(void)
     return 0;
 }
 
+int PluginNotificationsThread::workerBee(void)
+{
+    std::string eventType = "";
+    do
+    {
+        ParsedCommand event = m_pEvtQ->GetNextMessage();
+        eventType = event["type"];
+        
+        if("SignedIn" == eventType)
+        {
+            m_pPluginAPI->fire_SignedIn(event["message"]);
+        }
+        else if("PeerOnline" == eventType)
+        {
+            m_pPluginAPI->fire_PeerOnline(event["message"]);
+        }
+        else if("PeerOffline" == eventType)
+        {
+            m_pPluginAPI->fire_PeerOffline(event["message"]);
+        }
+        else if("RemotePeerCall" == eventType)
+        {
+            m_pPluginAPI->fire_RemotePeerCall(event["message"]);
+        }
+        else if("RemotePeerHangup" == eventType)
+        {
+            m_pPluginAPI->fire_RemotePeerHangup(event["message"]);
+        }
+        
+        usleep(100000);
+    } while(eventType != "quit");
+            
+    return 0;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 /// @fn WebrtcPluginAPI::WebrtcPluginAPI(const WebrtcPluginPtr& plugin, const FB::BrowserHostPtr host)
@@ -70,8 +104,11 @@ WebrtcPluginAPI::WebrtcPluginAPI(const WebrtcPluginPtr& plugin, const FB::Browse
     m_testString = "Hello World";
     
     m_pMsgQ = new (projectname::ThreadSafeMessageQueue)();
-    m_pMainThread = new PluginMainThread(m_pMsgQ);
+    m_pEvtQ = new (projectname::ThreadSafeMessageQueue)();
+    m_pMainThread = new PluginMainThread(m_pMsgQ, m_pEvtQ);
+    m_pNotificationsThread = new PluginNotificationsThread(this, m_pEvtQ);
     m_pMainThread->startThread();
+    m_pNotificationsThread->startThread();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -90,6 +127,7 @@ WebrtcPluginAPI::~WebrtcPluginAPI()
     m_pMainThread->stopThread();
     
     delete m_pMsgQ;
+    delete m_pEvtQ;
     delete m_pMainThread;
 }
 

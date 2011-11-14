@@ -35,6 +35,7 @@ namespace projectname
         };
         
         PeerConnectionClient(ThreadSafeMessageQueue* pMsgQ,
+                             ThreadSafeMessageQueue* pEvtQ,
                              const std::string& peerName,
                              const std::string& serverLocation,
                              const int serverPort);
@@ -88,6 +89,7 @@ namespace projectname
     protected:
         Call* m_pCall;
         ThreadSafeMessageQueue* m_pMsgQ;
+        ThreadSafeMessageQueue* m_pEvtQ;
         Peers peers_;
         State state_;
         int my_id_;
@@ -95,7 +97,7 @@ namespace projectname
     protected:
         std::string m_PeerName;
         std::string m_ServerLocation;
-        int m_ServerPort;    
+        int m_ServerPort;
     };
 }
 #endif

@@ -49,13 +49,15 @@ namespace projectname
     }
 
     PeerConnectionClient::PeerConnectionClient(ThreadSafeMessageQueue* pMsgQ,
+                                               ThreadSafeMessageQueue* pEvtQ,
                                                const std::string& peerName,
                                                const std::string& serverLocation,
                                                const int serverPort):
     control_socket_(CreateClientSocket()),
     hanging_get_(CreateClientSocket()),
-    m_pCall(new Call(pMsgQ)),
+    m_pCall(new Call(pMsgQ,pEvtQ)),
     m_pMsgQ(pMsgQ),
+    m_pEvtQ(pEvtQ),
     state_(NOT_CONNECTED),
     my_id_(-1),
     m_PeerName(peerName),
@@ -599,6 +601,18 @@ namespace projectname
                     }
                     ASSERT(is_connected());
                     std::cout << "Client: Sign in complete" << std::endl;
+                    ParsedCommand event;
+                    event["type"] = "SignedIn";
+                    
+                    for(Peers::iterator it = peers_.begin();
+                        it != peers_.end();
+                        it++)
+                    {
+                        event["message"] += it->second;
+                        event["message"] += ":";
+                    }                    
+                    
+                    m_pEvtQ->PostMessage(event);
                 }
                 else if (state_ == SIGNING_OUT) 
                 {
@@ -653,11 +667,20 @@ namespace projectname
                         {
                             peers_[id] = name;
                             std::cout << "Peer[" << name << "] Online..." << std::endl;
+                            ParsedCommand event;
+                            event["type"] = "PeerOnline";
+                            event["message"] = name;
+                            m_pEvtQ->PostMessage(event);
+
                         } 
                         else 
                         {
                             peers_.erase(id);
                             std::cout << "Peer[" << name << "]: Offline..." << std::endl;
+                            ParsedCommand event;
+                            event["type"] = "PeerOffline";
+                            event["message"] = name;
+                            m_pEvtQ->PostMessage(event);
                         }
                     }
                 } 
