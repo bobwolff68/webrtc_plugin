@@ -14,7 +14,7 @@
 #include "WPLThreadSafeMessageQueue.h"
 #include "WPLPeerConnectionObserver.h"
 
-namespace projectname
+namespace GoCast
 {
     class Call
     {

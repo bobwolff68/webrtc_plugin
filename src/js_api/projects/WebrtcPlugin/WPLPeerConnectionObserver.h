@@ -14,7 +14,7 @@
 #include "talk/app/webrtc/peerconnectionfactory.h"
 #include "talk/base/scoped_ptr.h"
 
-namespace projectname
+namespace GoCast
 {
     class PeerConnectionObserver : public webrtc::PeerConnectionObserver
     {

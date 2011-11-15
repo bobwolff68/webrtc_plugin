@@ -14,7 +14,7 @@
 #include "talk/base/physicalsocketserver.h"
 #include "WPLPeerConnectionClient.h"
 
-namespace projectname
+namespace GoCast
 {
     class SocketServer : public talk_base::PhysicalSocketServer
     {

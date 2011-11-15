@@ -37,7 +37,7 @@ namespace
     }    
 }
 
-namespace projectname
+namespace GoCast
 {
     PeerConnectionClient::~PeerConnectionClient()
     {

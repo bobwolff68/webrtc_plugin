@@ -10,7 +10,7 @@
 #include <iostream>
 #include "WPLCall.h"
 
-namespace projectname
+namespace GoCast
 {
     Call::Call(ThreadSafeMessageQueue* pMsgQ,
                ThreadSafeMessageQueue* pEvtQ):

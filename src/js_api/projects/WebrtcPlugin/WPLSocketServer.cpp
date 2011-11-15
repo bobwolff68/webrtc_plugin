@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include "WPLSocketServer.h"
 
-namespace projectname
+namespace GoCast
 {
     SocketServer::SocketServer():
     m_pThread(talk_base::Thread::Current()),

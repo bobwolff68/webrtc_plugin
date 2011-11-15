@@ -20,11 +20,42 @@
 typedef std::map<int, std::string> Peers;
 typedef std::map<std::string, std::string> ParsedCommand;
 
-namespace projectname
+namespace GoCast
 {
+    /**
+    	Handles p2p signaling and voice connection management.
+        This class has been designed to interact with WebRTC's
+        sample 'peerconnection_server'. The interaction involves
+        registering the client's peer name, followed by receiving
+        a unique peer id. Right after login, and from time to time,
+        it also receives notifications from the server when someone
+        comes online or goes offline. It also manages instances of
+        the GoCast::PeerConnectionObserver class, which in turn
+        manages the creation/teardown of the capture/encode/transmit
+        and receive/decode/render pipelines. GoCast::PeerConnectionClient
+        receives signaling messages from its observers and forwards them
+        to the server, which in turn forwards them to the appropriate peers.
+        It also forwards the signaling messages t receives from the server
+        and forwards them to the appropriate observers.
+     
+        NOTE: There are two aspects to setting up a successful connection 
+              between peers. One is having a mechanism to exchange signaling 
+              messages between peers. This is achieved here through the peers 
+              signing in to a common server, and forwarding any signaling 
+              messages to it, as it knows the location of the intended recipients.
+              All this is handled through TCP connections. The second aspect is
+              the voice data connection between peers, which is handled through
+              RTP/RTCP(UDP) connections, with STUN/TURN/ICE for NAT traversal.
+              GoCast::PeerConnectionClient handles the first aspect, while
+              GoCast::PeerConnectionObserver handles the second.
+     */
     class PeerConnectionClient : public sigslot::has_slots<>
     {
     public:
+        /**
+        	Describes the different states of the GoCast::PeerConnectionClient
+            instance.
+         */
         enum State
         {
             NOT_CONNECTED,
@@ -34,14 +65,33 @@ namespace projectname
             SIGNING_OUT,
         };
         
+        /**
+        	Constructor.
+        	@param pMsgQ Message queue to store commands to be executed.
+        	@param pEvtQ Event queue to store generated events that are to be fired into JavaScript.
+        	@param peerName Unique peer name
+        	@param serverLocation Public IP of the signin server
+        	@param serverPort Public port on which the signin server is listening.
+        	@returns N/A
+         */
         PeerConnectionClient(ThreadSafeMessageQueue* pMsgQ,
                              ThreadSafeMessageQueue* pEvtQ,
                              const std::string& peerName,
                              const std::string& serverLocation,
                              const int serverPort);
+        
+        /**
+        	Destructor
+        	@returns N/A
+         */
         virtual ~PeerConnectionClient();
         
-        int id() const;
+        /**
+        	Returns the unique peer id
+        	@returns int
+         */
+        int id(void) const;
+        
         bool is_connected() const;
         const Peers& peers() const;
         bool Connect(const std::string& server, int port,

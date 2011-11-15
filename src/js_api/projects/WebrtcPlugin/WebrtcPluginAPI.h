@@ -21,8 +21,8 @@ class PluginNotificationsThread;
 class PluginMainThread : public ThreadSingle
 {
 public:
-    PluginMainThread(projectname::ThreadSafeMessageQueue* pMsgQ,
-                     projectname::ThreadSafeMessageQueue* pEvtQ):
+    PluginMainThread(GoCast::ThreadSafeMessageQueue* pMsgQ,
+                     GoCast::ThreadSafeMessageQueue* pEvtQ):
     m_pMsgQ(pMsgQ), m_pEvtQ(pEvtQ) {}
     
     virtual ~PluginMainThread() {}
@@ -31,8 +31,8 @@ protected:
     int workerBee(void);
     
 protected:
-    projectname::ThreadSafeMessageQueue* m_pMsgQ;
-    projectname::ThreadSafeMessageQueue* m_pEvtQ;
+    GoCast::ThreadSafeMessageQueue* m_pMsgQ;
+    GoCast::ThreadSafeMessageQueue* m_pEvtQ;
 };
 
 class WebrtcPluginAPI : public FB::JSAPIAuto
@@ -80,15 +80,15 @@ private:
     std::string m_testString;
     PluginMainThread* m_pMainThread;
     PluginNotificationsThread* m_pNotificationsThread;
-    projectname::ThreadSafeMessageQueue* m_pMsgQ;
-    projectname::ThreadSafeMessageQueue* m_pEvtQ;
+    GoCast::ThreadSafeMessageQueue* m_pMsgQ;
+    GoCast::ThreadSafeMessageQueue* m_pEvtQ;
 };
 
 class PluginNotificationsThread : public ThreadSingle
 {
 public:
     PluginNotificationsThread(WebrtcPluginAPI* pPluginAPI,
-                              projectname::ThreadSafeMessageQueue* pEvtQ):
+                              GoCast::ThreadSafeMessageQueue* pEvtQ):
     m_pPluginAPI(pPluginAPI), m_pEvtQ(pEvtQ) {}
     
     virtual ~PluginNotificationsThread() {}
@@ -98,7 +98,7 @@ protected:
     
 protected:
     WebrtcPluginAPI* m_pPluginAPI;
-    projectname::ThreadSafeMessageQueue* m_pEvtQ;
+    GoCast::ThreadSafeMessageQueue* m_pEvtQ;
 };
 
 #endif // H_WebrtcPluginAPI

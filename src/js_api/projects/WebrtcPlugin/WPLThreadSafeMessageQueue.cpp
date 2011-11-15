@@ -9,7 +9,7 @@
 #include <assert.h>
 #include "WPLThreadSafeMessageQueue.h"
 
-namespace projectname
+namespace GoCast
 {
     ThreadSafeMessageQueue::ThreadSafeMessageQueue()
     {

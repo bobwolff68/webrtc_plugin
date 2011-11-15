@@ -25,10 +25,10 @@ int PluginMainThread::workerBee(void)
 {
     talk_base::AutoThread autoThread;
 
-    projectname::SocketServer socketServer;
+    GoCast::SocketServer socketServer;
     talk_base::Thread::Current()->set_socketserver(&socketServer);
     
-    projectname::PeerConnectionClient testClient(m_pMsgQ, m_pEvtQ, "", "", -1);
+    GoCast::PeerConnectionClient testClient(m_pMsgQ, m_pEvtQ, "", "", -1);
     socketServer.SetPeerConnectionClient(&testClient);
 
     talk_base::Thread::Current()->Run();
@@ -103,8 +103,8 @@ WebrtcPluginAPI::WebrtcPluginAPI(const WebrtcPluginPtr& plugin, const FB::Browse
     
     m_testString = "Hello World";
     
-    m_pMsgQ = new (projectname::ThreadSafeMessageQueue)();
-    m_pEvtQ = new (projectname::ThreadSafeMessageQueue)();
+    m_pMsgQ = new (GoCast::ThreadSafeMessageQueue)();
+    m_pEvtQ = new (GoCast::ThreadSafeMessageQueue)();
     m_pMainThread = new PluginMainThread(m_pMsgQ, m_pEvtQ);
     m_pNotificationsThread = new PluginNotificationsThread(this, m_pEvtQ);
     m_pMainThread->startThread();

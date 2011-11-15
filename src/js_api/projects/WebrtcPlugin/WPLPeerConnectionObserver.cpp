@@ -15,7 +15,7 @@
 #include "talk/base/common.h"
 #include "talk/p2p/client/basicportallocator.h"
 
-namespace projectname
+namespace GoCast
 {
     PeerConnectionObserver::PeerConnectionObserver(ThreadSafeMessageQueue* pMsgQ):
     m_pMsgQ(pMsgQ),

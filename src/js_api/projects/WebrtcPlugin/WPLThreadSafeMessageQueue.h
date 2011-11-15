@@ -14,7 +14,7 @@
 #include <string>
 #include <pthread.h>
 
-namespace projectname
+namespace GoCast
 {
     class ThreadSafeMessageQueue
     {
