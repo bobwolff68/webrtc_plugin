@@ -31,9 +31,9 @@ cd ../..
 ./rebuild_webrtc.sh clean
 ./rebuild_plugin.sh clean
 
+echo
 echo third_party/webrtc/trunk contains webrtc.xcodeproj for XCode.
-echo NOTE: Be sure to MODERNIZE all projects.
-echo This can be done by selecting target 'All (webrtc project)' and
-echo "clicking on the warnings (command-4) then clicking on each warning"
-echo and modernizing these projects.
-# resultant binary in third_party/webrtc/trunk/xcodebuild/Debug/cmdline_audio_peer
+echo
+echo src/examples/cmdline_audio_peer/webrtc_projects.xcodeproj contains main project build.
+echo
+# resultant binary in third_party/webrtc/trunk/xcodebuild/Debug/webrtc_projects

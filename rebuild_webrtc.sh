@@ -7,7 +7,7 @@ echo Resetting/Rebuilding project files...
 if [ `uname` = "Linux" ]
 then
   cd third_party/webrtc
-  python trunk/build/gyp_chromium --depth=trunk ../../src/examples/cmdline_audio_peer/cmdline_audio_peer.gyp
+  python trunk/build/gyp_chromium --depth=trunk ../../src/examples/cmdline_audio_peer/webrtc_projects.gyp
 
   cd trunk
   if [ "$1" = "clean" ]
@@ -31,6 +31,9 @@ then
 	exit 1
   fi
 
+  make peerconnection_server
+  make BUILDTYPE=Release peerconnection_server
+
   cd ../../..
 fi
 
@@ -40,7 +43,7 @@ if [ `uname` = "Darwin" ]
 then
 
 cd third_party/webrtc
-python trunk/build/gyp_chromium --depth=trunk ../../src/examples/cmdline_audio_peer/cmdline_audio_peer.gyp -Dclang=1
+python trunk/build/gyp_chromium --depth=trunk ../../src/examples/cmdline_audio_peer/webrtc_projects.gyp -Dclang=1
 cd ../..
 
 echo "Rebuilding webrtc (via cmdline_audio_peer dependencies)"
@@ -50,25 +53,32 @@ cd src/examples/cmdline_audio_peer
 # TODO - check returncode from xcodebuild and halt the process on unsuccessful batch items.
 if [ "$1" = "clean" ]
 then
-  xcodebuild -project cmdline_audio_peer.xcodeproj -target cmdline_audio_peer -configuration Debug clean
-  xcodebuild -project cmdline_audio_peer.xcodeproj -target cmdline_audio_peer -configuration Release clean
+  xcodebuild -project webrtc_projects.xcodeproj -target cmdline_audio_peer -configuration Debug clean
+  xcodebuild -project webrtc_projects.xcodeproj -target cmdline_audio_peer -configuration Release clean
+  xcodebuild -project webrtc_projects.xcodeproj -target peerconnection_server -configuration Debug clean
+  xcodebuild -project webrtc_projects.xcodeproj -target peerconnection_server -configuration Release clean
 fi
 
 # Now do the build for Debug and release.
-xcodebuild -project cmdline_audio_peer.xcodeproj -target cmdline_audio_peer -configuration Debug
+xcodebuild -project webrtc_projects.xcodeproj -target cmdline_audio_peer -configuration Debug
 if [ $? != 0 ]
 then
 	echo ; echo 'xcodebuild (Debug) cmdline_audio_peer' failed. Exiting early.
 	echo
 	exit 1
 fi
-xcodebuild -project cmdline_audio_peer.xcodeproj -target cmdline_audio_peer -configuration Release
+xcodebuild -project webrtc_projects.xcodeproj -target cmdline_audio_peer -configuration Release
 if [ $? != 0 ]
 then
 	echo ; echo 'xcodebuild (Release) cmdline_audio_peer' failed. Exiting early.
 	echo
 	exit 1
 fi
+
+# Now build peerconnection_server
+xcodebuild -project webrtc_projects.xcodeproj -target peerconnection_server -configuration Debug
+xcodebuild -project webrtc_projects.xcodeproj -target peerconnection_server -configuration Release
+
 cd ../../..
 
 fi
