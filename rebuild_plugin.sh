@@ -48,7 +48,7 @@ then
 
 echo "Rebuilding webrtc (via cmdline_audio_peer dependencies)"
 
-third_party/FireBreath/prepmac.sh src/js_api/projects src/js_api/build
+third_party/FireBreath/prepmac_GoCast.sh src/js_api/projects src/js_api/build
 
 cd src/js_api/build
 
@@ -76,7 +76,7 @@ fi
 cd ../../..
 
 echo
-echo "Place symlink to src/js_api/build/\[Debug\|Release\]/WebrtcPlugin.plugin"
+echo "Place symlink to src/js_api/build/[Debug|Release]/WebrtcPlugin.plugin"
 echo output in ~/Library/Internet Plug-Ins/
 echo
 
