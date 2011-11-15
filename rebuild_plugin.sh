@@ -48,7 +48,7 @@ then
 
 echo "Rebuilding webrtc (via cmdline_audio_peer dependencies)"
 
-third_party/FireBreath/prepmac.sh src/js_api/projects src/js_api/build
+third_party/FireBreath/prepmac_GoCast.sh src/js_api/projects src/js_api/build
 
 cd src/js_api/build
 
