@@ -10,6 +10,21 @@
   'includes': [
     '../../../third_party/webrtc/trunk/src/build/common.gypi',
   ],
+  'targets': [
+    {
+      'target_name': 'peerconnection_server',
+      'type': 'executable',
+      'sources': [
+        '../../../third_party/webrtc/trunk/peerconnection/samples/server/data_socket.cc',
+        '../../../third_party/webrtc/trunk/peerconnection/samples/server/data_socket.h',
+        '../../../third_party/webrtc/trunk/peerconnection/samples/server/main.cc',
+        '../../../third_party/webrtc/trunk/peerconnection/samples/server/peer_channel.cc',
+        '../../../third_party/webrtc/trunk/peerconnection/samples/server/peer_channel.h',
+        '../../../third_party/webrtc/trunk/peerconnection/samples/server/utils.cc',
+        '../../../third_party/webrtc/trunk/peerconnection/samples/server/utils.h',
+      ],
+    },
+  ],
   'conditions': [
       ['OS=="linux"', {
           'targets': [
