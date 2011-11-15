@@ -12,8 +12,8 @@ then
   cd trunk
   if [ "$1" = "clean" ]
   then
-    make clean
-    make BUILDTYPE=Release clean
+    rm -Rf out/Debug
+    rm -Rf out/Release
   fi
 
   make cmdline_audio_peer

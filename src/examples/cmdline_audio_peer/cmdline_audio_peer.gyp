@@ -93,9 +93,10 @@
 		'link_settings': {
 			'libraries': [
 # TODO - use _Release here if release build.
-				'../../../third_party/webrtc/trunk/out/Debug/libwebrtc_Debug.a',
+				'../../../third_party/webrtc/trunk/out/Release/libwebrtc_Release.a',
 				'-lexpat',
 				'-lX11',
+				'-lXext',
 				'-ldl',
 				'-lrt',
 				'-lpthread',

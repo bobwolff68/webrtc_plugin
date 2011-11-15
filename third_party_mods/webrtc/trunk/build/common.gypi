@@ -989,7 +989,7 @@
       }],
       ['OS=="linux" and glibcxx_debug==1', {
         'defines': ['_GLIBCXX_DEBUG=1',],
-        'cflags_cc!': ['-fno-rtti'],
+#        'cflags_cc!': ['-fno-rtti'],
         'cflags_cc+': ['-frtti', '-g'],
       }],
       ['remoting==1', {
@@ -1531,7 +1531,7 @@
           '-pipe',
         ],
         'cflags_cc': [
-          '-fno-rtti',
+#          '-fno-rtti',
           '-fno-threadsafe-statics',
           # Make inline functions have hidden visiblity by default.
           # Surprisingly, not covered by -fvisibility=hidden.
