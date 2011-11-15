@@ -17,13 +17,23 @@
 #include "talk/base/scoped_ptr.h"
 #include "talk/base/physicalsocketserver.h"
 
-typedef std::map<int, std::string> Peers;
 typedef std::map<std::string, std::string> ParsedCommand;
+typedef std::map<int, /**< id for a peer mapped to... */
+std::string> Peers; /**< The peer name/description for each peer id. */
 
 class TestPeerConnectionObserver;
 
+/**
+ @brief Using the QT-style signals and slots as its base, PeerConnectionClient keeps our
+ connection state maintained. It also gives us access to initiate connection with
+ a server, send messages to peers, and have a continuously updated list of peers.
+ */
 class TestPeerConnectionClient : public sigslot::has_slots<> {
 public:
+    /**
+     The current state of the client connection. Note that these states are not just 'static'
+     but also are transient in nature by their names (SIGNING_OUT_WAITING and SIGNING_OUT).
+     */
     enum State {
         NOT_CONNECTED,
         SIGNING_IN,
@@ -38,10 +48,29 @@ public:
                              const int serverPort);
     virtual ~TestPeerConnectionClient();
     
+    /**
+    	What is my peer id assigned from the server
+    	@returns peer id for this client
+     */
     int id() const;
+    /**
+    	Find out the connection state with the server. Yes or no.
+    	@returns Whether or not we are connected to the server at this time.
+     */
     bool is_connected() const;
+    /**
+    	The list of current peers - their id and description in a map<int, std::string>
+    	@returns A reference to a map of int,string
+     */
     const Peers& peers() const;
     
+    /**
+    	Make a new connection to a server.
+    	@param server IP address of server. TODO Can this be a canonical name as well?
+    	@param port Port number for connection
+    	@param client_name The desired client name for this client. All peers will know this client by the requested name. TODO What to do about name collisions?
+    	@returns true on success.
+     */
     bool Connect(const std::string& server, int port,
                  const std::string& client_name);
     bool SendToPeer(int peer_id, const std::string& message);
