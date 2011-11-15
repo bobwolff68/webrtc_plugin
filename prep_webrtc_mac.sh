@@ -29,6 +29,7 @@ cd ../../..
 # back up to root
 cd ../..
 ./rebuild_webrtc.sh clean
+./rebuild_plugin.sh clean
 
 echo third_party/webrtc/trunk contains webrtc.xcodeproj for XCode.
 echo NOTE: Be sure to MODERNIZE all projects.
