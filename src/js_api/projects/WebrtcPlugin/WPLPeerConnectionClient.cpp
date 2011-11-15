@@ -200,7 +200,6 @@ namespace projectname
                 std::cout << "Cannot call - peer " << cmd["peername"]
                           << " not online..." << std::endl;
             }
-            
         }
         else if("sendtopeer" == cmd["command"] || "SENDTOPEER" == cmd["command"])
         {
@@ -252,7 +251,6 @@ namespace projectname
             {
                 std::cerr << __FUNCTION__ << ": Failed to remove peer from call: " << peers_[peerId] << std::endl;
             }
-            
         }
         else if("quit" == cmd["command"] || "QUIT" == cmd["command"] ||
                 "exit" == cmd["command"] || "EXIT" == cmd["command"])
@@ -386,7 +384,8 @@ namespace projectname
                          "GET /sign_out?peer_id=%i HTTP/1.0\r\n\r\n", my_id_);
                 onconnect_data_ = buffer;
                 return ConnectControlSocket();
-            } else
+            } 
+            else
             {
                 // Can occur if the app is closed before we finish connecting.
                 return true;
