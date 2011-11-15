@@ -76,7 +76,7 @@ fi
 cd ../../..
 
 echo
-echo "Place symlink to src/js_api/build/\[Debug\|Release\]/WebrtcPlugin.plugin"
+echo "Place symlink to src/js_api/build/[Debug|Release]/WebrtcPlugin.plugin"
 echo output in ~/Library/Internet Plug-Ins/
 echo
 

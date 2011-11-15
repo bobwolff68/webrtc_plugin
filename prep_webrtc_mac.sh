@@ -17,6 +17,8 @@ gclient sync -r 888 --force
 
 #echo Replacing standard files with our modified versions from third_party_mods
 cp -R ../../third_party_mods/webrtc ../../third_party
+# Any mods for FireBreath
+cp -R ../../third_party_mods/FireBreath ../../third_party
 # patch up the libsrtp by config'ing it in preparation for later build steps.
 # Only necessary (still safe though) when NOT copying full-blown third_party_mods (like when up-revving)
 cp -R ../../third_party_mods/webrtc/trunk/third_party/libsrtp ../../third_party/webrtc/trunk/third_party/
