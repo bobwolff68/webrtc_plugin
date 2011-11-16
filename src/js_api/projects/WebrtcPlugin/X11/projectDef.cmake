@@ -24,7 +24,7 @@ add_definitions(
 set (SOURCES
     ${SOURCES}
     ${PLATFORM}
-    ThreadSingle.h
+    ../../../include/ThreadSingle.h
     WPLThreadSafeMessageQueue.h
     WPLThreadSafeMessageQueue.cpp
     )
