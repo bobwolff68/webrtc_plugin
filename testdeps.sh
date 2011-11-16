@@ -22,7 +22,7 @@ then
   EXITVAL=1
 fi
 
-which doxygen
+which doxygen >/dev/null
 if [ $? != 0 ]
 then
   echo
