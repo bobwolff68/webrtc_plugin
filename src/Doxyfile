@@ -700,7 +700,8 @@ RECURSIVE              = YES
 # subdirectory from a directory tree whose root is specified with the INPUT tag. 
 # Note that relative paths are relative to directory from which doxygen is run.
 
-EXCLUDE                = 
+EXCLUDE                = js_api/build \
+                         examples/cmdline_audio_peer/CMakeFiles
 
 # The EXCLUDE_SYMLINKS tag can be used select whether or not files or 
 # directories that are symbolic links (a Unix file system feature) are excluded 
@@ -792,7 +793,7 @@ FILTER_SOURCE_PATTERNS =
 # Note: To get rid of all source code in the generated output, make sure also 
 # VERBATIM_HEADERS is set to NO.
 
-SOURCE_BROWSER         = NO
+SOURCE_BROWSER         = YES
 
 # Setting the INLINE_SOURCES tag to YES will include the body 
 # of functions and classes directly in the documentation.
@@ -989,7 +990,7 @@ DOCSET_FEEDNAME        = "webRTC Plugin Documentation"
 # reverse domain-name style string, e.g. com.mycompany.MyDocSet. Doxygen 
 # will append .docset to the name.
 
-DOCSET_BUNDLE_ID       = com.xvstreams.webrtc_plugin
+DOCSET_BUNDLE_ID       = com.gocast.webrtc_plugin
 
 # When GENERATE_PUBLISHER_ID tag specifies a string that should uniquely identify 
 # the documentation publisher. This should be a reverse domain-name style 
