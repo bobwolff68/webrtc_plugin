@@ -6,6 +6,15 @@ then
   exit
 fi
 
+./testdeps.sh
+if [ $?!=0 ]
+then
+  echo
+  echo Required dependencies not present. Exiting.
+  echo
+  exit 1
+fi
+
 # TODO - Need to check that gclient exists.
 # TODO - Make sure wget is present
 mkdir -p third_party/webrtc

@@ -1,5 +1,14 @@
 #!/bin/sh
 
+./testdeps.sh
+if [ $? != 0 ]
+then
+  echo
+  echo Required dependencies not present. Exiting.
+  echo
+  exit 1
+fi
+
 # Grabbing all the firebreath items
 git submodule init
 git submodule update
