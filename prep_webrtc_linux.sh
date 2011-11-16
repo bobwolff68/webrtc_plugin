@@ -6,6 +6,15 @@ then
   exit
 fi
 
+./testdeps.sh
+if [ $?!=0 ]
+then
+  echo
+  echo Required dependencies not present. Exiting.
+  echo
+  exit 1
+fi
+
 # Must copy ONE modification for Linux. (Hopefully this doesn't grow.)
 cp third_party_mods/webrtc/trunk/build/common.gypi third_party/webrtc/trunk/build
 
