@@ -14,6 +14,10 @@
 #include <string>
 #include "talk/base/basictypes.h"
 
+extern std::string peername;
+extern std::string mainserver;
+extern int mainserver_port;
+
 extern const char kAudioLabel[];
 extern const char kVideoLabel[];
 extern const char kStreamLabel[];

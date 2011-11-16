@@ -1,6 +1,6 @@
 //
-//  PeerConnectionObserver.cpp
-//  TestPeerConnectionClient
+//  File: PeerConnectionObserver.cpp
+//  Project: WebrtcPlugin
 //
 //  Created by Manjesh Malavalli on 10/20/11.
 //  Copyright 2011 XVDTH. All rights reserved.
@@ -122,7 +122,7 @@ namespace GoCast
 
     void PeerConnectionObserver::OnSignalingMessage(const std::string& msg)
     {
-        ParsedCommand sendCmd;
+        ParsedMessage sendCmd;
         std::stringstream sstrm;
         sstrm << m_PeerId;
         sendCmd["command"] = "sendtopeer";
@@ -162,7 +162,7 @@ namespace GoCast
                 if(true == m_pPeerConnection->Close())
                 {
                     DeletePeerConnection();
-                    ParsedCommand cmd;
+                    ParsedMessage cmd;
                     cmd["command"] = "deleteobserver";
                     cmd["peerid"] = ToString(peerId);
                     m_pMsgQ->PostMessage(cmd);
@@ -231,7 +231,7 @@ namespace GoCast
         if(true == m_pPeerConnection->Close())
         {
             DeletePeerConnection();
-            ParsedCommand cmd;
+            ParsedMessage cmd;
             cmd["command"] = "sendtopeer";
             cmd["peerid"] = ToString(remotePeerId);
             cmd["message"] = "bye";

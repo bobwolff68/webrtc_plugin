@@ -1,6 +1,6 @@
 //
-//  PeerConnectionClient.cpp
-//  PeerConnectionClient
+//  File: WPLPeerConnectionClient.cpp
+//  Project: WebrtcPlugin
 //
 //  Created by Manjesh Malavalli on 10/14/11.
 //  Copyright 2011 XVDTH. All rights reserved.
@@ -77,7 +77,7 @@ namespace GoCast
         bool bStatus = true;
         
         bQuitCommand = false;
-        ParsedCommand cmd = m_pMsgQ->GetNextMessage();
+        ParsedMessage cmd = m_pMsgQ->GetNextMessage();
         
         if(true == cmd["command"].empty())
         {
@@ -600,18 +600,22 @@ namespace GoCast
                     }
                     ASSERT(is_connected());
                     std::cout << "Client: Sign in complete" << std::endl;
-                    ParsedCommand event;
-                    event["type"] = "SignedIn";
                     
-                    for(Peers::iterator it = peers_.begin();
-                        it != peers_.end();
-                        it++)
+                    if(NULL != m_pEvtQ)
                     {
-                        event["message"] += it->second;
-                        event["message"] += ":";
-                    }                    
-                    
-                    m_pEvtQ->PostMessage(event);
+                        ParsedMessage event;
+                        event["type"] = "SignedIn";
+                        
+                        for(Peers::iterator it = peers_.begin();
+                            it != peers_.end();
+                            it++)
+                        {
+                            event["message"] += it->second;
+                            event["message"] += ":";
+                        }                    
+                        
+                        m_pEvtQ->PostMessage(event);
+                    }
                 }
                 else if (state_ == SIGNING_OUT) 
                 {
@@ -666,20 +670,28 @@ namespace GoCast
                         {
                             peers_[id] = name;
                             std::cout << "Peer[" << name << "] Online..." << std::endl;
-                            ParsedCommand event;
-                            event["type"] = "PeerOnline";
-                            event["message"] = name;
-                            m_pEvtQ->PostMessage(event);
+                            
+                            if(NULL != m_pEvtQ)
+                            {
+                                ParsedMessage event;
+                                event["type"] = "PeerOnline";
+                                event["message"] = name;
+                                m_pEvtQ->PostMessage(event);
+                            }
 
                         } 
                         else 
                         {
                             peers_.erase(id);
                             std::cout << "Peer[" << name << "]: Offline..." << std::endl;
-                            ParsedCommand event;
-                            event["type"] = "PeerOffline";
-                            event["message"] = name;
-                            m_pEvtQ->PostMessage(event);
+                            
+                            if(NULL != m_pEvtQ)
+                            {
+                                ParsedMessage event;
+                                event["type"] = "PeerOffline";
+                                event["message"] = name;
+                                m_pEvtQ->PostMessage(event);
+                            }
                         }
                     }
                 } 

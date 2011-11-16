@@ -12,19 +12,19 @@
 #include <iostream>
 #include "ThreadSingle.h"
 #include "TestDefaults.h"
-#include "TestPeerConnectionClient.h"
-#include "TestSocketServer.h"
+#include "WPLPeerConnectionClient.h"
+#include "WPLSocketServer.h"
 #include "shell.h"
 
 bool bBreakReceived=false;
 
 // Must have a signal handler.
-extern std::string peername;
+//extern std::string peername;
 
 class TestClientShell : public ThreadSingle
 {
 public:
-    TestClientShell(ThreadSafeMessageQueue* pQueue):
+    TestClientShell(GoCast::ThreadSafeMessageQueue* pQueue):
     m_pQueue(pQueue)
     {
         
@@ -36,7 +36,7 @@ public:
     }
     
 private:
-    ThreadSafeMessageQueue* m_pQueue;
+    GoCast::ThreadSafeMessageQueue* m_pQueue;
     
 private:
     int workerBee(void)
@@ -49,11 +49,31 @@ private:
         {
             std::cout << "AudioClientTest::" << peername << " > " << std::flush;
             cmd_ok = cmdshell.parseLine(cin, false);
-            if (cmd_ok) 
+            if (cmd_ok)
+            {
+                ParsedMessage cmd = cmdshell.getPairs();
+                if("signin" == cmd["command"] || "SIGNIN" == cmd["command"])
+                {
+                    if(true == cmd["server"].empty())
+                    {
+                        cmd["server"] = mainserver;
+                    }
+                    
+                    if(true == cmd["serverport"].empty())
+                    {
+                        cmd["serverport"] = mainserver_port;
+                    }
+                    
+                    if(true == cmd["peername"].empty())
+                    {
+                        cmd["peername"] = peername;
+                    }
+                }
                 m_pQueue->PostMessage(cmdshell.getPairs());
+            }
         } while(cmd_ok && !bBreakReceived);
    
-        map<std::string, std::string> exitpairs;
+        ParsedMessage exitpairs;
         exitpairs["command"] = "QUIT";
         m_pQueue->PostMessage(exitpairs);
         

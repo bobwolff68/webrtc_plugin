@@ -1,13 +1,13 @@
 //
-//  TestPeerConnectionClient.h
-//  TestPeerConnectionClient
+//  File: WPLPeerConnectionClient.h
+//  Project: WebrtcPlugin
 //
 //  Created by Manjesh Malavalli on 10/14/11.
 //  Copyright 2011 XVDTH. All rights reserved.
 //
 
-#ifndef TestPeerConnectionClient_TestPeerConnectionClient_h
-#define TestPeerConnectionClient_TestPeerConnectionClient_h
+#ifndef WebrtcPlugin_WPLPeerConnectionClient_h
+#define WebrtcPlugin_WPLPeerConnectionClient_h
 
 #include <map>
 #include <string>
@@ -18,25 +18,25 @@
 #include "talk/base/physicalsocketserver.h"
 
 typedef std::map<int, std::string> Peers;
-typedef std::map<std::string, std::string> ParsedCommand;
+typedef std::map<std::string, std::string> ParsedMessage;
 
 namespace GoCast
 {
     /**
-    	Handles p2p signaling and voice connection management.
-        This class has been designed to interact with WebRTC's
-        sample 'peerconnection_server'. The interaction involves
-        registering the client's peer name, followed by receiving
-        a unique peer id. Right after login, and from time to time,
+    	Handles signaling between peers with the aid of a signin server.
+        This class has been designed to interact with WebRTC's sample 
+        'peerconnection_server' aka 'signin server'. The interaction 
+        involves registering the client's peer name, followed by receiving
+        a unique peer id. Right after signin, and from time to time,
         it also receives notifications from the server when someone
         comes online or goes offline. It also manages instances of
         the GoCast::PeerConnectionObserver class, which in turn
-        manages the creation/teardown of the capture/encode/transmit
+        manage the creation/teardown of the capture/encode/transmit
         and receive/decode/render pipelines. GoCast::PeerConnectionClient
         receives signaling messages from its observers and forwards them
         to the server, which in turn forwards them to the appropriate peers.
-        It also forwards the signaling messages t receives from the server
-        and forwards them to the appropriate observers.
+        It also forwards the signaling messages it receives from the server
+        to the appropriate observers.
      
         NOTE: There are two aspects to setting up a successful connection 
               between peers. One is having a mechanism to exchange signaling 
@@ -69,8 +69,8 @@ namespace GoCast
         	Constructor.
         	@param pMsgQ Message queue to store commands to be executed.
         	@param pEvtQ Event queue to store generated events that are to be fired into JavaScript.
-        	@param peerName Unique peer name
-        	@param serverLocation Public IP of the signin server
+        	@param peerName Unique peer name.
+        	@param serverLocation Public IP of the signin server.
         	@param serverPort Public port on which the signin server is listening.
         	@returns N/A
          */
@@ -82,23 +82,62 @@ namespace GoCast
         
         /**
         	Destructor
-        	@returns N/A
+        	@returns N/A.
          */
         virtual ~PeerConnectionClient();
         
         /**
         	Returns the unique peer id
-        	@returns int
+        	@returns int: the unique peer id, or -1 if not signed in.
          */
         int id(void) const;
         
-        bool is_connected() const;
-        const Peers& peers() const;
+        /**
+        	Checks if client is signed in to a signin server.
+        	@returns bool: 'true' if connected, 'false' if not.
+         */
+        bool is_connected(void) const;
+        
+        /**
+        	Returns the list of online peers
+        	@returns std::map<int,std::string>: Map of unique peer id's and
+                     their corresponding names.
+         */
+        const Peers& peers(void) const;
+        
+        /**
+        	Signs in to a signin server. 
+        	@param server Signin server's public ip address.
+        	@param port Signin server's public port.
+        	@param client_name Desired name of the client
+        	@returns bool: 'true' if successful, 'false' if not.
+         */
         bool Connect(const std::string& server, int port,
                      const std::string& client_name);
-        bool SendToPeer(int peer_id,
-                        const std::string& message);
+        
+        /**
+            Sends given message to the signin server instructing
+            it to forward the message to theonline peer corresponding 
+            to the given peer id.
+            @param peer_id Unique id of the destination peer.
+            @param message Message to be sent.
+            @returns bool: 'true' if successful, 'false' if not.
+         */
+        bool SendToPeer(int peer_id,const std::string& message);
+
+        /**
+        	Signs out the peer client from the signin server.
+        	@returns bool: 'true' if successful, 'false' if not.
+         */
         bool SignOut();
+
+        /**
+        	Attempts to execute the next command from the command message queue.
+        	@param bQuitCommand 'true' if function returns 'false' because 
+                   the command is 'quit' or 'exit'.
+        	@returns bool: 'true' if successful, 'false' if either unsuccessful or 
+                     command is 'quit' or exit'.
+         */
         bool ExecuteNextCommand(bool& bQuitCommand);
 
     protected:
@@ -137,16 +176,49 @@ namespace GoCast
         std::string notification_data_;
         
     protected:
+        /**
+            Pointer to class which sets up, manages and tears down peer connection
+            observers.
+         */
         Call* m_pCall;
+
+        /**
+        	Message queue that stores commands to be executed by the
+            GoCast::PeerConnecitonClient instance.
+         */
         ThreadSafeMessageQueue* m_pMsgQ;
+        
+        /**
+        	Event queue to store generated events that are to be fired into JavaScript.
+            NOTE: Pass NULL in constructor if not using event queue.
+         */
         ThreadSafeMessageQueue* m_pEvtQ;
+        
+        /**
+        	List of online peers (unique peer id, unique peer name).
+         */
         Peers peers_;
+        
+        /**
+        	Current state of the GoCast::PeerConnectionClient instance.
+         */
         State state_;
         int my_id_;
         
     protected:
+        /**
+        	Unique name of the peer client.
+         */
         std::string m_PeerName;
+        
+        /**
+            Public IP address of the signin server.
+         */
         std::string m_ServerLocation;
+
+        /**
+        	Public port on which the signin server is listening.
+         */
         int m_ServerPort;
     };
 }

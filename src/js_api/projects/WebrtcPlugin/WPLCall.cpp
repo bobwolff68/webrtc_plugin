@@ -1,6 +1,6 @@
 //
-//  Call.cpp
-//  cmdline_audio_peer
+//  File: WPLCall.cpp
+//  Project: WebrtcPlugin
 //
 //  Created by Manjesh Malavalli on 11/3/11.
 //  Copyright 2011 XVDTH. All rights reserved.
@@ -44,10 +44,13 @@ namespace GoCast
             m_Observers[peerId]->SetPeerId(peerId);
             m_Observers[peerId]->SetPeerName(peerName);
             
-            ThreadSafeMessageQueue::ParsedCommand event;
-            event["type"] = "RemotePeerCall";
-            event["message"] = peerName;
-            m_pEvtQ->PostMessage(event);
+            if(NULL != m_pEvtQ)
+            {
+                ThreadSafeMessageQueue::ParsedMessage event;
+                event["type"] = "RemotePeerCall";
+                event["message"] = peerName;
+                m_pEvtQ->PostMessage(event);
+            }
         }
         
         ListParticipants();
@@ -68,10 +71,13 @@ namespace GoCast
         {
             bStatus = true;
 
-            ThreadSafeMessageQueue::ParsedCommand event;
-            event["type"] = "RemotePeerHangup";
-            event["message"] = m_Participants[peerId];
-            m_pEvtQ->PostMessage(event);
+            if(NULL != m_pEvtQ)
+            {
+                ThreadSafeMessageQueue::ParsedMessage event;
+                event["type"] = "RemotePeerHangup";
+                event["message"] = m_Participants[peerId];
+                m_pEvtQ->PostMessage(event);
+            }
         }
         else
         {

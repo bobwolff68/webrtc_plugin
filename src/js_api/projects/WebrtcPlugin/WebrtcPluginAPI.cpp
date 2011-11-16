@@ -41,7 +41,7 @@ int PluginNotificationsThread::workerBee(void)
     std::string eventType = "";
     do
     {
-        ParsedCommand event = m_pEvtQ->GetNextMessage();
+        ParsedMessage event = m_pEvtQ->GetNextMessage();
         eventType = event["type"];
         
         if("SignedIn" == eventType)
@@ -120,8 +120,8 @@ WebrtcPluginAPI::WebrtcPluginAPI(const WebrtcPluginPtr& plugin, const FB::Browse
 ///////////////////////////////////////////////////////////////////////////////
 WebrtcPluginAPI::~WebrtcPluginAPI()
 {
-    ParsedCommand cmd;
-    ParsedCommand event;
+    ParsedMessage cmd;
+    ParsedMessage event;
     
     cmd["command"] = "quit";
     m_pMsgQ->PostMessage(cmd);
@@ -188,7 +188,7 @@ void WebrtcPluginAPI::Signin(const std::string& peerName,
                              const std::string& serverIP,
                              const int serverPort)
 {
-    ParsedCommand cmd;
+    ParsedMessage cmd;
 
     cmd["command"] = "signin";
     cmd["server"] = serverIP,
@@ -199,7 +199,7 @@ void WebrtcPluginAPI::Signin(const std::string& peerName,
 
 void WebrtcPluginAPI::Signout(void)
 {
-    ParsedCommand cmd;
+    ParsedMessage cmd;
     
     cmd["command"] = "signout";
     m_pMsgQ->PostMessage(cmd);
@@ -207,7 +207,7 @@ void WebrtcPluginAPI::Signout(void)
 
 void WebrtcPluginAPI::Call(const std::string &peerName)
 {
-    ParsedCommand cmd;
+    ParsedMessage cmd;
     
     cmd["command"] = "call";
     cmd["peername"] = peerName;
@@ -216,7 +216,7 @@ void WebrtcPluginAPI::Call(const std::string &peerName)
 
 void WebrtcPluginAPI::Hangup(const std::string &peerName)
 {
-    ParsedCommand cmd;
+    ParsedMessage cmd;
     
     cmd["command"] = "hangup";
     cmd["peername"] = peerName;

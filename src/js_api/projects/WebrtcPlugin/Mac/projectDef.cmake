@@ -26,7 +26,7 @@ SOURCE_GROUP(Mac FILES ${PLATFORM})
 set (SOURCES
     ${SOURCES}
     ${PLATFORM}
-    ThreadSingle.h
+    ../../../include/ThreadSingle.h
     WPLThreadSafeMessageQueue.h
     WPLThreadSafeMessageQueue.cpp
     )

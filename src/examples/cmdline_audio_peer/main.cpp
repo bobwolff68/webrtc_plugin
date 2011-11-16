@@ -9,20 +9,18 @@
 #include <iostream>
 #include <sstream>
 #include "talk/base/thread.h"
-#include "TestPeerConnectionClient.h"
-#include "TestSocketServer.h"
+#include "WPLPeerConnectionClient.h"
+#include "WPLSocketServer.h"
 #include "TestClientShell.h"
+#include "TestDefaults.h"
 
-extern std::string peername;
-extern std::string mainserver;
-extern int mainserver_port;
 extern bool parsecmd(int argc, char**argv);
 
 int main (int argc, const char * argv[])
 {
     talk_base::AutoThread auto_thread;
     talk_base::Thread* thread = talk_base::Thread::Current();
-    ThreadSafeMessageQueue mq;
+    GoCast::ThreadSafeMessageQueue mq;
     
     if (!parsecmd(argc, (char**)argv))
     {
@@ -30,12 +28,12 @@ int main (int argc, const char * argv[])
         exit(-1);
     }
     
-    TestSocketServer socket_server;
+    GoCast::SocketServer socket_server;
     thread->set_socketserver(&socket_server);
     
     //Declare client only after set_socketserver()
-    TestPeerConnectionClient testClient(&mq, peername, mainserver, mainserver_port);
-    socket_server.SetTestPeerConnectionClient(&testClient);
+    GoCast::PeerConnectionClient testClient(&mq, NULL, peername, mainserver, mainserver_port);
+    socket_server.SetPeerConnectionClient(&testClient);
     
     //Run client shell
     TestClientShell shell(&mq);

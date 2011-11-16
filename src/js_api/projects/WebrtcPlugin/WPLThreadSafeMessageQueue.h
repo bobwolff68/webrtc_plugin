@@ -1,13 +1,13 @@
 //
-//  ThreadSafeMessageQueue.h
-//  cmdline_audio_peer
+//  File: WPLThreadSafeMessageQueue.h
+//  Project: WebrtcPlugin
 //
 //  Created by Manjesh Malavalli on 11/2/11.
 //  Copyright 2011 XVDTH. All rights reserved.
 //
 
-#ifndef WebrtcPlugin_ThreadSafeMessageQueue_h
-#define WebrtcPlugin_ThreadSafeMessageQueue_h
+#ifndef WebrtcPlugin_WPLThreadSafeMessageQueue_h
+#define WebrtcPlugin_WPLThreadSafeMessageQueue_h
 
 #include <deque>
 #include <map>
@@ -16,20 +16,49 @@
 
 namespace GoCast
 {
+    /**
+    	Thread-safe message queue class.
+     */
     class ThreadSafeMessageQueue
     {
     public:
-        typedef std::map<std::string, std::string> ParsedCommand;
+        typedef std::map<std::string, std::string> ParsedMessage;
         
     private:
-        std::deque<ParsedCommand> cmdQ;
+        /**
+        	Message queue.
+         */
+        std::deque<ParsedMessage> cmdQ;
+        
+        /**
+        	Mutex to regulate access to message queue.
+         */
         pthread_mutex_t qMutex;
         
     public:
+        /**
+        	Constructor.
+        	@returns N/A.
+         */
         ThreadSafeMessageQueue();
+        
+        /**
+        	Destructor.
+        	@returns N/A.
+         */
         virtual ~ThreadSafeMessageQueue();
-        void PostMessage(ParsedCommand& msg);
-        ParsedCommand GetNextMessage(void);
+        
+        /**
+        	Post new message.
+        	@param msg Message to be posted.
+         */
+        void PostMessage(ParsedMessage& msg);
+        
+        /**
+        	Get next message to be processed.
+        	@returns ParsedMessage: parsed message.
+         */
+        ParsedMessage GetNextMessage(void);
     };
 }
 

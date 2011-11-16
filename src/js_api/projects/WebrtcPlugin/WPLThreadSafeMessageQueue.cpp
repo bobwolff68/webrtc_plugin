@@ -1,6 +1,6 @@
 //
-//  ThreadSafeMessageQueue.cpp
-//  cmdline_audio_peer
+//  File: WPLThreadSafeMessageQueue.cpp
+//  Project: WebrtcPlugin
 //
 //  Created by Manjesh Malavalli on 11/2/11.
 //  Copyright 2011 XVDTH. All rights reserved.
@@ -21,7 +21,7 @@ namespace GoCast
         pthread_mutex_destroy(&qMutex);
     }
 
-    void ThreadSafeMessageQueue::PostMessage(ParsedCommand& msg)
+    void ThreadSafeMessageQueue::PostMessage(ParsedMessage& msg)
     {
         int pthreadRet = pthread_mutex_lock(&qMutex);
         assert(0 == pthreadRet);
@@ -30,9 +30,9 @@ namespace GoCast
         assert(0 == pthreadRet);
     }
 
-    ThreadSafeMessageQueue::ParsedCommand ThreadSafeMessageQueue::GetNextMessage(void)
+    ThreadSafeMessageQueue::ParsedMessage ThreadSafeMessageQueue::GetNextMessage(void)
     {
-        ParsedCommand nextMsg;
+        ParsedMessage nextMsg;
         int pthreadRet = pthread_mutex_lock(&qMutex);
         assert(0 == pthreadRet);
         

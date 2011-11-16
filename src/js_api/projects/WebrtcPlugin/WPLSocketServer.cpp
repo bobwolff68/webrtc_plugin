@@ -1,6 +1,6 @@
 //
-//  SocketServer.cpp
-//  TestPeerConnectionClient
+//  File WPLSocketServer.cpp
+//  Project: WebrtcPlugin
 //
 //  Created by Manjesh Malavalli on 10/18/11.
 //  Copyright 2011 XVDTH. All rights reserved.
