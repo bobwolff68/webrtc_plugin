@@ -37,17 +37,6 @@ namespace GoCast
         to the server, which in turn forwards them to the appropriate peers.
         It also forwards the signaling messages it receives from the server
         to the appropriate observers.
-     
-        NOTE: There are two aspects to setting up a successful connection 
-              between peers. One is having a mechanism to exchange signaling 
-              messages between peers. This is achieved here through the peers 
-              signing in to a common server, and forwarding any signaling 
-              messages to it, as it knows the location of the intended recipients.
-              All this is handled through TCP connections. The second aspect is
-              the voice data connection between peers, which is handled through
-              RTP/RTCP(UDP) connections, with STUN/TURN/ICE for NAT traversal.
-              GoCast::PeerConnectionClient handles the first aspect, while
-              GoCast::PeerConnectionObserver handles the second.
      */
     class PeerConnectionClient : public sigslot::has_slots<>
     {
