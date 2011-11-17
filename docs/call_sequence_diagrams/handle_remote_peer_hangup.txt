@@ -1,0 +1,10 @@
+RemotePeer[RP]-->PeerConnectionObserver[PO]: hangup msg from RP
+
+PeerConnectionObserver[PO]-->PeerConnection[PC]: close PC (Close())
+
+PeerConnection[PC]-->PeerConnection[PC]: remove audio channel
+
+PeerConnection[PC]-->PeerConnectionObserver[PO]: report audio channel removed (OnRemoveStream())
+
+PeerConnectionObserver[PO]-->PeerConnection[PC]: delete
+

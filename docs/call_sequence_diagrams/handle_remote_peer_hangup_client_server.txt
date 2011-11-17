@@ -1,0 +1,14 @@
+RemotePeer[RP]-->SigninServer[SS]: hangup msg from RP
+
+SigninServer[SS]-->PeerConnectionClient[PCC]: hangup msg from RP
+
+PeerConnectionClient[PCC]-->PeerConnectionObserver[PO]: process hangup msg (OnMessageFromPeer())
+
+PeerConnectionObserver[PO]-->PeerConnection[PC]: close PC (Close())
+
+PeerConnection[PC]-->PeerConnection[PC]: remove audio channel
+
+PeerConnection[PC]-->PeerConnectionObserver[PO]: report audio channel removed (OnRemoveStream())
+
+PeerConnectionObserver[PO]-->PeerConnection[PC]: delete
+

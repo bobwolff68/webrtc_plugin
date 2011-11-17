@@ -1,0 +1,26 @@
+RemotePeer[RP]-->SigninServer[SS]: offer from remote peer (msg)
+
+SigninServer[SS]-->PeerConnectionClient[PCC]: offer from remote peer (msg)
+
+PeerConnectionClient[PCC]-->PeerConnectionObserver[PO]: offer from remote peer (msg) (OnMessageFromPeer())
+
+PeerConnectionObserver[PO]-->PeerConnection[PC]: new/init
+
+PeerConnectionObserver[PO]-->PeerConnection[PC]: register self w/ PC (RegisterObserver())
+
+PeerConnectionObserver[PO]-->PeerConnection[PC]: process sig msg (SignalingMessage())
+
+PeerConnection[PC]-->PeerConnection[PC]: add remote audio stream (AddStream())
+
+PeerConnection[PC]-->PeerConnectionObserver[PO]: report added remote audio stream (OnAddStream())
+
+PeerConnection[PC]-->PeerConnectionObserver[PO]: sig msg available (OnSignalingMessage())
+
+PeerConnectionObserver[PO]-->PeerConnectionClient[PCC]: send reply to remote peer (msg)
+
+PeerConnectionClient[PCC]-->SigninServer[SS]: send reply to remote peer (msg) (SendToPeer())
+
+SigninServer[SS]-->RemotePeer[RP]: send reply to remote peer (msg)
+
+note over PeerConnection[PC],RemotePeer[RP]: VOICE CONNECTION
+
