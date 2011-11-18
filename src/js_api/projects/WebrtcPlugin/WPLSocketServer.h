@@ -1,10 +1,14 @@
-//
+/*
+ *  Copyright (c) 2011 GoCast. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree. All contributing project authors may be found in the 
+ *  AUTHORS file in the root of the source tree.
+ */
+
 //  File: WPLSocketServer.h
 //  Project: WebrtcPlugin
-//
-//  Created by Manjesh Malavalli on 10/18/11.
-//  Copyright 2011 XVDTH. All rights reserved.
-//
 
 #ifndef WebrtcPlugin_WPLSocketServer_h
 #define WebrtcPlugin_WPLSocketServer_h

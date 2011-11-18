@@ -1,10 +1,14 @@
-//
-//  TestClientShell.h
-//  TestPeerConnectionClient
-//
-//  Created by Manjesh Malavalli on 10/14/11.
-//  Copyright 2011 XVDTH. All rights reserved.
-//
+/*
+ *  Copyright (c) 2011 GoCast. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree. All contributing project authors may be found in the 
+ *  AUTHORS file in the root of the source tree.
+ */
+
+//  File: TestClientShell.h
+//  Project: cmdline_audio_peer
 
 #ifndef TestPeerConnectionClient_TestClientShell_h
 #define TestPeerConnectionClient_TestClientShell_h
