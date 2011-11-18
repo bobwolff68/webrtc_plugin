@@ -1,6 +1,42 @@
 #ifndef _ANYOPTION_H
 #define _ANYOPTION_H
 
+/*
+ *  Copyright (c) 2011 GoCast. All Rights Reserved.
+ *
+ *  Use of this source code is governed by a BSD-style license
+ *  that can be found in the LICENSE file in the root of the source
+ *  tree. All contributing project authors may be found in the
+ *  AUTHORS file in the root of the source tree.
+ */
+
+/* 
+  kishan gave an acknowledgment that this is in the public domain
+   in an email to me (rwolff) - 
+
+  From: "Kishan Thomas" <kishan@hackorama.com>
+  To: "Robert Wolff (XVD)" <rwolff@xvdth.com>
+  Sent: Wednesday, January 21, 2009 7:37:55 AM
+  Subject: Re: Command line parser - copyright / license?
+
+  Hi Bob,
+
+  Its in the public domain, please feel free to use. If you mention hackorama.com somewhere in the documentation it will be nice.
+
+  Thanks
+  Kishan
+
+  Robert Wolff (XVD) wrote:
+  Hi there,
+
+  I found your commandline parser class on hackorama.com and would like to use it for my application(s). However, I don't see any license given. Can you clarify if it is freeware, BSD, MIT, GPLv2, etc.
+
+  Thanks!
+
+  Bob Wolff
+
+*/
+
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
