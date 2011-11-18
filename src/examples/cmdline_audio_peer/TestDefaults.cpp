@@ -7,8 +7,8 @@
  *  AUTHORS file in the root of the source tree.
  */
 
-//  TestDefaults.cpp
-//  TestPeerConnectionClient
+// File: TestDefaults.cpp
+// Project: cmdline_audio_peer
 
 #include "TestDefaults.h"
 #include <stdlib.h>

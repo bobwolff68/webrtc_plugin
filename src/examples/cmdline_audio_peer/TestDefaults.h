@@ -7,11 +7,11 @@
  *  AUTHORS file in the root of the source tree.
  */
 
-//  TestDefaults.h
-//  TestPeerConnectionClient
+// File: TestDefaults.h
+// Project: cmdline_audio_peer
 
-#ifndef TestPeerConnectionClient_TestDefaults_h
-#define TestPeerConnectionClient_TestDefaults_h
+#ifndef cmdline_audio_peer_TestDefaults_h
+#define cmdline_audio_peer_TestDefaults_h
 
 #pragma once
 

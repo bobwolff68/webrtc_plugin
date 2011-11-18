@@ -10,8 +10,8 @@
 //  File: TestClientShell.h
 //  Project: cmdline_audio_peer
 
-#ifndef TestPeerConnectionClient_TestClientShell_h
-#define TestPeerConnectionClient_TestClientShell_h
+#ifndef cmdline_audio_peer_TestClientShell_h
+#define cmdline_audio_peer_TestClientShell_h
 
 #include <iostream>
 #include "ThreadSingle.h"
