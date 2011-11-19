@@ -22,6 +22,15 @@ then
   EXITVAL=1
 fi
 
+which cmake >/dev/null
+if [ $? != 0 ]
+then
+  echo
+  echo "'cmake' is required and was not found."
+  echo "Go to 'cmake.org' do download."
+  EXITVAL=1
+fi
+
 which doxygen >/dev/null
 if [ $? != 0 ]
 then

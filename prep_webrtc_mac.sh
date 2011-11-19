@@ -7,7 +7,7 @@ then
 fi
 
 ./testdeps.sh
-if [ $?!=0 ]
+if [ $? != 0 ]
 then
   echo
   echo Required dependencies not present. Exiting.
