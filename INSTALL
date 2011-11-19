@@ -1,0 +1,33 @@
+
+The project is relatively automated regarding building and use. But as in many
+things, reading the docs is suggested. Full docs are found on the website at 
+
+  http://gocast.it
+
+If you're in a hurry, however, and you're on a Mac or Linux, you should have
+good luck in simply running:
+
+  ./prep_webrtc.sh
+
+This will in turn download and build webRTC along with FireBreath and our
+plugin. Note that the webrtc repository is over 100MB in size so set some
+time aside (unless you've got a fantastic net connection)
+
+The resultant output are found in:
+[Linux]
+third_party/webrtc/out/[Debug|Release]/
+  libwebrtc_*.a
+  peerconnection_server
+  cmdline_audio_peer
+
+src/js_api/build/bin/WebrtcPlugin/npWebrtcPlugin.so
+
+[Mac]
+third_party/webrtc/xcodebuild/[Debug|Release]/
+  libwebrtc_*.a
+  peerconnection_server
+  cmdline_audio_peer
+
+src/js_api/build/projects/WebrtcPlugin/Debug/WebrtcPlugin.plugin
+
+
