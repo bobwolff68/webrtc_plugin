@@ -18,6 +18,12 @@
 #include "talk/app/webrtc/peerconnectionfactory.h"
 #include "talk/base/scoped_ptr.h"
 
+#define GOCAST_AUDIO_IN   ""
+#define GOCAST_AUDIO_OUT  ""
+#define GOCAST_AUDIO_OPTS (cricket::MediaEngineInterface::ECHO_CANCELLATION |\
+                           cricket::MediaEngineInterface::NOISE_SUPPRESSION |\
+                           cricket::MediaEngineInterface::AUTO_GAIN_CONTROL)
+
 namespace GoCast
 {
     /**
@@ -39,9 +45,18 @@ namespace GoCast
         	Constructor.
         	@param pMsgQ Message queue to store commands to 
                    GoCast::PeerConnectionClient.
+            @param pWorkerThread Pointer to the peer connection 
+                                 factory's worker thread.
+            @param pPeerConnectionFactory Pointer to the global
+                                          peer connection factory
+                                          instance.
         	@returns N/A.
          */
-        PeerConnectionObserver(ThreadSafeMessageQueue* pMsgQ);
+        PeerConnectionObserver(
+            ThreadSafeMessageQueue* pMsgQ,
+            talk_base::scoped_ptr<talk_base::Thread>* pWorkerThread,
+            talk_base::scoped_ptr<webrtc::PeerConnectionFactory>* pPeerConnectionFactory
+        );
         
         /**
         	Destructor.
@@ -90,7 +105,7 @@ namespace GoCast
         	@returns bool: 'true' if successful, 'false' if not.
          */
         virtual bool DisconnectFromCurrentPeer(void);
-
+        
     protected:
         /**
         	Initializes the webrtc::PeerConnection instance.
@@ -135,11 +150,6 @@ namespace GoCast
          */
         virtual void OnRemoveStream(const std::string& streamId, bool video);
         
-        /**
-        	Sets up the local audio stream for transmission.
-         */
-        virtual void ShareLocalAudioStream(void);
-        
     protected:
         /**
         	Message queue to store commands to GoCast::PeerConnectionClient.
@@ -153,16 +163,16 @@ namespace GoCast
         talk_base::scoped_ptr<webrtc::PeerConnection> m_pPeerConnection;
         
         /**
-        	Factory class that generates instances of webrtc::PeerConnection.
-         */
-        talk_base::scoped_ptr<webrtc::PeerConnectionFactory> m_pPeerConnectionFactory;
-        
-        /**
-        	Scoped reference to the worker thread used by webrtc::PeerConnection
+            Scoped reference to the worker thread used by webrtc::PeerConnection
             to manage the media pipeline.
          */
-        talk_base::scoped_ptr<talk_base::Thread> m_pWorkerThread;
-        
+        talk_base::scoped_ptr<talk_base::Thread>* m_pWorkerThread;
+
+        /**
+        	Factory class that generates instances of webrtc::PeerConnection.
+         */
+        talk_base::scoped_ptr<webrtc::PeerConnectionFactory>* m_pPeerConnectionFactory;
+                
         /**
         	Unique id of the remote peer.
          */
@@ -172,19 +182,6 @@ namespace GoCast
         	Unique name of the remote peer.
          */
         std::string m_PeerName;
-        
-        /**
-        	'true' if local media pipeline has been created, 'false' if not.
-            This is required in OnAddStream() because, OnAddStream() can be
-            called when a remote stream is added as part of call request from
-            the remote peer, in which case the local media pipeline has not
-            been created yet, and hence should be. OnAddStream() can also be
-            called when a remote stream is added as a result of the remote
-            peer accepting a call request from the local peer, in which case
-            the local media pipeline has already been created, so a call to
-            ShareLocalAudioStream() is not required.
-         */
-        bool m_bAudioStreamShared;
     };
 }
 

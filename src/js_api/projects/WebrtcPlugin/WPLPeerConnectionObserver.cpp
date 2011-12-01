@@ -17,15 +17,19 @@
 #include "WPLSocketServer.h"
 #include "rtc_common.h"
 #include "talk/base/common.h"
-#include "talk/p2p/client/basicportallocator.h"
+#include "talk/session/phone/mediaengine.h"
 
 namespace GoCast
 {
-    PeerConnectionObserver::PeerConnectionObserver(ThreadSafeMessageQueue* pMsgQ):
-    m_pMsgQ(pMsgQ),
-    m_PeerId(-1),
-    m_PeerName(""),
-    m_bAudioStreamShared(false)
+    PeerConnectionObserver::PeerConnectionObserver(
+        ThreadSafeMessageQueue* pMsgQ,
+        talk_base::scoped_ptr<talk_base::Thread>* pWorkerThread,
+        talk_base::scoped_ptr<webrtc::PeerConnectionFactory>* pPeerConnectionFactory
+    ):  m_pMsgQ(pMsgQ),
+        m_pWorkerThread(pWorkerThread),
+        m_pPeerConnectionFactory(pPeerConnectionFactory),
+        m_PeerId(-1),
+        m_PeerName("")
     {
 
     }
@@ -42,53 +46,12 @@ namespace GoCast
 
     bool PeerConnectionObserver::InitPeerConnection(void)
     {
-        ASSERT(NULL == m_pPeerConnectionFactory.get());
         ASSERT(NULL == m_pPeerConnection.get());
-        ASSERT(NULL == m_pWorkerThread.get());
-        
-        //Reset worker thread
-        m_pWorkerThread.reset(new talk_base::Thread());
-        if(false == m_pWorkerThread->SetName("ObserverWT", this) ||
-           false == m_pWorkerThread->Start())
-        {
-            std::cerr << __FUNCTION__
-                      << ": Unable to start libjingle worker thread"
-                      << std::endl;
-            m_pWorkerThread.reset();
-            return false;
-        }
-        
-        //Create port allocator of peer connection factory
-        cricket::PortAllocator* pPortAllocator = NULL;
-        pPortAllocator = new cricket::BasicPortAllocator(
-                            new talk_base::BasicNetworkManager(),
-                            talk_base::SocketAddress("stun.l.google.com", 19302),
-                            talk_base::SocketAddress(),
-                            talk_base::SocketAddress(),
-                            talk_base::SocketAddress()
-                         );
-        
-        //Create peer connection factory
-        m_pPeerConnectionFactory.reset(
-            new webrtc::PeerConnectionFactory(
-                    pPortAllocator,
-                    m_pWorkerThread.get()
-                )
-        );
-        
-        if(false == m_pPeerConnectionFactory->Initialize())
-        {
-            std::cerr << __FUNCTION__ 
-                      << ": Unable to create peer connection factory"
-                      << std::endl;
-            DeletePeerConnection();
-            return false;
-        }
-        
+                        
         //Create peer connection
         m_pPeerConnection.reset(
-            m_pPeerConnectionFactory->CreatePeerConnection(
-                m_pWorkerThread.get()
+            (*m_pPeerConnectionFactory)->CreatePeerConnection(
+                m_pWorkerThread->get()
             )
         );
         
@@ -102,19 +65,22 @@ namespace GoCast
         }
         
         m_pPeerConnection->RegisterObserver(this);
-        bool bStatus = m_pPeerConnection->SetAudioDevice("", "", 0);
+        bool bStatus = m_pPeerConnection->SetAudioDevice(
+                            GOCAST_AUDIO_IN,
+                            GOCAST_AUDIO_OUT,
+                            GOCAST_AUDIO_OPTS
+                       );
+        
         std::cout << "SetAudioDevice "
                   << (bStatus ? "succeeded" : "failed")
                   << std::endl;
         
-        return true;
+        return bStatus;
     }
 
     void PeerConnectionObserver::DeletePeerConnection(void)
     {
         m_pPeerConnection.reset();
-        m_pWorkerThread.reset();
-        m_pPeerConnectionFactory.reset();
         m_PeerId = -1;
         m_PeerName = "";
     }
@@ -139,20 +105,17 @@ namespace GoCast
     {
         if(false == video)
         {
-            std::cout << "Peerconnection added remote stream: " 
+            std::cout << m_PeerName << " added local stream: " 
                       << streamId 
                       << std::endl;
-            ShareLocalAudioStream();
         }
     }
 
     void PeerConnectionObserver::OnRemoveStream(const std::string &streamId, bool video)
     {
-        std::cout << "Peerconnection removed remote stream: " 
+        std::cout << m_PeerName << "removed local stream: " 
                   << streamId
                   << std::endl;
-
-        m_bAudioStreamShared = false;
     }
 
     void PeerConnectionObserver::OnMessageFromRemotePeer(int peerId, const std::string& msg)
@@ -213,18 +176,8 @@ namespace GoCast
         
         m_PeerId = peerId;
         m_PeerName = peerName;
-        ShareLocalAudioStream();
-    }
-
-    void PeerConnectionObserver::ShareLocalAudioStream(void)
-    {
-        //If peer has not shared its stream with remote peer yet, share it
-        if(false == m_bAudioStreamShared)
-        {
-            m_pPeerConnection->AddStream("local_audio",false);
-            m_pPeerConnection->Connect();
-            m_bAudioStreamShared = true;
-        }
+        m_pPeerConnection->AddStream("local_audio",false);
+        m_pPeerConnection->Connect();
     }
 
     bool PeerConnectionObserver::DisconnectFromCurrentPeer(void)

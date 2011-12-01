@@ -13,20 +13,35 @@
 #include <assert.h>
 #include <iostream>
 #include "WPLCall.h"
+#include "talk/session/phone/mediaengine.h"
+#include "talk/session/phone/webrtcvoiceengine.h"
+#include "talk/p2p/client/basicportallocator.h"
 
 namespace GoCast
 {
+    cricket::MediaEngineInterface* MediaEngineFactory::Create()
+    {
+        return new cricket::CompositeMediaEngine
+        <cricket::WebRtcVoiceEngine,
+        cricket::NullVideoEngine>();
+    }
+    
+    cricket::DeviceManagerInterface* DeviceManagerFactory::Create()
+    {
+        return new cricket::DeviceManager();
+    }
+    
     Call::Call(ThreadSafeMessageQueue* pMsgQ,
                ThreadSafeMessageQueue* pEvtQ):
     m_pMsgQ(pMsgQ),
     m_pEvtQ(pEvtQ)
     {
-        
+
     }
 
     Call::~Call()
     {
-        
+
     }
 
     bool Call::AddParticipant(int peerId, std::string& peerName, bool bRemoteCall)
@@ -37,7 +52,11 @@ namespace GoCast
         }
         
         m_Participants[peerId] = peerName;
-        m_Observers[peerId] = new PeerConnectionObserver(m_pMsgQ);
+        m_Observers[peerId] = new PeerConnectionObserver(
+                                        m_pMsgQ,
+                                        &m_pWorkerThread,
+                                        &m_pPeerConnectionFactory
+                                  );
         
         if(false == bRemoteCall)
         {
@@ -128,5 +147,63 @@ namespace GoCast
     void Call::OnMessageFromPeer(int peerId, const std::string &msg)
     {
         m_Observers[peerId]->OnMessageFromRemotePeer(peerId, msg);
+    }
+    
+    bool Call::InitPeerConnectionFactory()
+    {
+        ASSERT(NULL == m_pPeerConnectionFactory.get());
+        ASSERT(NULL == m_pWorkerThread.get());
+        
+        //Reset worker thread
+        m_pWorkerThread.reset(new talk_base::Thread());
+        if(false == m_pWorkerThread->SetName("ObserverWT", this) ||
+           false == m_pWorkerThread->Start())
+        {
+            std::cerr << __FUNCTION__
+            << ": Unable to start libjingle worker thread"
+            << std::endl;
+            m_pWorkerThread.reset();
+            return false;
+        }
+        
+        //Create port allocator of peer connection factory
+        cricket::PortAllocator* pPortAllocator = NULL;
+        pPortAllocator = new cricket::BasicPortAllocator(
+                            new talk_base::BasicNetworkManager(),
+                            talk_base::SocketAddress("stun.l.google.com", 19302),
+                            talk_base::SocketAddress(),
+                            talk_base::SocketAddress(),
+                            talk_base::SocketAddress()
+                        );
+        
+        //Create media engine and device manager
+        m_pMediaEngine = MediaEngineFactory::Create();
+        m_pDeviceManager = DeviceManagerFactory::Create();
+        
+        //Create peer connection factory
+        m_pPeerConnectionFactory.reset(
+            new webrtc::PeerConnectionFactory(
+                        pPortAllocator,
+                        m_pMediaEngine,
+                        m_pDeviceManager,
+                        m_pWorkerThread.get()
+            )
+        );
+        
+        if(false == m_pPeerConnectionFactory->Initialize())
+        {
+            std::cerr << __FUNCTION__ 
+            << ": Unable to create peer connection factory"
+            << std::endl;
+            return false;
+        }
+        
+        return true;
+    }
+    
+    void Call::DeInitPeerConnectionFactory()
+    {
+        m_pWorkerThread.reset();
+        m_pPeerConnectionFactory.reset();
     }
 }

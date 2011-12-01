@@ -256,6 +256,19 @@ namespace GoCast
                 std::cerr << __FUNCTION__ << ": Failed to remove peer from call: " << peers_[peerId] << std::endl;
             }
         }
+        else if("initpeerconnfactory" == cmd["command"] || "INITPEERCONNFACTORY" == cmd["command"])
+        {
+            bStatus = m_pCall->InitPeerConnectionFactory();
+            
+            if(false == bStatus)
+            {
+                std::cerr << __FUNCTION__ << ": Failed to init peerconnection factory" << std::endl;
+            }
+        }
+        else if("deinitpeerconnfactory" == cmd["command"] || "DEINITPEERCONNFACTORY" == cmd["command"])
+        {
+            m_pCall->DeInitPeerConnectionFactory();
+        }
         else if("quit" == cmd["command"] || "QUIT" == cmd["command"] ||
                 "exit" == cmd["command"] || "EXIT" == cmd["command"])
         {
@@ -602,8 +615,12 @@ namespace GoCast
                             pos = eol + 1;
                         }
                     }
+                    
                     ASSERT(is_connected());
                     std::cout << "Client: Sign in complete" << std::endl;
+                    ParsedMessage cmd;
+                    cmd["command"] = "initpeerconnfactory";
+                    m_pMsgQ->PostMessage(cmd);
                     
                     if(NULL != m_pEvtQ)
                     {
@@ -625,6 +642,9 @@ namespace GoCast
                 {
                     Close();
                     std::cout << "Client: Signing out" << std::endl;
+                    ParsedMessage cmd;
+                    cmd["command"] = "deinitpeerconnfactory";
+                    m_pMsgQ->PostMessage(cmd);
                 } 
                 else if (state_ == SIGNING_OUT_WAITING) 
                 {

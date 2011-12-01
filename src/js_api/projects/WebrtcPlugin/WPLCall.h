@@ -20,6 +20,18 @@
 
 namespace GoCast
 {
+    class MediaEngineFactory
+    {
+    public:
+        static cricket::MediaEngineInterface* Create();
+    };
+    
+    class DeviceManagerFactory
+    {
+    public:
+        static cricket::DeviceManagerInterface* Create();
+    };
+    
     /**
     	Handles list of call participants and manages
         corresponding peer connection observers. This class
@@ -88,7 +100,21 @@ namespace GoCast
          */
         void OnMessageFromPeer(int peerId, const std::string& msg);
         
+        /**
+        	Lists the participants on the call.
+         */
         void ListParticipants(void);
+        
+        /**
+        	Initializes the peer connection factory.
+        	@returns 'true' if successful, 'false' if not.
+         */
+        bool InitPeerConnectionFactory();
+        
+        /**
+        	Deinitializes the peer connection factory.
+         */
+        void DeInitPeerConnectionFactory();
         
     protected:
         /**
@@ -111,7 +137,31 @@ namespace GoCast
             NOTE: Pass NULL in constructor if not using event queue.
          */
         ThreadSafeMessageQueue* m_pEvtQ;
-    };
+
+        /**
+        	Interface to the media engine which manages the audio/
+            video channels of all peer connections.
+         */
+        cricket::MediaEngineInterface* m_pMediaEngine;
+        
+        /**
+        	Interface to the device manager which manages
+            the link between the audio/video channels of the 
+            peer connections and the hardware input/output devices.
+         */
+        cricket::DeviceManagerInterface* m_pDeviceManager;
+        
+        /**
+            Scoped reference to the worker thread used by webrtc::PeerConnection
+            to manage the media pipeline.
+         */
+        talk_base::scoped_ptr<talk_base::Thread> m_pWorkerThread;
+        
+        /**
+            Factory class that generates instances of webrtc::PeerConnection.
+         */
+        talk_base::scoped_ptr<webrtc::PeerConnectionFactory> m_pPeerConnectionFactory;
+};
 }
 
 #endif
