@@ -22,7 +22,7 @@ cd third_party/webrtc
 
 echo Getting webrtc from its repo into third_party/webrtc
 gclient config http://webrtc.googlecode.com/svn/trunk
-gclient sync -r 839 --force
+gclient sync -r 1080 --force
 
 cd ../..
 
