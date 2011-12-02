@@ -30,5 +30,21 @@ cd ../..
 cp third_party_mods/webrtc/trunk/build/common.gypi third_party/webrtc/trunk/build
 
 ./rebuild_webrtc.sh clean
+if [ $? != 0 ]
+then
+  echo
+  echo *** BUILD FAILED ***
+  echo
+  exit 1
+fi
+
 ./rebuild_plugin.sh clean
+if [ $? != 0 ]
+then
+  echo
+  echo *** BUILD FAILED ***
+  echo
+  exit 1
+fi
+
 # output to be found in third_party/webrtc/trunk/out/Debug/

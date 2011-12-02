@@ -8,6 +8,12 @@ if [ `uname` = "Linux" ]
 then
   cd third_party/webrtc
   python trunk/build/gyp_chromium --depth=trunk ../../src/examples/cmdline_audio_peer/webrtc_projects.gyp
+  if [ $? != 0 ]
+  then
+	echo ; echo 'python gyp_chromium' failed. .gyp file issue most likely. Exiting early.
+	echo
+	exit 1
+  fi
 
   cd trunk
   if [ "$1" = "clean" ]
@@ -44,6 +50,13 @@ then
 
 cd third_party/webrtc
 python trunk/build/gyp_chromium --depth=trunk ../../src/examples/cmdline_audio_peer/webrtc_projects.gyp -Dclang=1
+if [ $? != 0 ]
+then
+	echo ; echo 'python gyp_chromium' failed. .gyp file issue most likely. Exiting early.
+	echo
+	exit 1
+fi
+
 cd ../..
 
 echo "Rebuilding webrtc (via cmdline_audio_peer dependencies)"
