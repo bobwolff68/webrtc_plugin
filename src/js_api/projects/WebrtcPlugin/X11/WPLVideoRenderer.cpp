@@ -1,3 +1,5 @@
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+
 #include <gdk/gdk.h>
 #include <assert.h>
 #include "WPLVideoRenderer.h"
@@ -135,3 +137,5 @@ namespace GoCast
 	    m_spFrmBuf.reset(NULL);
     }
 }
+
+#endif

@@ -1,3 +1,5 @@
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+
 #ifndef WebrtcPlugin_WPLVideoRenderer_h
 #define WebrtcPlugin_WPLVideoRenderer_h
 
@@ -45,3 +47,4 @@ namespace GoCast
 
 #endif
 
+#endif
