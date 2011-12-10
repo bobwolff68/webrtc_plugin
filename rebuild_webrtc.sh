@@ -37,6 +37,21 @@ then
 	exit 1
   fi
 
+  make cmdline_video_peer
+  if [ $? != 0 ]
+  then
+	echo ; echo 'make (Debug) cmdline_video_peer' failed. Exiting early.
+	echo
+	exit 1
+  fi
+  make BUILDTYPE=Release cmdline_video_peer
+  if [ $? != 0 ]
+  then
+	echo ; echo 'make (Release) cmdline_video_peer' failed. Exiting early.
+	echo
+	exit 1
+  fi
+
   make peerconnection_server
   make BUILDTYPE=Release peerconnection_server
 

@@ -47,8 +47,12 @@ namespace GoCast
     Call::Call(ThreadSafeMessageQueue* pMsgQ,
                ThreadSafeMessageQueue* pEvtQ):
     m_pMsgQ(pMsgQ),
-    m_pEvtQ(pEvtQ),
-    m_pLocalRenderer(NULL)
+    m_pEvtQ(pEvtQ)
+    
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))    
+    ,m_pLocalRenderer(NULL)
+#endif
+    
     {
     
     }

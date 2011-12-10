@@ -29,10 +29,10 @@ namespace GoCast
         m_pWorkerThread(pWorkerThread),
         m_pPeerConnectionFactory(pPeerConnectionFactory),
         m_PeerId(-1),
-        m_PeerName(""),
+        m_PeerName("")
 
 #if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
-        m_pRemoteRenderer(NULL)
+        ,m_pRemoteRenderer(NULL)
 #endif
 
     {
