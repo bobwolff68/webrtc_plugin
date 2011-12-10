@@ -69,7 +69,62 @@
 				'-lXext',
 			],
 		},
-         }, 
+         },        
+         {
+            'target_name': 'cmdline_video_peer',
+            'type': 'executable',
+            'sources': [
+                'main.cpp',
+                'parsecmd.cpp',
+                'shell.cpp',
+                'shell.h',
+                '../../js_api/projects/WebrtcPlugin/WPLPeerConnectionClient.h',
+                '../../js_api/projects/WebrtcPlugin/WPLPeerConnectionClient.cpp',
+                '../../js_api/projects/WebrtcPlugin/WPLPeerConnectionObserver.h',
+                '../../js_api/projects/WebrtcPlugin/WPLPeerConnectionObserver.cpp',
+                'TestDefaults.h',
+                'TestDefaults.cpp',
+                '../../js_api/projects/WebrtcPlugin/WPLSocketServer.h',
+                '../../js_api/projects/WebrtcPlugin/WPLSocketServer.cpp',
+                'TestClientShell.h',
+                '../../include/ThreadSingle.h',
+                '../../js_api/projects/WebrtcPlugin/WPLThreadSafeMessageQueue.h',
+                '../../js_api/projects/WebrtcPlugin/WPLThreadSafeMessageQueue.cpp',
+                '../../js_api/projects/WebrtcPlugin/WPLCall.h',
+                '../../js_api/projects/WebrtcPlugin/WPLCall.cpp',
+                '../../include/rtc_common.h',
+                '../../include/anyoption/anyoption.h',
+                '../../include/anyoption/anyoption.cpp',
+                '../../js_api/projects/WebrtcPlugin/X11/WPLVideoRenderer.h',
+                '../../js_api/projects/WebrtcPlugin/X11/WPLVideoRenderer.cpp',
+            ],
+           'dependencies': [
+                '../../../third_party/webrtc/trunk/third_party_mods/libjingle/libjingle.gyp:libjingle_app',
+            ],
+            'defines': [
+                'GOCAST_ENABLE_VIDEO',
+                'GOCAST_LINUX',
+            ],
+            'include_dirs': [
+                '../../../third_party/webrtc/trunk/third_party/libjingle/source',
+                '../../../third_party/webrtc/trunk/third_party_mods/libjingle/source',
+		        '../../include',
+		        '../../js_api/projects/WebrtcPlugin'
+            ],
+            'cflags': [
+                '<!@(pkg-config --cflags gtk+-2.0)',
+            ],
+		    'link_settings': {
+		        'ldflags': [
+                    '<!@(pkg-config --libs-only-L --libs-only-other gtk+-2.0 gthread-2.0)',
+                ],
+			    'libraries': [
+				    '-lX11',
+				    '-lXext',
+				    '<!@(pkg-config --libs-only-l gtk+-2.0 gthread-2.0)',
+			    ],
+		    },
+         },
           {
 	# Now for the version which doesn't use gyp's monster deps, but instead links the monolithic libwebrtc.a
             'target_name': 'cmdline_audio_peer_monolithic',

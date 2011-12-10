@@ -18,6 +18,13 @@
 #include "talk/app/webrtc/peerconnectionfactory.h"
 #include "talk/base/scoped_ptr.h"
 
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+#include "X11/WPLVideoRenderer.h"
+
+#define LOCAL   0
+#define REMOTE  1
+#endif
+
 #define GOCAST_AUDIO_IN   ""
 #define GOCAST_AUDIO_OUT  ""
 #define GOCAST_AUDIO_OPTS (cricket::MediaEngineInterface::ECHO_CANCELLATION |\
@@ -97,14 +104,20 @@ namespace GoCast
         	Attempts to set up a voice connection with the desired remote peer.
         	@param peerId Unique id of the remote peer.
         	@param peerName Uniqe name of the remote peer.
+        	@param bSetPreviewWindow 'true' if preview window required, 'false' if not.
+        	@returns bool: 'true' if successful, 'false' if not.
          */
-        virtual void ConnectToPeer(int peerId, const std::string& peerName);
+        virtual bool ConnectToPeer(int peerId, const std::string& peerName);
         
         /**
         	Initiates teardown of the voice connection with the remote peer.
         	@returns bool: 'true' if successful, 'false' if not.
          */
         virtual bool DisconnectFromCurrentPeer(void);
+        
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+        bool SetRemoteVideoRenderer(const std::string& streamId);
+#endif
         
     protected:
         /**
@@ -182,6 +195,12 @@ namespace GoCast
         	Unique name of the remote peer.
          */
         std::string m_PeerName;
+        
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+    protected:
+        VideoRenderer* m_pRemoteRenderer;
+#endif
+
     };
 }
 

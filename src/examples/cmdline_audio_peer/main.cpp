@@ -10,6 +10,10 @@
 // File: main.cpp
 // Project: cmdline_audio_peer
 
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+#include <gtk/gtk.h>
+#endif
+
 #include <iostream>
 #include <sstream>
 #include "talk/base/thread.h"
@@ -31,6 +35,10 @@ int main (int argc, const char * argv[])
         std::cout << "Error parsing command line arguments." << endl;
         exit(-1);
     }
+    
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+    gtk_init(&argc, (char***)&argv);
+#endif    
     
     GoCast::SocketServer socket_server;
     thread->set_socketserver(&socket_server);

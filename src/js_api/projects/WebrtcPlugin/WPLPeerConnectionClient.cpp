@@ -269,6 +269,16 @@ namespace GoCast
         {
             m_pCall->DeInitPeerConnectionFactory();
         }
+
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+        else if("setremoterenderer" == cmd["command"] || "SETREMOTERENDERER" == cmd["command"])
+        {
+            int peerId = FromString<int>(cmd["peerid"]);
+            
+            bStatus = m_pCall->SetRemoteVideoRenderer(peerId, cmd["streamid"]);
+        }
+#endif
+
         else if("quit" == cmd["command"] || "QUIT" == cmd["command"] ||
                 "exit" == cmd["command"] || "EXIT" == cmd["command"])
         {
@@ -467,7 +477,7 @@ namespace GoCast
     {
         if(false == m_pCall->HasParticipant(peer_id))
         {
-            bool bStatus = m_pCall->AddParticipant(peer_id, peers_[peer_id],true);
+            bool bStatus = m_pCall->AddParticipant(peer_id, peers_[peer_id], true);
             if(false == bStatus)
             {
                 std::cerr << __FUNCTION__ << ": Cannot add participant to call..." << std::endl;

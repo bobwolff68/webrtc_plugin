@@ -10,6 +10,10 @@
 //  File WPLSocketServer.cpp
 //  Project: WebrtcPlugin
 
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+#include <gtk/gtk.h>
+#endif
+
 #include <iostream>
 #include <stdio.h>
 #include "WPLSocketServer.h"
@@ -38,6 +42,13 @@ namespace GoCast
     {
         ASSERT(NULL != m_pThread);
         
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+        while(gtk_events_pending())
+        {
+            gtk_main_iteration();
+        }
+#endif
+
         bool bQuitCommand = false;
         bool bStatus = m_pClient->ExecuteNextCommand(bQuitCommand);    
         
@@ -47,6 +58,6 @@ namespace GoCast
             m_pThread->Quit();
         }
         
-        return talk_base::PhysicalSocketServer::Wait(100, process_io);
+        return talk_base::PhysicalSocketServer::Wait(20, process_io);
     }
 }

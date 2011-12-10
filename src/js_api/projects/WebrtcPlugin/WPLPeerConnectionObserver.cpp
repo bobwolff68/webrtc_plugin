@@ -29,7 +29,12 @@ namespace GoCast
         m_pWorkerThread(pWorkerThread),
         m_pPeerConnectionFactory(pPeerConnectionFactory),
         m_PeerId(-1),
-        m_PeerName("")
+        m_PeerName(""),
+
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+        m_pRemoteRenderer(NULL)
+#endif
+
     {
 
     }
@@ -71,9 +76,13 @@ namespace GoCast
                             GOCAST_AUDIO_OPTS
                        );
         
-        std::cout << "SetAudioDevice "
-                  << (bStatus ? "succeeded" : "failed")
-                  << std::endl;
+        if(false == bStatus)
+        {
+            std::cout << "SetAudioDevice "
+                      << (bStatus ? "succeeded" : "failed")
+                      << std::endl;
+            return false;
+        }
         
         return bStatus;
     }
@@ -103,18 +112,29 @@ namespace GoCast
 
     void PeerConnectionObserver::OnAddStream(const std::string &streamId, bool video)
     {
-        if(false == video)
+        std::cout << m_PeerName << " added local " 
+                  << (video ? "video" : "voice") 
+                  << " stream: " << streamId
+                  << std::endl;
+                  
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+        if(true==video && NULL==m_pRemoteRenderer)
         {
-            std::cout << m_PeerName << " added local stream: " 
-                      << streamId 
-                      << std::endl;
+            ParsedMessage cmd;
+            cmd["command"] = "setremoterenderer";
+            cmd["peerid"] = ToString(m_PeerId);
+            cmd["streamid"] = streamId;
+            m_pMsgQ->PostMessage(cmd);
         }
+#endif
+                  
     }
 
     void PeerConnectionObserver::OnRemoveStream(const std::string &streamId, bool video)
     {
-        std::cout << m_PeerName << "removed local stream: " 
-                  << streamId
+        std::cout << m_PeerName << " removed local " 
+                  << (video ? "video" : "voice") 
+                  << " stream: " << streamId
                   << std::endl;
     }
 
@@ -126,9 +146,20 @@ namespace GoCast
             {
                 std::cout << m_PeerName << " hung up..." << std::endl;
                 int peerId = m_PeerId;
+                
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+                m_pPeerConnection->SetVideoRenderer("video", NULL);
+                if(NULL != m_pRemoteRenderer)
+                {
+                    m_pRemoteRenderer->Deinit();
+                    VideoRenderer::Destroy(m_pRemoteRenderer);
+                    m_pRemoteRenderer = NULL;
+                }
+#endif
+                
                 if(true == m_pPeerConnection->Close())
                 {
-                    DeletePeerConnection();
+                    DeletePeerConnection();                    
                     ParsedMessage cmd;
                     cmd["command"] = "deleteobserver";
                     cmd["peerid"] = ToString(peerId);
@@ -161,23 +192,49 @@ namespace GoCast
         m_pPeerConnection->SignalingMessage(msg);
     }
 
-    void PeerConnectionObserver::ConnectToPeer(int peerId, const std::string& peerName)
+    bool PeerConnectionObserver::ConnectToPeer(int peerId, const std::string& peerName)
     {
         if(IsConnectionActive())
         {
             std::cerr << __FUNCTION__ << ": Local peer busy..." << std::endl;
-            return;
+            return false;
         }
         
         if(false == InitPeerConnection())
         {
-            return;
+            std::cerr << __FUNCTION__ << ": InitPeerConnection() failed..." << std::endl;
+            return false;
         }
         
         m_PeerId = peerId;
         m_PeerName = peerName;
-        m_pPeerConnection->AddStream("local_audio",false);
+        m_pPeerConnection->AddStream("voice",false);
+        
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+        m_pPeerConnection->AddStream("video",true);
+        m_pRemoteRenderer = VideoRenderer::Create(
+                                m_PeerName,
+                                GOCAST_DEFAULT_RENDER_WIDTH,
+                                GOCAST_DEFAULT_RENDER_HEIGHT
+                            );
+        
+        bool bStatus = m_pRemoteRenderer->Init();
+        if(false == bStatus)
+        {
+            std::cerr << __FUNCTION__ << ": remote renderer init failed..." << std::endl;
+            return false;
+        }
+        
+        bStatus = m_pPeerConnection->SetVideoRenderer("video", m_pRemoteRenderer);
+        if(false == bStatus)
+        {
+            std::cerr << __FUNCTION__ << ":set remote renderer failed..." << std::endl;
+            return false;
+        }
+#endif
+        
         m_pPeerConnection->Connect();
+        return true;
     }
 
     bool PeerConnectionObserver::DisconnectFromCurrentPeer(void)
@@ -185,6 +242,16 @@ namespace GoCast
         std::cout << "Hanging up..." << std::endl;
         int remotePeerId = m_PeerId;
         
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+        m_pPeerConnection->SetVideoRenderer("video", NULL);
+        if(NULL != m_pRemoteRenderer)
+        {
+            m_pRemoteRenderer->Deinit();
+            VideoRenderer::Destroy(m_pRemoteRenderer);
+            m_pRemoteRenderer = NULL;
+        }
+#endif
+
         if(true == m_pPeerConnection->Close())
         {
             DeletePeerConnection();
@@ -199,4 +266,26 @@ namespace GoCast
         std::cerr << __FUNCTION__ << ": Peer connection close error..." << std::endl;
         return false;
     }
+    
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+        bool PeerConnectionObserver::SetRemoteVideoRenderer(const std::string& streamId)
+        {
+            m_pRemoteRenderer = VideoRenderer::Create(
+                                    m_PeerName,
+                                    GOCAST_DEFAULT_RENDER_WIDTH,
+                                    GOCAST_DEFAULT_RENDER_HEIGHT
+                                );
+                                   
+            bool bStatus = m_pRemoteRenderer->Init();
+            if(false == bStatus)
+            {
+                std::cerr << __FUNCTION__ << ": remote renderer init failed..." << std::endl;
+                return false;
+            }
+            
+            return m_pPeerConnection->SetVideoRenderer(streamId, m_pRemoteRenderer);        
+        }
+#endif
+
 }
+

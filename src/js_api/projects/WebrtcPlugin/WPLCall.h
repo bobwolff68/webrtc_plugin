@@ -18,6 +18,10 @@
 #include "WPLThreadSafeMessageQueue.h"
 #include "WPLPeerConnectionObserver.h"
 
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+#include "X11/WPLVideoRenderer.h"
+#endif
+
 namespace GoCast
 {
     class MediaEngineFactory
@@ -116,6 +120,10 @@ namespace GoCast
          */
         void DeInitPeerConnectionFactory();
         
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+        bool SetRemoteVideoRenderer(const int peerId, const std::string& streamId);
+#endif
+        
     protected:
         /**
         	List of participants (peerid, peername).
@@ -161,6 +169,11 @@ namespace GoCast
             Factory class that generates instances of webrtc::PeerConnection.
          */
         talk_base::scoped_ptr<webrtc::PeerConnectionFactory> m_pPeerConnectionFactory;
+        
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+        VideoRenderer* m_pLocalRenderer;
+#endif
+
 };
 }
 

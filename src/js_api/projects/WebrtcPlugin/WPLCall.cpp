@@ -17,13 +17,26 @@
 #include "talk/session/phone/webrtcvoiceengine.h"
 #include "talk/p2p/client/basicportallocator.h"
 
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+#include "talk/session/phone/webrtcvideoengine.h"
+#endif
+
+
 namespace GoCast
 {
     cricket::MediaEngineInterface* MediaEngineFactory::Create()
     {
+
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+        return new cricket::CompositeMediaEngine
+        <cricket::WebRtcVoiceEngine,
+        cricket::WebRtcVideoEngine>();
+#else
         return new cricket::CompositeMediaEngine
         <cricket::WebRtcVoiceEngine,
         cricket::NullVideoEngine>();
+#endif
+
     }
     
     cricket::DeviceManagerInterface* DeviceManagerFactory::Create()
@@ -34,9 +47,10 @@ namespace GoCast
     Call::Call(ThreadSafeMessageQueue* pMsgQ,
                ThreadSafeMessageQueue* pEvtQ):
     m_pMsgQ(pMsgQ),
-    m_pEvtQ(pEvtQ)
+    m_pEvtQ(pEvtQ),
+    m_pLocalRenderer(NULL)
     {
-
+    
     }
 
     Call::~Call()
@@ -51,6 +65,27 @@ namespace GoCast
             return false;
         }
         
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))    
+        if(true == m_Participants.empty())
+        {
+            std::string title = "me";
+            m_pLocalRenderer = VideoRenderer::Create(
+                                    title,
+                                    GOCAST_DEFAULT_RENDER_WIDTH,
+                                    GOCAST_DEFAULT_RENDER_HEIGHT
+                               );
+            
+            if(false == m_pLocalRenderer->Init())
+            {
+                VideoRenderer::Destroy(m_pLocalRenderer);
+                return false;
+            }
+            
+            m_pMediaEngine->SetVideoCapture(true);
+            m_pMediaEngine->SetLocalRenderer(m_pLocalRenderer);
+        }
+#endif
+
         m_Participants[peerId] = peerName;
         m_Observers[peerId] = new PeerConnectionObserver(
                                         m_pMsgQ,
@@ -60,7 +95,11 @@ namespace GoCast
         
         if(false == bRemoteCall)
         {
-            m_Observers[peerId]->ConnectToPeer(peerId,peerName);
+            if(false == m_Observers[peerId]->ConnectToPeer(peerId,peerName))
+            {
+                RemoveParticipant(peerId, true);
+                return false;
+            }
         }
         else
         {
@@ -75,7 +114,7 @@ namespace GoCast
                 m_pEvtQ->PostMessage(event);
             }
         }
-        
+
         ListParticipants();
         
         return true;
@@ -113,6 +152,18 @@ namespace GoCast
             m_Observers.erase(peerId);
             m_Participants.erase(peerId);
             ListParticipants();
+            
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+            if(true == m_Participants.empty())
+            {
+                m_pMediaEngine->SetLocalRenderer(NULL);
+                m_pLocalRenderer->Deinit();
+                VideoRenderer::Destroy(m_pLocalRenderer);
+                m_pLocalRenderer = NULL;
+                m_pMediaEngine->SetVideoCapture(false);
+            }
+#endif
+            
         }
         else
         {
@@ -206,4 +257,17 @@ namespace GoCast
         m_pWorkerThread.reset();
         m_pPeerConnectionFactory.reset();
     }
+    
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+    bool Call::SetRemoteVideoRenderer(const int peerId, const std::string& streamId)
+    {
+        if(!HasParticipant(peerId))
+        {
+            return false;
+        }
+        
+        return m_Observers[peerId]->SetRemoteVideoRenderer(streamId);
+    }
+#endif
+
 }
