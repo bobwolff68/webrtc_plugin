@@ -38,7 +38,7 @@ namespace GoCast
 		    return false;
 	    }
 
-	    gtk_window_set_position(GTK_WINDOW(m_pWindow), GTK_WIN_POS_CENTER);
+	    gtk_window_set_position(GTK_WINDOW(m_pWindow), GTK_WIN_POS_NONE);
 	    gtk_window_set_default_size(GTK_WINDOW(m_pWindow), m_width, m_height);
 	    gtk_window_set_resizable(GTK_WINDOW(m_pWindow), FALSE);
 	    gtk_window_set_deletable(GTK_WINDOW(m_pWindow), FALSE);
