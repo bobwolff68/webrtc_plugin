@@ -10,6 +10,10 @@
 #include "talk/session/phone/videocommon.h"
 #include "talk/base/scoped_ptr.h"
 
+#ifdef GOCAST_PLUGIN
+#include "PluginWindow.h"
+#endif
+
 #define GOCAST_DEFAULT_RENDER_WIDTH     352
 #define GOCAST_DEFAULT_RENDER_HEIGHT    288
 
@@ -17,8 +21,11 @@ namespace GoCast
 {
 	class VideoRenderer : public cricket::VideoRenderer
 	{
-	public:
-		static VideoRenderer* Create(const std::string& peerName, const int width, const int height);
+	public:	
+		static VideoRenderer* Create(const std::string& peerName, 
+		                             const int width, 
+		                             const int height);
+
 		static void Destroy(VideoRenderer* pRenderer);
 		static gboolean OnRefreshRenderArea(gpointer pData);
 	
@@ -29,8 +36,10 @@ namespace GoCast
 		virtual bool SetSize(int width, int height, int reserved);
 		virtual bool RenderFrame(const cricket::VideoFrame* pFrame);
 
-	protected:
-		explicit VideoRenderer(const std::string& peerName, const int width, int height);
+	protected:	
+		explicit VideoRenderer(const std::string& peerName, 
+		                       const int width, 
+		                       int height);
 		virtual ~VideoRenderer();
 
 	protected:
@@ -42,6 +51,25 @@ namespace GoCast
 		const std::string& m_peerName;
 		const int m_width;
 		const int m_height;
+		
+#ifdef GOCAST_PLUGIN
+    public:
+        VideoRenderer* Prev() const { return m_pPrev; }
+        void SetPrev(VideoRenderer* pRenderer) { m_pPrev = pRenderer; }
+        VideoRenderer* Next() const { return m_pNext; }
+        void SetNext(VideoRenderer* pRenderer) { m_pNext = pRenderer; }
+        int RendererIndex() const { return m_rendererIndex; }
+            
+    protected:
+        int m_rendererIndex;
+        VideoRenderer* m_pNext;
+        VideoRenderer* m_pPrev;
+        
+    protected:
+        static VideoRenderer* s_pHead;
+        static int s_numRenderers;
+#endif
+
 	};
 }
 

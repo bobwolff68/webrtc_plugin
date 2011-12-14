@@ -69,16 +69,26 @@ namespace GoCast
             return false;
         }
         
-#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))    
-        if(true == m_Participants.empty())
+        if(NULL != m_pEvtQ && true == bRemoteCall)
         {
+            ThreadSafeMessageQueue::ParsedMessage event;
+            event["type"] = "RemotePeerCall";
+            event["message"] = peerName;
+            m_pEvtQ->PostMessage(event);
+        }
+        
+        
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+        if(false == IsActive())
+        {
+
             std::string title = "me";
             m_pLocalRenderer = VideoRenderer::Create(
+                                    
                                     title,
                                     GOCAST_DEFAULT_RENDER_WIDTH,
                                     GOCAST_DEFAULT_RENDER_HEIGHT
                                );
-            
             if(false == m_pLocalRenderer->Init())
             {
                 VideoRenderer::Destroy(m_pLocalRenderer);
@@ -108,15 +118,7 @@ namespace GoCast
         else
         {
             m_Observers[peerId]->SetPeerId(peerId);
-            m_Observers[peerId]->SetPeerName(peerName);
-            
-            if(NULL != m_pEvtQ)
-            {
-                ThreadSafeMessageQueue::ParsedMessage event;
-                event["type"] = "RemotePeerCall";
-                event["message"] = peerName;
-                m_pEvtQ->PostMessage(event);
-            }
+            m_Observers[peerId]->SetPeerName(peerName);            
         }
 
         ListParticipants();
@@ -127,6 +129,7 @@ namespace GoCast
     bool Call::RemoveParticipant(int peerId, bool bRemoteHangup)
     {
         bool bStatus = false;
+        std::string removedPeerName = "";
         
         if(m_Observers.end() == m_Observers.find(peerId))
         {
@@ -136,14 +139,6 @@ namespace GoCast
         if(true == bRemoteHangup)
         {
             bStatus = true;
-
-            if(NULL != m_pEvtQ)
-            {
-                ThreadSafeMessageQueue::ParsedMessage event;
-                event["type"] = "RemotePeerHangup";
-                event["message"] = m_Participants[peerId];
-                m_pEvtQ->PostMessage(event);
-            }
         }
         else
         {
@@ -154,11 +149,12 @@ namespace GoCast
         {
             delete m_Observers[peerId];
             m_Observers.erase(peerId);
+            removedPeerName = m_Participants[peerId];
             m_Participants.erase(peerId);
             ListParticipants();
             
 #if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
-            if(true == m_Participants.empty())
+            if(false == IsActive())
             {
                 m_pMediaEngine->SetLocalRenderer(NULL);
                 m_pLocalRenderer->Deinit();
@@ -172,6 +168,14 @@ namespace GoCast
         else
         {
             std::cerr << __FUNCTION__ << ": DisconnectFromCurrentPeer() error..." << std::endl;
+        }
+        
+        if(NULL != m_pEvtQ && true == bRemoteHangup)
+        {
+            ThreadSafeMessageQueue::ParsedMessage event;
+            event["type"] = "RemotePeerHangup";
+            event["message"] = removedPeerName;
+            m_pEvtQ->PostMessage(event);
         }
         
         return bStatus;

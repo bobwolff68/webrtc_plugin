@@ -20,6 +20,8 @@
 
 #include "WebrtcPlugin.h"
 
+FB::PluginWindow* pThePluginWindow = NULL;
+
 ///////////////////////////////////////////////////////////////////////////////
 /// @fn WebrtcPlugin::StaticInitialize()
 ///
@@ -119,15 +121,24 @@ bool WebrtcPlugin::onMouseMove(FB::MouseMoveEvent *evt, FB::PluginWindow *)
     //printf("Mouse move at: %d, %d\n", evt->m_x, evt->m_y);
     return false;
 }
-bool WebrtcPlugin::onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *)
+bool WebrtcPlugin::onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *pWin)
 {
     // The window is attached; act appropriately
+    pThePluginWindow = pWin;
     return false;
 }
 
-bool WebrtcPlugin::onWindowDetached(FB::DetachedEvent *evt, FB::PluginWindow *)
+bool WebrtcPlugin::onWindowDetached(FB::DetachedEvent *evt, FB::PluginWindow *pWin)
 {
     // The window is about to be detached; act appropriately
+    pThePluginWindow = NULL;
+    return false;
+}
+
+bool WebrtcPlugin::onWindowResized(FB::ResizedEvent *evt, FB::PluginWindow *pWin)
+{
+    // The window has been resized; act appropriately
+    pThePluginWindow = pWin;
     return false;
 }
 

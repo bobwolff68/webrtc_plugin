@@ -4,6 +4,13 @@
 #include <assert.h>
 #include "WPLVideoRenderer.h"
 
+#ifdef GOCAST_PLUGIN
+#include "X11/PluginWindowX11.h"
+extern FB::PluginWindow* pThePluginWindow;
+int GoCast::VideoRenderer::s_numRenderers = 0;
+GoCast::VideoRenderer* GoCast::VideoRenderer::s_pHead = NULL;
+#endif
+
 namespace GoCast
 {
     VideoRenderer* VideoRenderer::Create(const std::string& peerName,
@@ -27,6 +34,8 @@ namespace GoCast
 
     bool VideoRenderer::Init()
     {
+
+#ifndef GOCAST_PLUGIN
 	    if(NULL!=m_pWindow || NULL!=m_pRenderArea)
 	    {
 		    return false;
@@ -54,14 +63,47 @@ namespace GoCast
 	    gtk_widget_set_size_request(m_pRenderArea, m_width, m_height);
 	    gtk_container_add(GTK_CONTAINER(m_pWindow), m_pRenderArea);
 	    gtk_widget_show_all(m_pWindow);
-	
+#else
+        FB::PluginWindowX11* pThePluginWindowX11 = 
+            reinterpret_cast<FB::PluginWindowX11*>(pThePluginWindow);
+        m_pRenderArea = pThePluginWindowX11->getWidget();
+        m_rendererIndex = s_numRenderers++;
+        
+        if(NULL != s_pHead)
+        {
+            s_pHead->SetPrev(this);
+        }
+        
+        s_pHead = this;     
+#endif
+
 	    return true;
     }
 
     void VideoRenderer::Deinit()
     {
+    
+#ifndef GOCAST_PLUGIN
 	    gtk_widget_destroy(m_pRenderArea);
 	    gtk_widget_destroy(m_pWindow);
+#else   
+        s_numRenderers--;
+        
+        if(NULL != m_pPrev)
+        {
+            m_pPrev->SetNext(m_pNext);
+        }
+        else
+        {
+            s_pHead = m_pNext;
+        }
+        
+        if(NULL != m_pNext)
+        {
+            m_pNext->SetPrev(m_pPrev);
+        }
+#endif
+
     }
 
     void VideoRenderer::RedrawRenderArea()
@@ -71,7 +113,13 @@ namespace GoCast
 	    gdk_draw_rgb_32_image(
 	      m_pRenderArea->window,
 	      m_pRenderArea->style->fg_gc[GTK_STATE_NORMAL],
-	      0,
+
+#ifdef GOCAST_PLUGIN
+	      (m_rendererIndex=(m_pNext?(m_pNext->RendererIndex()+1):m_rendererIndex))*m_width,
+#else
+          0,
+#endif
+
 	      0,
 	      m_width,
 	      m_height,
@@ -128,6 +176,13 @@ namespace GoCast
     m_peerName(peerName),
     m_width(width),
     m_height(height)
+    
+#ifdef GOCAST_PLUGIN
+    , m_rendererIndex(0)
+    , m_pNext(s_pHead)
+    , m_pPrev(NULL)
+#endif
+    
     {
 	    m_spFrmBuf.reset(new uint8[m_width*m_height*4]);
     }

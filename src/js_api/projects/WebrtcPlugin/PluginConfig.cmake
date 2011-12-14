@@ -7,7 +7,7 @@
 
 set(PLUGIN_NAME "WebrtcPlugin")
 set(PLUGIN_PREFIX "WPL")
-set(COMPANY_NAME "XVDTHUSA")
+set(COMPANY_NAME "GoCast")
 
 # ActiveX constants:
 set(FBTYPELIB_NAME WebrtcPluginLib)
@@ -28,14 +28,14 @@ set(FBComJavascriptObject_GUID fbbf16fe-3d02-5d77-b218-206bec8c697d)
 set(IFBComEventSource_GUID 38350cb3-37de-5a8d-8496-ede359fed39a)
 
 # these are the pieces that are relevant to using it from Javascript
-set(ACTIVEX_PROGID "XVDTHUSA.WebrtcPlugin")
-set(MOZILLA_PLUGINID "xvdth.com/WebrtcPlugin")
+set(ACTIVEX_PROGID "GoCast.WebrtcPlugin")
+set(MOZILLA_PLUGINID "www.gocast.it/WebrtcPlugin")
 
 # strings
-set(FBSTRING_CompanyName "XVDTH, USA")
+set(FBSTRING_CompanyName "GoCast, USA")
 set(FBSTRING_FileDescription "WebRTC Plugin")
 set(FBSTRING_PLUGIN_VERSION "1.0.0.0")
-set(FBSTRING_LegalCopyright "Copyright 2011 XVDTH, USA")
+set(FBSTRING_LegalCopyright "Copyright 2011 GoCast, USA")
 set(FBSTRING_PluginFileName "np${PLUGIN_NAME}.dll")
 set(FBSTRING_ProductName "WebrtcPlugin")
 set(FBSTRING_FileExtents "")
@@ -45,7 +45,11 @@ set(FBSTRING_MIMEType "application/x-webrtcplugin")
 # Uncomment this next line if you're not planning on your plugin doing
 # any drawing:
 
-set (FB_GUI_DISABLED 1)
+if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+    set (FB_GUI_DISABLED 0)
+else()
+    set (FB_GUI_DISABLED 1)
+endif()
 
 # Mac plugin settings. If your plugin does not draw, set these all to 0
 set(FBMAC_USE_QUICKDRAW 0)

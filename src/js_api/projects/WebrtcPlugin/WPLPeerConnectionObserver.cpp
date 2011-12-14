@@ -217,7 +217,6 @@ namespace GoCast
                                 GOCAST_DEFAULT_RENDER_WIDTH,
                                 GOCAST_DEFAULT_RENDER_HEIGHT
                             );
-        
         bool bStatus = m_pRemoteRenderer->Init();
         if(false == bStatus)
         {
@@ -275,7 +274,6 @@ namespace GoCast
                                     GOCAST_DEFAULT_RENDER_WIDTH,
                                     GOCAST_DEFAULT_RENDER_HEIGHT
                                 );
-                                   
             bool bStatus = m_pRemoteRenderer->Init();
             if(false == bStatus)
             {

@@ -20,9 +20,6 @@
 
 #if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
 #include "X11/WPLVideoRenderer.h"
-
-#define LOCAL   0
-#define REMOTE  1
 #endif
 
 #define GOCAST_AUDIO_IN   ""

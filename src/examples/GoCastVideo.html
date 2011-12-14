@@ -32,12 +32,28 @@
                 if(false == OnCallWithPeer[peername])
                 {
                     document.getElementById("GoCastPlugin").Call(peername);
+		    var width = parseInt(document.getElementById("GoCastPlugin").width);
+		    if(width < 352*2)
+		    {
+			 document.getElementById("GoCastPlugin").width = 352*2;
+			document.getElementById("GoCastPlugin").height = 288;
+		    }
+		    else
+			document.getElementById("GoCastPlugin").width = (width + 352);
                     OnCallWithPeer[peername] = true;
                     LoadCallPage();
                 }
                 else
                 {
                     document.getElementById("GoCastPlugin").Hangup(peername);
+		    var width = parseInt(document.getElementById("GoCastPlugin").width);
+		    if(width == 352*2)
+		    {
+			document.getElementById("GoCastPlugin").width = 1;
+			document.getElementById("GoCastPlugin").height = 1;
+		    }
+		    else
+			document.getElementById("GoCastPlugin").width = (width - 352);
                     OnCallWithPeer[peername] = false;
                     LoadCallPage();
                 }
@@ -70,10 +86,26 @@
                          LoadCallPage();});
                 
                 AddEvent(GoCastPlugin,"RemotePeerCall",function(message)
-                         {OnCallWithPeer[message] = true; LoadCallPage();});
+                         {var width = parseInt(document.getElementById("GoCastPlugin").width);
+			 if(width < 352*2)
+			 {
+			 	document.getElementById("GoCastPlugin").width = 352*2;
+				document.getElementById("GoCastPlugin").height = 288;
+			 }
+			 else
+				document.getElementById("GoCastPlugin").width = (width + 352);
+			 OnCallWithPeer[message] = true; LoadCallPage();});
 
                 AddEvent(GoCastPlugin,"RemotePeerHangup",function(message)
-                         {OnCallWithPeer[message] = false; LoadCallPage();});
+                         {var width = parseInt(document.getElementById("GoCastPlugin").width);
+			 if(width == 352*2)
+			 {
+				document.getElementById("GoCastPlugin").width = 1;
+				document.getElementById("GoCastPlugin").height = 1;
+			 }
+			 else
+			 	document.getElementById("GoCastPlugin").width = (width - 352);
+                         OnCallWithPeer[message] = false; LoadCallPage();});
 
                 LoadSigninPage();
             }
@@ -119,7 +151,7 @@ onclick="javascript:Signout()"/>Sign Out</button>';
         <h1>
             GoCast Voice Chat
         </h1>
-        <object id="GoCastPlugin" type="application/x-webrtcplugin">
+        <object id="GoCastPlugin" type="application/x-webrtcplugin" width="1" height="1">
             <param name="onload" value="OnPluginLoad" />
         </object><br/>
         <pre id="pagelocation">
