@@ -39,4 +39,5 @@ then
   echo
 fi
 
+# We're all done now.
 exit $EXITVAL
