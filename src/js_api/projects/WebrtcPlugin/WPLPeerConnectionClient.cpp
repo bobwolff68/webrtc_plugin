@@ -194,7 +194,7 @@ namespace GoCast
                     if(true == bStatus)
                     {
                         std::cout << std::endl << "Requesting peer: " << it->second << " for credentials..." << std::endl;
-                        std::string credentials = "credentialreq ";
+                        std::string credentials = "credentialsreq ";
                         credentials += (m_bAudioOnly ? "audioonly" : "audiovideo");
                         SendToPeer(it->first, credentials);
                         break;
