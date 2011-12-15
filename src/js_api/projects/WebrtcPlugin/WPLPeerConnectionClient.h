@@ -15,6 +15,8 @@
 
 #include <map>
 #include <string>
+#include <unistd.h>
+#include "ThreadSingle.h"
 #include "WPLThreadSafeMessageQueue.h"
 #include "WPLCall.h"
 #include "talk/base/sigslot.h"
@@ -25,7 +27,38 @@ typedef std::map<int, std::string> Peers;
 typedef std::map<std::string, std::string> ParsedMessage;
 
 namespace GoCast
-{
+{   
+    class TimedPing : public ThreadSingle
+    {
+    public:
+        explicit TimedPing(ThreadSafeMessageQueue* pMsgQ, int periodMus)
+        : m_pMsgQ(pMsgQ),
+          m_periodMus(periodMus)
+        { }
+        virtual ~TimedPing() { }
+        
+    protected:
+        virtual int workerBee()
+        {
+            while(false == IsStopRequested())
+            {
+                usleep(m_periodMus);
+                
+                ParsedMessage cmd;
+                cmd["command"] = "sendtopeer";
+                cmd["peerid"] = "-1";
+                cmd["message"] = "ping";
+                m_pMsgQ->PostMessage(cmd);
+            }
+            
+            return 0;
+        }
+        
+    protected:
+        ThreadSafeMessageQueue* m_pMsgQ;
+        int m_periodMus;
+    };
+    
     /**
     	Handles signaling between peers with the aid of a signin server.
         This class has been designed to interact with WebRTC's sample 
@@ -71,7 +104,8 @@ namespace GoCast
                              ThreadSafeMessageQueue* pEvtQ,
                              const std::string& peerName,
                              const std::string& serverLocation,
-                             const int serverPort);
+                             const int serverPort,
+                             const bool bAudioOnly = true);
         
         /**
         	Destructor
@@ -196,6 +230,9 @@ namespace GoCast
         	Current state of the GoCast::PeerConnectionClient instance.
          */
         State state_;
+        
+        TimedPing* m_pTimedServerPing;
+        bool m_bAudioOnly;
         int my_id_;
         
     protected:

@@ -72,7 +72,10 @@ namespace GoCast
         	@param bRemoteCall 'true' if added peer requested a call, 'false' if not.
         	@returns 'true' if successful, 'false' if not.
          */
-        bool AddParticipant(int peerId, std::string& peerName, bool bRemoteCall);
+        bool AddParticipant(int peerId,
+                            std::string& peerName, 
+                            bool bRemoteCall,
+                            bool bAudioOnly = true);
         
         /**
         	Remove a peer from the call.

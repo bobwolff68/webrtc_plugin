@@ -62,7 +62,10 @@ namespace GoCast
 
     }
 
-    bool Call::AddParticipant(int peerId, std::string& peerName, bool bRemoteCall)
+    bool Call::AddParticipant(int peerId,
+                              std::string& peerName,
+                              bool bRemoteCall,
+                              bool bAudioOnly)
     {
         if(m_Observers.end() != m_Observers.find(peerId))
         {
@@ -84,7 +87,6 @@ namespace GoCast
 
             std::string title = "me";
             m_pLocalRenderer = VideoRenderer::Create(
-                                    
                                     title,
                                     GOCAST_DEFAULT_RENDER_WIDTH,
                                     GOCAST_DEFAULT_RENDER_HEIGHT
@@ -104,7 +106,8 @@ namespace GoCast
         m_Observers[peerId] = new PeerConnectionObserver(
                                         m_pMsgQ,
                                         &m_pWorkerThread,
-                                        &m_pPeerConnectionFactory
+                                        &m_pPeerConnectionFactory,
+                                        bAudioOnly
                                   );
         
         if(false == bRemoteCall)

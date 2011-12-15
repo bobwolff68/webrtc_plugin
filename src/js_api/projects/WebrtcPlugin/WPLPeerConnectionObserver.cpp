@@ -24,12 +24,14 @@ namespace GoCast
     PeerConnectionObserver::PeerConnectionObserver(
         ThreadSafeMessageQueue* pMsgQ,
         talk_base::scoped_ptr<talk_base::Thread>* pWorkerThread,
-        talk_base::scoped_ptr<webrtc::PeerConnectionFactory>* pPeerConnectionFactory
+        talk_base::scoped_ptr<webrtc::PeerConnectionFactory>* pPeerConnectionFactory,
+        bool bAudioOnly
     ):  m_pMsgQ(pMsgQ),
         m_pWorkerThread(pWorkerThread),
         m_pPeerConnectionFactory(pPeerConnectionFactory),
         m_PeerId(-1),
-        m_PeerName("")
+        m_PeerName(""),
+        m_bAudioOnly(bAudioOnly)
 
 #if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
         ,m_pRemoteRenderer(NULL)
@@ -211,24 +213,9 @@ namespace GoCast
         m_pPeerConnection->AddStream("voice",false);
         
 #if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
-        m_pPeerConnection->AddStream("video",true);
-        m_pRemoteRenderer = VideoRenderer::Create(
-                                m_PeerName,
-                                GOCAST_DEFAULT_RENDER_WIDTH,
-                                GOCAST_DEFAULT_RENDER_HEIGHT
-                            );
-        bool bStatus = m_pRemoteRenderer->Init();
-        if(false == bStatus)
+        if(false == m_bAudioOnly)
         {
-            std::cerr << __FUNCTION__ << ": remote renderer init failed..." << std::endl;
-            return false;
-        }
-        
-        bStatus = m_pPeerConnection->SetVideoRenderer("video", m_pRemoteRenderer);
-        if(false == bStatus)
-        {
-            std::cerr << __FUNCTION__ << ":set remote renderer failed..." << std::endl;
-            return false;
+            m_pPeerConnection->AddStream("video",true);
         }
 #endif
         
