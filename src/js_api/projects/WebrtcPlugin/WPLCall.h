@@ -133,6 +133,8 @@ namespace GoCast
          */
         Participants m_Participants;
         
+        Participants m_AVParticipants;
+        
         /**
         	List of peer connection observers (peerid, GoCast::PeerConnectionObserver*).
          */

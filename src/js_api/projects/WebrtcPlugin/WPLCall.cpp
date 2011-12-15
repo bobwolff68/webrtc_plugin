@@ -82,7 +82,7 @@ namespace GoCast
         
         
 #if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
-        if(false == IsActive())
+        if(false == bAudioOnly && true == m_AVParticipants.empty())
         {
 
             std::string title = "me";
@@ -103,6 +103,11 @@ namespace GoCast
 #endif
 
         m_Participants[peerId] = peerName;
+        if(false == bAudioOnly)
+        {
+            m_AVParticipants[peerId] = peerName;
+        }
+        
         m_Observers[peerId] = new PeerConnectionObserver(
                                         m_pMsgQ,
                                         &m_pWorkerThread,
@@ -154,10 +159,11 @@ namespace GoCast
             m_Observers.erase(peerId);
             removedPeerName = m_Participants[peerId];
             m_Participants.erase(peerId);
+            m_AVParticipants.erase(peerId);
             ListParticipants();
             
 #if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
-            if(false == IsActive())
+            if(true == m_AVParticipants.empty())
             {
                 m_pMediaEngine->SetLocalRenderer(NULL);
                 m_pLocalRenderer->Deinit();
