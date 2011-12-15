@@ -517,7 +517,7 @@ namespace GoCast
             
             ParsedMessage cmd;
             cmd["command"] = "sendtopeer";
-            cmd["peerid"] = peers_[peer_id];
+            cmd["peername"] = peers_[peer_id];
             cmd["message"] = "credentialsrep ";
             cmd["message"] += (m_bAudioOnly ? "audioonly" : "audiovideo");
             m_pMsgQ->PostMessage(cmd);
