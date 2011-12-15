@@ -66,7 +66,7 @@ namespace GoCast
     m_pMsgQ(pMsgQ),
     m_pEvtQ(pEvtQ),
     state_(NOT_CONNECTED),
-    m_pTimedServerPing(new TimedPing(m_pMsgQ, 10000000)),
+    m_pTimedServerPing(new TimedPing(m_pMsgQ, 5000000)),
     m_bAudioOnly(bAudioOnly),
     my_id_(-1),
     m_PeerName(peerName),
@@ -517,7 +517,7 @@ namespace GoCast
             
             ParsedMessage cmd;
             cmd["command"] = "sendtopeer";
-            cmd["peerid"] = ToString(peer_id);
+            cmd["peerid"] = peers_[peer_id];
             cmd["message"] = "credentialsrep ";
             cmd["message"] += (m_bAudioOnly ? "audioonly" : "audiovideo");
             m_pMsgQ->PostMessage(cmd);
