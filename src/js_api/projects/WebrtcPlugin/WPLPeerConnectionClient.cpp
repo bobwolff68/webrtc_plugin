@@ -46,7 +46,7 @@ namespace GoCast
     PeerConnectionClient::~PeerConnectionClient()
     {
         delete m_pCall;
-        delete m_pTimedServerPing;
+        //delete m_pTimedServerPing;
     }
 
     int PeerConnectionClient::id() const 
@@ -66,7 +66,7 @@ namespace GoCast
     m_pMsgQ(pMsgQ),
     m_pEvtQ(pEvtQ),
     state_(NOT_CONNECTED),
-    m_pTimedServerPing(new TimedPing(m_pMsgQ, 5000000)),
+    //m_pTimedServerPing(new TimedPing(m_pMsgQ, 5000000)),
     m_bAudioOnly(bAudioOnly),
     my_id_(-1),
     m_PeerName(peerName),
@@ -407,11 +407,15 @@ namespace GoCast
             return false;
         }
         
+        std::cout << "Stage 1" << std::endl;
+        
         ASSERT(is_connected());
         if (!is_connected() || peer_id == -1)
         {
             return false;
         }
+        
+        std::cout << "Stage 2" << std::endl;
         
         char headers[1024];
         sprintfn(headers, sizeof(headers),
@@ -483,6 +487,7 @@ namespace GoCast
         int err = control_socket_->Connect(server_address_);
         if (err == SOCKET_ERROR)
         {
+            std::cout << "Stage 3" << std::endl;
             Close();
             return false;
         }
@@ -707,7 +712,7 @@ namespace GoCast
                     ParsedMessage cmd;
                     cmd["command"] = "initpeerconnfactory";
                     m_pMsgQ->PostMessage(cmd);
-                    m_pTimedServerPing->startThread();
+                    //m_pTimedServerPing->startThread();
                     
                     if(NULL != m_pEvtQ)
                     {
@@ -732,7 +737,7 @@ namespace GoCast
                     ParsedMessage cmd;
                     cmd["command"] = "deinitpeerconnfactory";
                     m_pMsgQ->PostMessage(cmd);
-                    m_pTimedServerPing->stopThread();
+                    //m_pTimedServerPing->stopThread();
                 } 
                 else if (state_ == SIGNING_OUT_WAITING) 
                 {

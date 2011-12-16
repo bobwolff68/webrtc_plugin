@@ -27,7 +27,8 @@ typedef std::map<int, std::string> Peers;
 typedef std::map<std::string, std::string> ParsedMessage;
 
 namespace GoCast
-{   
+{
+#if 0  
     class TimedPing : public ThreadSingle
     {
     public:
@@ -58,6 +59,7 @@ namespace GoCast
         ThreadSafeMessageQueue* m_pMsgQ;
         int m_periodMus;
     };
+#endif
     
     /**
     	Handles signaling between peers with the aid of a signin server.
@@ -231,7 +233,7 @@ namespace GoCast
          */
         State state_;
         
-        TimedPing* m_pTimedServerPing;
+        //TimedPing* m_pTimedServerPing;
         bool m_bAudioOnly;
         int my_id_;
         
