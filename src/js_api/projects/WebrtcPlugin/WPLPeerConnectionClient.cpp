@@ -196,7 +196,13 @@ namespace GoCast
                         std::cout << std::endl << "Requesting peer: " << it->second << " for credentials..." << std::endl;
                         std::string credentials = "credentialsreq ";
                         credentials += (m_bAudioOnly ? "audioonly" : "audiovideo");
-                        SendToPeer(it->first, credentials);
+                        bStatus = SendToPeer(it->first, credentials);
+                        
+                        if(false == bStatus)
+                        {
+                            std::cerr << __FUNCTION__ << ": Failed to send message: " << credentials << std::endl;
+                        }
+                        
                         break;
                     }
                 }
@@ -239,7 +245,12 @@ namespace GoCast
             
             sstrm << cmd["peerid"];
             sstrm >> peerid;
-            SendToPeer(peerid, cmd["message"]);
+            bStatus = SendToPeer(peerid, cmd["message"]);
+            
+            if(false == bStatus)
+            {
+                std::cerr << __FUNCTION__ << ": Failed to send message: " << cmd["message"] << std::endl;
+            }
         }
         else if("hangup" == cmd["command"] || "HANGUP" == cmd["command"])
         {
