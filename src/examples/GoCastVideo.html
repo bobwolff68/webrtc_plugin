@@ -92,8 +92,12 @@
                           numRenderers--;
                           GoCastPlugin.width = (width - parseInt(rendererDims[0]));
                           if(numRenderers == 0) GoCastPlugin.height = "0";});                       
-                          
-                LoadSigninPage();
+                
+                if(navigator.appVersion.indexOf("X11") != -1 ||
+                   navigator.appVersion.indexOf("Linux") != -1)  
+                    LoadSigninPage();
+                else
+                    LoadErrorPage("Video chat not supported on this OS yet... [ UBUNTU 10.04 - 11.04 ONLY ]");
             }
             
             function LoadCallPage()
@@ -130,7 +134,14 @@ onclick="javascript:Signout()"/>Sign Out</button>';
 <tr><td>serverport:</td><td> <input type="text" id="serverport" size="10"/> </td></tr>\
 <tr><td><button id="signinbutton" size="10" onclick="javascript:Signin()">Sign In</button></td>\</tr>\
             </table>';
-        }
+            }
+            
+            function LoadErrorPage(errMsg)
+            {
+                var pageLocation = document.getElementById("pagelocation");
+                pageLocation.innerHTML = errMsg;
+            }
+            
         </script>
     </head>
     <body>
