@@ -484,6 +484,12 @@ namespace GoCast
         ASSERT(!onconnect_data_.empty());
         size_t sent = socket->Send(onconnect_data_.c_str(), onconnect_data_.length());
         ASSERT(sent == onconnect_data_.length());
+        
+        if(onconnect_data_.length() > sent)
+        {
+            std::cerr << __FUNCTION__ << ": Failed to send to server: " << onconnect_data_ << std::endl;
+        }
+        
         UNUSED(sent);
         onconnect_data_.clear();
     }
