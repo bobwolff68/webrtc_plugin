@@ -2,6 +2,7 @@
 
 #include <gdk/gdk.h>
 #include <assert.h>
+#include <unistd.h>
 #include "WPLVideoRenderer.h"
 #include "rtc_common.h"
 
@@ -206,7 +207,7 @@ namespace GoCast
 	        m_pEvtQ->PostMessage(event);
 	        
 	        //TODO: Hack - wait till resize happens from javascript
-	        usleep(100000);
+	        usleep(500000);
 	    }
     }
 
@@ -224,7 +225,7 @@ namespace GoCast
 	        m_pEvtQ->PostMessage(event);
 
 	        //TODO: Hack - wait till resize happens from javascript
-	        usleep(100000);
+	        usleep(500000);
 	    }
     }
 }
