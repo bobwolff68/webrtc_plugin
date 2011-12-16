@@ -207,7 +207,7 @@ namespace GoCast
 	        m_pEvtQ->PostMessage(event);
 	        
 	        //TODO: Hack - wait till resize happens from javascript
-	        usleep(500000);
+	        usleep(1000000);
 	    }
     }
 
@@ -225,7 +225,7 @@ namespace GoCast
 	        m_pEvtQ->PostMessage(event);
 
 	        //TODO: Hack - wait till resize happens from javascript
-	        usleep(500000);
+	        usleep(1000000);
 	    }
     }
 }

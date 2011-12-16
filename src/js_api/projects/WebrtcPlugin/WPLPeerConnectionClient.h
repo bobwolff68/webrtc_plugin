@@ -27,40 +27,7 @@ typedef std::map<int, std::string> Peers;
 typedef std::map<std::string, std::string> ParsedMessage;
 
 namespace GoCast
-{
-#if 0  
-    class TimedPing : public ThreadSingle
-    {
-    public:
-        explicit TimedPing(ThreadSafeMessageQueue* pMsgQ, int periodMus)
-        : m_pMsgQ(pMsgQ),
-          m_periodMus(periodMus)
-        { }
-        virtual ~TimedPing() { }
-        
-    protected:
-        virtual int workerBee()
-        {
-            while(false == IsStopRequested())
-            {
-                usleep(m_periodMus);
-                
-                ParsedMessage cmd;
-                cmd["command"] = "sendtopeer";
-                cmd["peerid"] = "-2";
-                cmd["message"] = "ping";
-                m_pMsgQ->PostMessage(cmd);
-            }
-            
-            return 0;
-        }
-        
-    protected:
-        ThreadSafeMessageQueue* m_pMsgQ;
-        int m_periodMus;
-    };
-#endif
-    
+{   
     /**
     	Handles signaling between peers with the aid of a signin server.
         This class has been designed to interact with WebRTC's sample 
@@ -233,7 +200,6 @@ namespace GoCast
          */
         State state_;
         
-        //TimedPing* m_pTimedServerPing;
         bool m_bAudioOnly;
         int my_id_;
         
