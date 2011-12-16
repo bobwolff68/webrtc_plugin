@@ -42,9 +42,10 @@ public:
     	@returns N/A.
      */
     PluginMainThread(GoCast::ThreadSafeMessageQueue* pMsgQ,
-                     GoCast::ThreadSafeMessageQueue* pEvtQ):
+                     GoCast::ThreadSafeMessageQueue* pEvtQ,
+                     bool bAudioOnly):
     
-    m_pMsgQ(pMsgQ), m_pEvtQ(pEvtQ) {}
+    m_pMsgQ(pMsgQ), m_pEvtQ(pEvtQ), m_bAudioOnly(bAudioOnly) {}
     
     /**
     	Destructor.
@@ -69,6 +70,8 @@ protected:
     	Message queue to store events to be fired into JavaScript.
      */
     GoCast::ThreadSafeMessageQueue* m_pEvtQ;
+    
+    bool m_bAudioOnly;
 };
 
 /**
@@ -93,6 +96,8 @@ public:
 
     // Method echo
     FB::variant echo(const FB::variant& msg);
+    
+    void Start(const std::string& mediaType);
     
     /**
     	Implementation of plugin's "Signin()" JavaScript method.
@@ -162,6 +167,9 @@ public:
         @param std::string& The event's data type.
      */
     FB_JSAPI_EVENT(RemotePeerHangup, 1, (const std::string&));
+    
+    FB_JSAPI_EVENT(RendererAdd, 1, (const std::string&));
+    FB_JSAPI_EVENT(RendererRemove, 1, (const std::string&));
 
     // Method test-event
     void testEvent(const FB::variant& s);

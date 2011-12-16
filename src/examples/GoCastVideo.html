@@ -5,6 +5,7 @@
         <script type="text/javascript">
             var OnlinePeers = new Array();
             var OnCallWithPeer = new Array();
+            var numRenderers = 0;
             
             function AddEvent(obj, name, func)
             {
@@ -32,28 +33,12 @@
                 if(false == OnCallWithPeer[peername])
                 {
                     document.getElementById("GoCastPlugin").Call(peername);
-		    var width = parseInt(document.getElementById("GoCastPlugin").width);
-		    if(width < 352*2)
-		    {
-			 document.getElementById("GoCastPlugin").width = 352*2;
-			document.getElementById("GoCastPlugin").height = 288;
-		    }
-		    else
-			document.getElementById("GoCastPlugin").width = (width + 352);
                     OnCallWithPeer[peername] = true;
                     LoadCallPage();
                 }
                 else
                 {
                     document.getElementById("GoCastPlugin").Hangup(peername);
-		    var width = parseInt(document.getElementById("GoCastPlugin").width);
-		    if(width == 352*2)
-		    {
-			document.getElementById("GoCastPlugin").width = 1;
-			document.getElementById("GoCastPlugin").height = 1;
-		    }
-		    else
-			document.getElementById("GoCastPlugin").width = (width - 352);
                     OnCallWithPeer[peername] = false;
                     LoadCallPage();
                 }
@@ -68,6 +53,7 @@
             function OnPluginLoad()
             {
                 var GoCastPlugin = document.getElementById("GoCastPlugin");
+                GoCastPlugin.Start("audiovideo");
                 
                 AddEvent(GoCastPlugin,"SignedIn",function(message)
                          {OnlinePeers=message.split(':');
@@ -86,27 +72,27 @@
                          LoadCallPage();});
                 
                 AddEvent(GoCastPlugin,"RemotePeerCall",function(message)
-                         {var width = parseInt(document.getElementById("GoCastPlugin").width);
-			 if(width < 352*2)
-			 {
-			 	document.getElementById("GoCastPlugin").width = 352*2;
-				document.getElementById("GoCastPlugin").height = 288;
-			 }
-			 else
-				document.getElementById("GoCastPlugin").width = (width + 352);
-			 OnCallWithPeer[message] = true; LoadCallPage();});
+                         {OnCallWithPeer[message] = true; LoadCallPage();});
 
                 AddEvent(GoCastPlugin,"RemotePeerHangup",function(message)
-                         {var width = parseInt(document.getElementById("GoCastPlugin").width);
-			 if(width == 352*2)
-			 {
-				document.getElementById("GoCastPlugin").width = 1;
-				document.getElementById("GoCastPlugin").height = 1;
-			 }
-			 else
-			 	document.getElementById("GoCastPlugin").width = (width - 352);
-                         OnCallWithPeer[message] = false; LoadCallPage();});
-
+                         {OnCallWithPeer[message] = false; LoadCallPage();});
+                         
+                AddEvent(GoCastPlugin,"RendererAdd",function(message)
+                         {var width = parseInt(GoCastPlugin.width);
+                          var height = parseInt(GoCastPlugin.height);
+                          var rendererDims = message.split(':');
+                          GoCastPlugin.width = (width + parseInt(rendererDims[0]));
+                          GoCastPlugin.height = parseInt(rendererDims[1]);
+                          numRenderers++;});
+                          
+                AddEvent(GoCastPlugin,"RendererRemove",function(message)
+                         {var width = parseInt(GoCastPlugin.width);
+                          var height = parseInt(GoCastPlugin.height);
+                          var rendererDims = message.split(':');
+                          numRenderers--;
+                          GoCastPlugin.width = (width - parseInt(rendererDims[0]));
+                          if(numRenderers == 0) GoCastPlugin.height = "0";});                       
+                          
                 LoadSigninPage();
             }
             
@@ -151,7 +137,7 @@ onclick="javascript:Signout()"/>Sign Out</button>';
         <h1>
             GoCast Video Chat
         </h1>
-        <object id="GoCastPlugin" type="application/x-webrtcplugin" width="1" height="1">
+        <object id="GoCastPlugin" type="application/x-webrtcplugin" width="0" height="0">
             <param name="onload" value="OnPluginLoad" />
         </object><br/>
         <pre id="pagelocation">

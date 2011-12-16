@@ -3,21 +3,24 @@
 #include <gdk/gdk.h>
 #include <assert.h>
 #include "WPLVideoRenderer.h"
+#include "rtc_common.h"
 
 #ifdef GOCAST_PLUGIN
 #include "X11/PluginWindowX11.h"
 extern FB::PluginWindow* pThePluginWindow;
-int GoCast::VideoRenderer::s_numRenderers = 0;
 GoCast::VideoRenderer* GoCast::VideoRenderer::s_pHead = NULL;
 #endif
+
+int GoCast::VideoRenderer::s_numRenderers = 0;
 
 namespace GoCast
 {
     VideoRenderer* VideoRenderer::Create(const std::string& peerName,
                                          const int width,
-                                         const int height)
+                                         const int height,
+                                         ThreadSafeMessageQueue* pEvtQ)
     {
-	    return new VideoRenderer(peerName, width, height);
+	    return new VideoRenderer(peerName, width, height, pEvtQ);
     }
 
     void VideoRenderer::Destroy(VideoRenderer* pRenderer)
@@ -27,8 +30,12 @@ namespace GoCast
 
     gboolean VideoRenderer::OnRefreshRenderArea(gpointer pData)
     {
-	    VideoRenderer* pRenderer = reinterpret_cast<VideoRenderer*>(pData);
-	    pRenderer->RedrawRenderArea();
+	    VideoRenderer* pRenderer = reinterpret_cast<VideoRenderer*>(pData);	    
+	    if(0 < s_numRenderers)
+	    {
+	        pRenderer->RedrawRenderArea();
+	    }
+	    
 	    return FALSE;
     }
 
@@ -67,16 +74,18 @@ namespace GoCast
         FB::PluginWindowX11* pThePluginWindowX11 = 
             reinterpret_cast<FB::PluginWindowX11*>(pThePluginWindow);
         m_pRenderArea = pThePluginWindowX11->getWidget();
-        m_rendererIndex = s_numRenderers++;
         
         if(NULL != s_pHead)
         {
             s_pHead->SetPrev(this);
         }
         
+        m_rendererIndex = s_numRenderers;
         s_pHead = this;     
 #endif
-
+        
+        s_numRenderers++;
+        
 	    return true;
     }
 
@@ -87,8 +96,6 @@ namespace GoCast
 	    gtk_widget_destroy(m_pRenderArea);
 	    gtk_widget_destroy(m_pWindow);
 #else   
-        s_numRenderers--;
-        
         if(NULL != m_pPrev)
         {
             m_pPrev->SetNext(m_pNext);
@@ -104,6 +111,7 @@ namespace GoCast
         }
 #endif
 
+        s_numRenderers--;
     }
 
     void VideoRenderer::RedrawRenderArea()
@@ -170,7 +178,8 @@ namespace GoCast
 
     VideoRenderer::VideoRenderer(const std::string& peerName,
                                  const int width,
-                                 const int height):
+                                 const int height,
+                                 ThreadSafeMessageQueue* pEvtQ):
     m_pWindow(NULL),
     m_pRenderArea(NULL),
     m_peerName(peerName),
@@ -183,13 +192,40 @@ namespace GoCast
     , m_pPrev(NULL)
 #endif
     
+    , m_pEvtQ(pEvtQ)
     {
 	    m_spFrmBuf.reset(new uint8[m_width*m_height*4]);
+	    
+	    if(NULL != m_pEvtQ)
+	    {
+	        ThreadSafeMessageQueue::ParsedMessage event;
+	        event["type"] = "RendererAdd";
+	        event["message"] = ToString(m_width);
+	        event["message"] += ":";
+	        event["message"] += ToString(m_height);
+	        m_pEvtQ->PostMessage(event);
+	        
+	        //TODO: Hack - wait till resize happens from javascript
+	        usleep(100000);
+	    }
     }
 
     VideoRenderer::~VideoRenderer()
     {
 	    m_spFrmBuf.reset(NULL);
+
+	    if(NULL != m_pEvtQ)
+	    {
+	        ThreadSafeMessageQueue::ParsedMessage event;
+	        event["type"] = "RendererRemove";
+	        event["message"] = ToString(m_width);
+	        event["message"] += ":";
+	        event["message"] += ToString(m_height);
+	        m_pEvtQ->PostMessage(event);
+
+	        //TODO: Hack - wait till resize happens from javascript
+	        usleep(100000);
+	    }
     }
 }
 

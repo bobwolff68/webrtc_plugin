@@ -254,12 +254,14 @@ namespace GoCast
     }
     
 #if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
-        bool PeerConnectionObserver::SetRemoteVideoRenderer(const std::string& streamId)
+        bool PeerConnectionObserver::SetRemoteVideoRenderer(const std::string& streamId,
+                                                            ThreadSafeMessageQueue* pEvtQ)
         {
             m_pRemoteRenderer = VideoRenderer::Create(
                                     m_PeerName,
                                     GOCAST_DEFAULT_RENDER_WIDTH,
-                                    GOCAST_DEFAULT_RENDER_HEIGHT
+                                    GOCAST_DEFAULT_RENDER_HEIGHT,
+                                    pEvtQ
                                 );
             bool bStatus = m_pRemoteRenderer->Init();
             if(false == bStatus)

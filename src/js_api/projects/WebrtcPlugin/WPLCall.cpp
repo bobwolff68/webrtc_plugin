@@ -89,7 +89,8 @@ namespace GoCast
             m_pLocalRenderer = VideoRenderer::Create(
                                     title,
                                     GOCAST_DEFAULT_RENDER_WIDTH,
-                                    GOCAST_DEFAULT_RENDER_HEIGHT
+                                    GOCAST_DEFAULT_RENDER_HEIGHT,
+                                    m_pEvtQ
                                );
             if(false == m_pLocalRenderer->Init())
             {
@@ -163,7 +164,7 @@ namespace GoCast
             ListParticipants();
             
 #if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
-            if(true == m_AVParticipants.empty())
+            if(NULL != m_pLocalRenderer && true == m_AVParticipants.empty())
             {
                 m_pMediaEngine->SetLocalRenderer(NULL);
                 m_pLocalRenderer->Deinit();
@@ -283,7 +284,7 @@ namespace GoCast
             return false;
         }
         
-        return m_Observers[peerId]->SetRemoteVideoRenderer(streamId);
+        return m_Observers[peerId]->SetRemoteVideoRenderer(streamId, m_pEvtQ);
     }
 #endif
 

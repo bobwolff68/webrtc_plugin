@@ -114,7 +114,8 @@ namespace GoCast
         virtual bool DisconnectFromCurrentPeer(void);
         
 #if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
-        bool SetRemoteVideoRenderer(const std::string& streamId);
+        bool SetRemoteVideoRenderer(const std::string& streamId,
+                                    ThreadSafeMessageQueue* pEvtQ);
 #endif
         
     protected:
