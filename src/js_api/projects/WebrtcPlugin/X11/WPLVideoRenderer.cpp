@@ -8,6 +8,7 @@
 
 #ifdef GOCAST_PLUGIN
 #include "X11/PluginWindowX11.h"
+extern pthread_mutex_t pluginWinMutex;
 extern FB::PluginWindow* pThePluginWindow;
 GoCast::VideoRenderer* GoCast::VideoRenderer::s_pHead = NULL;
 #endif
@@ -72,9 +73,16 @@ namespace GoCast
 	    gtk_container_add(GTK_CONTAINER(m_pWindow), m_pRenderArea);
 	    gtk_widget_show_all(m_pWindow);
 #else
-        FB::PluginWindowX11* pThePluginWindowX11 = 
-            reinterpret_cast<FB::PluginWindowX11*>(pThePluginWindow);
-        m_pRenderArea = pThePluginWindowX11->getWidget();
+        pthread_mutex_lock(&pluginWinMutex);
+        
+        if(NULL != pThePluginWindow)
+        {
+            FB::PluginWindowX11* pThePluginWindowX11 = 
+                reinterpret_cast<FB::PluginWindowX11*>(pThePluginWindow);
+            m_pRenderArea = pThePluginWindowX11->getWidget();
+        }
+        
+        pthread_mutex_unlock(&pluginWinMutex);
         
         if(NULL != s_pHead)
         {
@@ -119,7 +127,17 @@ namespace GoCast
     {
 	    gdk_threads_enter();
 
-	    gdk_draw_rgb_32_image(
+#ifdef GOCAST_PLUGIN
+        pthread_mutex_lock(&pluginWinMutex);
+        
+        if(NULL != pThePluginWindow)
+        {
+            FB::PluginWindowX11* pThePluginWindowX11 = 
+                reinterpret_cast<FB::PluginWindowX11*>(pThePluginWindow);
+            m_pRenderArea = pThePluginWindowX11->getWidget();
+#endif
+
+        gdk_draw_rgb_32_image(
 	      m_pRenderArea->window,
 	      m_pRenderArea->style->fg_gc[GTK_STATE_NORMAL],
 
@@ -136,6 +154,12 @@ namespace GoCast
 	      m_spFrmBuf.get(),
 	      m_width*4
 	    );
+
+#ifdef GOCAST_PLUGIN
+        }
+        
+       pthread_mutex_unlock(&pluginWinMutex);
+#endif
 
 	    gdk_threads_leave();
     }
@@ -207,7 +231,7 @@ namespace GoCast
 	        m_pEvtQ->PostMessage(event);
 	        
 	        //TODO: Hack - wait till resize happens from javascript
-	        usleep(1000000);
+	        //usleep(1000000);
 	    }
     }
 
@@ -225,7 +249,7 @@ namespace GoCast
 	        m_pEvtQ->PostMessage(event);
 
 	        //TODO: Hack - wait till resize happens from javascript
-	        usleep(1000000);
+	        //usleep(1000000);
 	    }
     }
 }

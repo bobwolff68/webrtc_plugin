@@ -17,9 +17,9 @@
 \**********************************************************/
 
 #include "WebrtcPluginAPI.h"
-
 #include "WebrtcPlugin.h"
 
+pthread_mutex_t pluginWinMutex;
 FB::PluginWindow* pThePluginWindow = NULL;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -31,6 +31,7 @@ FB::PluginWindow* pThePluginWindow = NULL;
 ///////////////////////////////////////////////////////////////////////////////
 void WebrtcPlugin::StaticInitialize()
 {
+    pthread_mutex_init(&pluginWinMutex, NULL);
     // Place one-time initialization stuff here; As of FireBreath 1.4 this should only
     // be called once per process
 }
@@ -44,6 +45,7 @@ void WebrtcPlugin::StaticInitialize()
 ///////////////////////////////////////////////////////////////////////////////
 void WebrtcPlugin::StaticDeinitialize()
 {
+    pthread_mutex_destroy(&pluginWinMutex);
     // Place one-time deinitialization stuff here. As of FireBreath 1.4 this should
     // always be called just before the plugin library is unloaded
 }
@@ -124,21 +126,30 @@ bool WebrtcPlugin::onMouseMove(FB::MouseMoveEvent *evt, FB::PluginWindow *)
 bool WebrtcPlugin::onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *pWin)
 {
     // The window is attached; act appropriately
+    pthread_mutex_lock(&pluginWinMutex);
     pThePluginWindow = pWin;
+    pthread_mutex_unlock(&pluginWinMutex);
+    
     return false;
 }
 
 bool WebrtcPlugin::onWindowDetached(FB::DetachedEvent *evt, FB::PluginWindow *pWin)
 {
     // The window is about to be detached; act appropriately
+    pthread_mutex_lock(&pluginWinMutex);
     pThePluginWindow = NULL;
+    pthread_mutex_unlock(&pluginWinMutex);
+    
     return false;
 }
 
 bool WebrtcPlugin::onWindowResized(FB::ResizedEvent *evt, FB::PluginWindow *pWin)
 {
     // The window has been resized; act appropriately
+    pthread_mutex_lock(&pluginWinMutex);
     pThePluginWindow = pWin;
+    pthread_mutex_unlock(&pluginWinMutex);
+    
     return false;
 }
 
