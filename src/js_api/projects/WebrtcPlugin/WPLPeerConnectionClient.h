@@ -46,7 +46,7 @@ namespace GoCast
                 
                 ParsedMessage cmd;
                 cmd["command"] = "sendtopeer";
-                cmd["peerid"] = "-1";
+                cmd["peerid"] = "-2";
                 cmd["message"] = "ping";
                 m_pMsgQ->PostMessage(cmd);
             }
