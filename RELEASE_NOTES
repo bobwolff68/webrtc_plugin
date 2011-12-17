@@ -1,0 +1,13 @@
+GoCast.it audio/video plugin based on webrtc
+
+RELEASE_NOTES
+
+Dec 16th
+- Adding video conferencing support for Linux
+- Making audio-only and video-enabled plugins interoperate (fix)
+- Addition of gocast.it/video_chat page for testing.
+- Allow starting the plugin in audioonly mode or audiovideo with the Start method 
+
+Early December - fixed echo cancellation and also added conference-mode echo cancellation
+
+November - Initial release of audio-only plugin for Linux and Mac.

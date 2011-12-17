@@ -15,6 +15,8 @@
 
 #include <map>
 #include <string>
+#include <unistd.h>
+#include "ThreadSingle.h"
 #include "WPLThreadSafeMessageQueue.h"
 #include "WPLCall.h"
 #include "talk/base/sigslot.h"
@@ -25,7 +27,7 @@ typedef std::map<int, std::string> Peers;
 typedef std::map<std::string, std::string> ParsedMessage;
 
 namespace GoCast
-{
+{   
     /**
     	Handles signaling between peers with the aid of a signin server.
         This class has been designed to interact with WebRTC's sample 
@@ -71,7 +73,8 @@ namespace GoCast
                              ThreadSafeMessageQueue* pEvtQ,
                              const std::string& peerName,
                              const std::string& serverLocation,
-                             const int serverPort);
+                             const int serverPort,
+                             const bool bAudioOnly = true);
         
         /**
         	Destructor
@@ -196,6 +199,8 @@ namespace GoCast
         	Current state of the GoCast::PeerConnectionClient instance.
          */
         State state_;
+        
+        bool m_bAudioOnly;
         int my_id_;
         
     protected:

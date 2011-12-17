@@ -5,6 +5,7 @@
 
 #include <gtk/gtk.h>
 #include <string>
+#include "../WPLThreadSafeMessageQueue.h"
 #include "talk/session/phone/videorenderer.h"
 #include "talk/session/phone/videoframe.h"
 #include "talk/session/phone/videocommon.h"
@@ -24,7 +25,8 @@ namespace GoCast
 	public:	
 		static VideoRenderer* Create(const std::string& peerName, 
 		                             const int width, 
-		                             const int height);
+		                             const int height,
+		                             ThreadSafeMessageQueue* pEvtQ);
 
 		static void Destroy(VideoRenderer* pRenderer);
 		static gboolean OnRefreshRenderArea(gpointer pData);
@@ -39,7 +41,8 @@ namespace GoCast
 	protected:	
 		explicit VideoRenderer(const std::string& peerName, 
 		                       const int width, 
-		                       int height);
+		                       const int height,
+		                       ThreadSafeMessageQueue* pEvtQ);
 		virtual ~VideoRenderer();
 
 	protected:
@@ -67,9 +70,10 @@ namespace GoCast
         
     protected:
         static VideoRenderer* s_pHead;
-        static int s_numRenderers;
 #endif
 
+        static int s_numRenderers;        
+        ThreadSafeMessageQueue* m_pEvtQ;
 	};
 }
 
