@@ -59,7 +59,8 @@ namespace GoCast
         PeerConnectionObserver(
             ThreadSafeMessageQueue* pMsgQ,
             talk_base::scoped_ptr<talk_base::Thread>* pWorkerThread,
-            talk_base::scoped_ptr<webrtc::PeerConnectionFactory>* pPeerConnectionFactory
+            talk_base::scoped_ptr<webrtc::PeerConnectionFactory>* pPeerConnectionFactory,
+            bool bAudioOnly = true
         );
         
         /**
@@ -113,7 +114,8 @@ namespace GoCast
         virtual bool DisconnectFromCurrentPeer(void);
         
 #if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
-        bool SetRemoteVideoRenderer(const std::string& streamId);
+        bool SetRemoteVideoRenderer(const std::string& streamId,
+                                    ThreadSafeMessageQueue* pEvtQ);
 #endif
         
     protected:
@@ -192,6 +194,8 @@ namespace GoCast
         	Unique name of the remote peer.
          */
         std::string m_PeerName;
+        
+        bool m_bAudioOnly;
         
 #if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
     protected:

@@ -23,13 +23,6 @@
 #include "talk/base/thread.h"
 #include "rtc_common.h"
 
-
-void MainThreadRunner(void)
-{
-    talk_base::Thread::Current()->Run();
-    talk_base::Thread::Current()->set_socketserver(NULL);
-}
-
 int PluginMainThread::workerBee(void)
 {
     talk_base::AutoThread autoThread;
@@ -37,7 +30,7 @@ int PluginMainThread::workerBee(void)
     GoCast::SocketServer socketServer;
     talk_base::Thread::Current()->set_socketserver(&socketServer);
     
-    GoCast::PeerConnectionClient testClient(m_pMsgQ, m_pEvtQ, "", "", -1);
+    GoCast::PeerConnectionClient testClient(m_pMsgQ, m_pEvtQ, "", "", -1, m_bAudioOnly);
     socketServer.SetPeerConnectionClient(&testClient);
 
     talk_base::Thread::Current()->Run();
@@ -73,6 +66,14 @@ int PluginNotificationsThread::workerBee(void)
         {
             m_pPluginAPI->fire_RemotePeerHangup(event["message"]);
         }
+        else if("RendererAdd" == eventType)
+        {
+            m_pPluginAPI->fire_RendererAdd(event["message"]);
+        }
+        else if("RendererRemove" == eventType)
+        {
+            m_pPluginAPI->fire_RendererRemove(event["message"]);
+        }
         
         usleep(100000);
     } while(eventType != "quit");
@@ -98,6 +99,7 @@ WebrtcPluginAPI::WebrtcPluginAPI(const WebrtcPluginPtr& plugin, const FB::Browse
     registerMethod("Signout", make_method(this, &WebrtcPluginAPI::Signout));
     registerMethod("Call", make_method(this, &WebrtcPluginAPI::Call));
     registerMethod("Hangup", make_method(this, &WebrtcPluginAPI::Hangup));
+    registerMethod("Start", make_method(this, &WebrtcPluginAPI::Start));
     
     // Read-write property
     registerProperty("testString",
@@ -114,10 +116,6 @@ WebrtcPluginAPI::WebrtcPluginAPI(const WebrtcPluginPtr& plugin, const FB::Browse
     
     m_pMsgQ = new (GoCast::ThreadSafeMessageQueue)();
     m_pEvtQ = new (GoCast::ThreadSafeMessageQueue)();
-    m_pMainThread = new PluginMainThread(m_pMsgQ, m_pEvtQ);
-    m_pNotificationsThread = new PluginNotificationsThread(this, m_pEvtQ);
-    m_pMainThread->startThread();
-    m_pNotificationsThread->startThread();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -214,7 +212,7 @@ void WebrtcPluginAPI::Signout(void)
     m_pMsgQ->PostMessage(cmd);
 }
 
-void WebrtcPluginAPI::Call(const std::string &peerName)
+void WebrtcPluginAPI::Call(const std::string& peerName)
 {
     ParsedMessage cmd;
     
@@ -223,11 +221,20 @@ void WebrtcPluginAPI::Call(const std::string &peerName)
     m_pMsgQ->PostMessage(cmd);
 }
 
-void WebrtcPluginAPI::Hangup(const std::string &peerName)
+void WebrtcPluginAPI::Hangup(const std::string& peerName)
 {
     ParsedMessage cmd;
     
     cmd["command"] = "hangup";
     cmd["peername"] = peerName;
     m_pMsgQ->PostMessage(cmd);
+}
+
+void WebrtcPluginAPI::Start(const std::string& mediaType)
+{
+    bool bAudioOnly = ("audioonly" == mediaType) ? true : false;
+    m_pMainThread = new PluginMainThread(m_pMsgQ, m_pEvtQ, bAudioOnly);
+    m_pNotificationsThread = new PluginNotificationsThread(this, m_pEvtQ);
+    m_pMainThread->startThread();
+    m_pNotificationsThread->startThread();
 }

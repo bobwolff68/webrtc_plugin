@@ -45,6 +45,7 @@ namespace GoCast
 {
     PeerConnectionClient::~PeerConnectionClient()
     {
+        delete m_pCall;
     }
 
     int PeerConnectionClient::id() const 
@@ -56,13 +57,15 @@ namespace GoCast
                                                ThreadSafeMessageQueue* pEvtQ,
                                                const std::string& peerName,
                                                const std::string& serverLocation,
-                                               const int serverPort):
+                                               const int serverPort,
+                                               const bool bAudioOnly):
     control_socket_(CreateClientSocket()),
     hanging_get_(CreateClientSocket()),
     m_pCall(new Call(pMsgQ,pEvtQ)),
     m_pMsgQ(pMsgQ),
     m_pEvtQ(pEvtQ),
     state_(NOT_CONNECTED),
+    m_bAudioOnly(bAudioOnly),
     my_id_(-1),
     m_PeerName(peerName),
     m_ServerLocation(serverLocation),
@@ -178,24 +181,46 @@ namespace GoCast
             bStatus = false;
             cmd["peername"] = TOLOWERSTR(cmd["peername"]);
             
-            for(Peers::iterator it = peers_.begin();
-                it != peers_.end();
-                it++)
+            
+            if("" == cmd["credentials"])
             {
-                bStatus = (it->second == cmd["peername"]);
-                if(true == bStatus)
+                for(Peers::iterator it = peers_.begin();
+                    it != peers_.end();
+                    it++)
                 {
-                    std::cout << std::endl << "Calling peer: " << it->second << std::endl;
-
-                    bool bStatus1 = m_pCall->AddParticipant(it->first, it->second,false);
-                    
-                    if(false == bStatus1)
+                    bStatus = (it->second == cmd["peername"]);
+                    if(true == bStatus)
                     {
-                        std::cerr << __FUNCTION__ << ": Cannot call - peer already on call with you" << std::endl;
-                        return false;
+                        std::cout << std::endl << "Requesting peer: " << it->second << " for credentials..." << std::endl;
+                        std::string credentials = "credentialsreq ";
+                        credentials += (m_bAudioOnly ? "audioonly" : "audiovideo");
+                        SendToPeer(it->first, credentials);                        
+                        break;
                     }
-                    
-                    break;
+                }
+            }
+            else
+            {
+                bool bAudioOnly = m_bAudioOnly || ("audioonly" == cmd["credentials"]);
+                for(Peers::iterator it = peers_.begin();
+                    it != peers_.end();
+                    it++)
+                {
+                    bStatus = (it->second == cmd["peername"]);
+                    if(true == bStatus)
+                    {
+                        std::cout << std::endl << "Calling peer: " << it->second << std::endl;
+
+                        bool bStatus1 = m_pCall->AddParticipant(it->first, it->second,false,bAudioOnly);
+                        
+                        if(false == bStatus1)
+                        {
+                            std::cerr << __FUNCTION__ << ": Cannot call - peer already on call with you" << std::endl;
+                            return false;
+                        }
+                        
+                        break;
+                    }
                 }
             }
             
@@ -212,7 +237,6 @@ namespace GoCast
             
             sstrm << cmd["peerid"];
             sstrm >> peerid;
-            
             SendToPeer(peerid, cmd["message"]);
         }
         else if("hangup" == cmd["command"] || "HANGUP" == cmd["command"])
@@ -458,6 +482,12 @@ namespace GoCast
         ASSERT(!onconnect_data_.empty());
         size_t sent = socket->Send(onconnect_data_.c_str(), onconnect_data_.length());
         ASSERT(sent == onconnect_data_.length());
+        
+        if(onconnect_data_.length() > sent)
+        {
+            std::cerr << __FUNCTION__ << ": Failed to send to server: " << onconnect_data_ << std::endl;
+        }
+        
         UNUSED(sent);
         onconnect_data_.clear();
     }
@@ -475,16 +505,49 @@ namespace GoCast
 
     void PeerConnectionClient::OnMessageFromPeer(int peer_id,const std::string& message)
     {
-        if(false == m_pCall->HasParticipant(peer_id))
-        {
-            bool bStatus = m_pCall->AddParticipant(peer_id, peers_[peer_id], true);
-            if(false == bStatus)
-            {
-                std::cerr << __FUNCTION__ << ": Cannot add participant to call..." << std::endl;
-            }
-        }
+        std::stringstream ss;
+        std::string subject;
+        std::string body;
         
-        m_pCall->OnMessageFromPeer(peer_id, message);
+        ss << message;
+        ss >> subject;
+        
+        if("credentialsreq" == subject)
+        {
+            bool bAudioOnly = m_bAudioOnly;
+            std::cout << peers_[peer_id] << " request: " << message << std::endl;
+            ss >> body;
+            bAudioOnly = bAudioOnly || ("audioonly" == body);
+            
+            ParsedMessage cmd;
+            cmd["command"] = "sendtopeer";
+            cmd["peerid"] = ToString(peer_id);
+            cmd["message"] = "credentialsrep ";
+            cmd["message"] += (m_bAudioOnly ? "audioonly" : "audiovideo");
+            m_pMsgQ->PostMessage(cmd);
+            
+            if(false == m_pCall->HasParticipant(peer_id))
+            {
+                bool bStatus = m_pCall->AddParticipant(peer_id, peers_[peer_id], true, bAudioOnly);
+                if(false == bStatus)
+                {
+                    std::cerr << __FUNCTION__ << ": Cannot add participant to call..." << std::endl;
+                }
+            }            
+        }
+        else if("credentialsrep" == subject)
+        {
+            std::cout << peers_[peer_id] << " reply: " << message << std::endl;
+            ss >> body;
+            
+            ParsedMessage cmd;
+            cmd["command"] = "call";
+            cmd["peername"] = peers_[peer_id];
+            cmd["credentials"] = body;
+            m_pMsgQ->PostMessage(cmd);
+        }
+        else     
+            m_pCall->OnMessageFromPeer(peer_id, message);
     }
 
     bool PeerConnectionClient::GetHeaderValue(const std::string& data,size_t eoh,

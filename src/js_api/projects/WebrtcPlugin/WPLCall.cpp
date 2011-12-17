@@ -62,7 +62,10 @@ namespace GoCast
 
     }
 
-    bool Call::AddParticipant(int peerId, std::string& peerName, bool bRemoteCall)
+    bool Call::AddParticipant(int peerId,
+                              std::string& peerName,
+                              bool bRemoteCall,
+                              bool bAudioOnly)
     {
         if(m_Observers.end() != m_Observers.find(peerId))
         {
@@ -79,15 +82,15 @@ namespace GoCast
         
         
 #if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
-        if(false == IsActive())
+        if(false == bAudioOnly && true == m_AVParticipants.empty())
         {
 
             std::string title = "me";
             m_pLocalRenderer = VideoRenderer::Create(
-                                    
                                     title,
                                     GOCAST_DEFAULT_RENDER_WIDTH,
-                                    GOCAST_DEFAULT_RENDER_HEIGHT
+                                    GOCAST_DEFAULT_RENDER_HEIGHT,
+                                    m_pEvtQ
                                );
             if(false == m_pLocalRenderer->Init())
             {
@@ -101,10 +104,16 @@ namespace GoCast
 #endif
 
         m_Participants[peerId] = peerName;
+        if(false == bAudioOnly)
+        {
+            m_AVParticipants[peerId] = peerName;
+        }
+        
         m_Observers[peerId] = new PeerConnectionObserver(
                                         m_pMsgQ,
                                         &m_pWorkerThread,
-                                        &m_pPeerConnectionFactory
+                                        &m_pPeerConnectionFactory,
+                                        bAudioOnly
                                   );
         
         if(false == bRemoteCall)
@@ -151,10 +160,11 @@ namespace GoCast
             m_Observers.erase(peerId);
             removedPeerName = m_Participants[peerId];
             m_Participants.erase(peerId);
+            m_AVParticipants.erase(peerId);
             ListParticipants();
             
 #if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
-            if(false == IsActive())
+            if(NULL != m_pLocalRenderer && true == m_AVParticipants.empty())
             {
                 m_pMediaEngine->SetLocalRenderer(NULL);
                 m_pLocalRenderer->Deinit();
@@ -274,7 +284,7 @@ namespace GoCast
             return false;
         }
         
-        return m_Observers[peerId]->SetRemoteVideoRenderer(streamId);
+        return m_Observers[peerId]->SetRemoteVideoRenderer(streamId, m_pEvtQ);
     }
 #endif
 

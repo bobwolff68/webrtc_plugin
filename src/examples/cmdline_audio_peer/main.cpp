@@ -44,7 +44,12 @@ int main (int argc, const char * argv[])
     thread->set_socketserver(&socket_server);
     
     //Declare client only after set_socketserver()
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+    GoCast::PeerConnectionClient testClient(&mq, NULL, peername, mainserver, mainserver_port, false);
+#else
     GoCast::PeerConnectionClient testClient(&mq, NULL, peername, mainserver, mainserver_port);
+#endif
+    
     socket_server.SetPeerConnectionClient(&testClient);
     
     //Run client shell
