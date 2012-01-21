@@ -44,18 +44,13 @@ set(FBSTRING_MIMEType "application/x-webrtcplugin")
 
 # Uncomment this next line if you're not planning on your plugin doing
 # any drawing:
-
-if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-    set (FB_GUI_DISABLED 0)
-else()
-    set (FB_GUI_DISABLED 1)
-endif()
+set (FB_GUI_DISABLED 0)
 
 # Mac plugin settings. If your plugin does not draw, set these all to 0
 set(FBMAC_USE_QUICKDRAW 0)
 set(FBMAC_USE_CARBON 0)
-set(FBMAC_USE_COCOA 0)
-set(FBMAC_USE_COREGRAPHICS 0)
+set(FBMAC_USE_COCOA 1)
+set(FBMAC_USE_COREGRAPHICS 1)
 set(FBMAC_USE_COREANIMATION 0)
 set(FBMAC_USE_INVALIDATINGCOREANIMATION 0)
 

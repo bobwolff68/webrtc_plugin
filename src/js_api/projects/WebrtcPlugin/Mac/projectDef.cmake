@@ -18,6 +18,8 @@ add_definitions(
     -DPOSIX
     -DOSX
     -DWEBRTC_MAC
+    -DGOCAST_ENABLE_VIDEO
+    -DGOCAST_MAC
 )
 
 

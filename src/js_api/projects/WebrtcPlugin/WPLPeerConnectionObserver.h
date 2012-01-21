@@ -18,8 +18,16 @@
 #include "talk/app/webrtc/peerconnectionfactory.h"
 #include "talk/base/scoped_ptr.h"
 
-#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+#if(defined(GOCAST_ENABLE_VIDEO))
+
+#if(defined(GOCAST_LINUX))
 #include "X11/WPLVideoRenderer.h"
+#endif
+
+#if(defined(GOCAST_MAC))
+#include "Mac/WPLVideoRenderer.h"
+#endif
+
 #endif
 
 #define GOCAST_AUDIO_IN   ""
@@ -113,7 +121,7 @@ namespace GoCast
          */
         virtual bool DisconnectFromCurrentPeer(void);
         
-#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+#if(defined(GOCAST_ENABLE_VIDEO) && !defined(GOCAST_WINDOWS))
         bool SetRemoteVideoRenderer(const std::string& streamId,
                                     ThreadSafeMessageQueue* pEvtQ);
 #endif
@@ -158,7 +166,7 @@ namespace GoCast
         	Callback used by webrtc::PeerConnection one of the
             active remote audio/video streams have been removed.
         	@param streamId Unique descriptor of the a/v stream.
-        	@param video 'tru' if stream is video, 'false' if not.
+        	@param video 'true' if stream is video, 'false' if not.
          */
         virtual void OnRemoveStream(const std::string& streamId, bool video);
         
@@ -197,7 +205,7 @@ namespace GoCast
         
         bool m_bAudioOnly;
         
-#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+#if(defined(GOCAST_ENABLE_VIDEO) && !defined(GOCAST_WINDOWS))
     protected:
         VideoRenderer* m_pRemoteRenderer;
 #endif

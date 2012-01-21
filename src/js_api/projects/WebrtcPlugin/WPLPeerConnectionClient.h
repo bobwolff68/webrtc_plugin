@@ -135,6 +135,9 @@ namespace GoCast
                      command is 'quit' or exit'.
          */
         bool ExecuteNextCommand(bool& bQuitCommand);
+        
+        bool InitPeerConnectionFactory();
+        void DeInitPeerConnectionFactory();
 
     protected:
         void Close();

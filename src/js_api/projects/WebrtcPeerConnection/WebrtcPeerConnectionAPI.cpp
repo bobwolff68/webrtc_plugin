@@ -11,6 +11,8 @@
 #include "WebrtcPeerConnectionAPI.h"
 #include "talk/session/phone/webrtcvoiceengine.h"
 
+#include <iostream>
+
 #define GOCAST_AUDIO_OPTS (cricket::MediaEngineInterface::ECHO_CANCELLATION |\
 cricket::MediaEngineInterface::NOISE_SUPPRESSION |\
 cricket::MediaEngineInterface::AUTO_GAIN_CONTROL)
@@ -173,6 +175,7 @@ FB::variant WebrtcPeerConnectionAPI::RemoveStream(const std::string& streamId)
 
 FB::variant WebrtcPeerConnectionAPI::ProcessSignalingMessage(const std::string& message)
 {
+    std::cout << "Message: " << message << std::endl;
     FB::variant ret = m_pPeerConnection->SignalingMessage(message);
 
     std::string logMsg = "ProcessSignalingMessage(message): ==> ";

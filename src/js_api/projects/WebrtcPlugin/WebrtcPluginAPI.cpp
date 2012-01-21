@@ -26,15 +26,14 @@
 int PluginMainThread::workerBee(void)
 {
     talk_base::AutoThread autoThread;
-
     GoCast::SocketServer socketServer;
-    talk_base::Thread::Current()->set_socketserver(&socketServer);
     
+    talk_base::Thread::Current()->set_socketserver(&socketServer);
     GoCast::PeerConnectionClient testClient(m_pMsgQ, m_pEvtQ, "", "", -1, m_bAudioOnly);
     socketServer.SetPeerConnectionClient(&testClient);
-
     talk_base::Thread::Current()->Run();
     talk_base::Thread::Current()->set_socketserver(NULL);
+    
     return 0;
 }
 

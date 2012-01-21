@@ -93,11 +93,7 @@
                           GoCastPlugin.width = (width - parseInt(rendererDims[0]));
                           if(numRenderers == 0) GoCastPlugin.height = "0";});                       
                 
-                if(navigator.appVersion.indexOf("X11") != -1 ||
-                   navigator.appVersion.indexOf("Linux") != -1)  
                     LoadSigninPage();
-                else
-                    LoadErrorPage("Video chat not supported on this OS yet... [ UBUNTU 10.04 - 11.04 ONLY ]");
             }
             
             function LoadCallPage()

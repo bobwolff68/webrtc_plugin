@@ -294,7 +294,7 @@ namespace GoCast
             m_pCall->DeInitPeerConnectionFactory();
         }
 
-#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+#if(defined(GOCAST_ENABLE_VIDEO) && !defined(GOCAST_WINDOWS))
         else if("setremoterenderer" == cmd["command"] || "SETREMOTERENDERER" == cmd["command"])
         {
             int peerId = FromString<int>(cmd["peerid"]);
@@ -909,5 +909,13 @@ namespace GoCast
             LOG(WARNING) << "Failed to connect to the server";
             Close();
         }
+    }
+        
+    bool PeerConnectionClient::InitPeerConnectionFactory() {
+        return m_pCall->InitPeerConnectionFactory();
+    }
+        
+    void PeerConnectionClient::DeInitPeerConnectionFactory() {
+        m_pCall->DeInitPeerConnectionFactory();    
     }
 }

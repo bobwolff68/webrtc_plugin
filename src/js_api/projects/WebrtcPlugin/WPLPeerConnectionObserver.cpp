@@ -33,7 +33,7 @@ namespace GoCast
         m_PeerName(""),
         m_bAudioOnly(bAudioOnly)
 
-#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+#if(defined(GOCAST_ENABLE_VIDEO) && !defined(GOCAST_WINDOWS))
         ,m_pRemoteRenderer(NULL)
 #endif
 
@@ -119,7 +119,7 @@ namespace GoCast
                   << " stream: " << streamId
                   << std::endl;
                   
-#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+#if(defined(GOCAST_ENABLE_VIDEO) && !defined(GOCAST_WINDOWS))
         if(true==video && NULL==m_pRemoteRenderer)
         {
             ParsedMessage cmd;
@@ -149,7 +149,7 @@ namespace GoCast
                 std::cout << m_PeerName << " hung up..." << std::endl;
                 int peerId = m_PeerId;
                 
-#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+#if(defined(GOCAST_ENABLE_VIDEO) && !defined(GOCAST_WINDOWS))
                 m_pPeerConnection->SetVideoRenderer("video", NULL);
                 if(NULL != m_pRemoteRenderer)
                 {
@@ -212,7 +212,7 @@ namespace GoCast
         m_PeerName = peerName;
         m_pPeerConnection->AddStream("voice",false);
         
-#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+#if(defined(GOCAST_ENABLE_VIDEO) && !defined(GOCAST_WINDOWS))
         if(false == m_bAudioOnly)
         {
             m_pPeerConnection->AddStream("video",true);
@@ -228,7 +228,7 @@ namespace GoCast
         std::cout << "Hanging up..." << std::endl;
         int remotePeerId = m_PeerId;
         
-#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+#if(defined(GOCAST_ENABLE_VIDEO) && !defined(GOCAST_WINDOWS))
         m_pPeerConnection->SetVideoRenderer("video", NULL);
         if(NULL != m_pRemoteRenderer)
         {
@@ -253,7 +253,7 @@ namespace GoCast
         return false;
     }
     
-#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+#if(defined(GOCAST_ENABLE_VIDEO) && !defined(GOCAST_WINDOWS))
         bool PeerConnectionObserver::SetRemoteVideoRenderer(const std::string& streamId,
                                                             ThreadSafeMessageQueue* pEvtQ)
         {
@@ -270,7 +270,7 @@ namespace GoCast
                 return false;
             }
             
-            return m_pPeerConnection->SetVideoRenderer(streamId, m_pRemoteRenderer);        
+            return m_pPeerConnection->SetVideoRenderer(streamId, m_pRemoteRenderer);
         }
 #endif
 
