@@ -18,8 +18,16 @@
 #include "WPLThreadSafeMessageQueue.h"
 #include "WPLPeerConnectionObserver.h"
 
-#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+#if(defined(GOCAST_ENABLE_VIDEO))
+
+#if(defined(GOCAST_LINUX))
 #include "X11/WPLVideoRenderer.h"
+#endif
+
+#if(defined(GOCAST_MAC))
+#include "Mac/WPLVideoRenderer.h"
+#endif
+
 #endif
 
 namespace GoCast
@@ -123,7 +131,7 @@ namespace GoCast
          */
         void DeInitPeerConnectionFactory();
         
-#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+#if(defined(GOCAST_ENABLE_VIDEO) && !defined(GOCAST_WINDOWS))
         bool SetRemoteVideoRenderer(const int peerId, const std::string& streamId);
 #endif
         
@@ -175,7 +183,7 @@ namespace GoCast
          */
         talk_base::scoped_ptr<webrtc::PeerConnectionFactory> m_pPeerConnectionFactory;
         
-#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+#if(defined(GOCAST_ENABLE_VIDEO) && !defined(GOCAST_WINDOWS))
         VideoRenderer* m_pLocalRenderer;
 #endif
 

@@ -1,40 +1,33 @@
-/*
- *  Copyright (c) 2011 GoCast. All Rights Reserved.
- *
- *  Use of this source code is governed by a BSD-style license
- *  that can be found in the LICENSE file in the root of the source
- *  tree. All contributing project authors may be found in the 
- *  AUTHORS file in the root of the source tree.
- */
-
 /**********************************************************\
 
-  Auto-generated WebrtcPlugin.h
+  Auto-generated WebrtcPeerConnection.h
 
   This file contains the auto-generated main plugin object
-  implementation for the WebrtcPlugin project
+  implementation for the WebrtcPeerConnection project
 
 \**********************************************************/
-#ifndef H_WebrtcPluginPLUGIN
-#define H_WebrtcPluginPLUGIN
+#ifndef H_WebrtcPeerConnectionPLUGIN
+#define H_WebrtcPeerConnectionPLUGIN
 
 #include "PluginWindow.h"
 #include "PluginEvents/MouseEvents.h"
 #include "PluginEvents/AttachedEvent.h"
-#include "PluginEvents/DrawingEvents.h"
 
 #include "PluginCore.h"
 
-FB_FORWARD_PTR(WebrtcPlugin)
-class WebrtcPlugin : public FB::PluginCore
+#include "talk/app/webrtc/peerconnectionfactory.h"
+#include "talk/base/scoped_ptr.h"
+
+FB_FORWARD_PTR(WebrtcPeerConnection)
+class WebrtcPeerConnection : public FB::PluginCore
 {
 public:
     static void StaticInitialize();
     static void StaticDeinitialize();
 
 public:
-    WebrtcPlugin();
-    virtual ~WebrtcPlugin();
+    WebrtcPeerConnection();
+    virtual ~WebrtcPeerConnection();
 
 public:
     void onPluginReady();
@@ -53,8 +46,6 @@ public:
         EVENTTYPE_CASE(FB::MouseMoveEvent, onMouseMove, FB::PluginWindow)
         EVENTTYPE_CASE(FB::AttachedEvent, onWindowAttached, FB::PluginWindow)
         EVENTTYPE_CASE(FB::DetachedEvent, onWindowDetached, FB::PluginWindow)
-        EVENTTYPE_CASE(FB::ResizedEvent, onWindowResized, FB::PluginWindow)
-        EVENTTYPE_CASE(FB::RefreshEvent, onWindowRefresh, FB::PluginWindow)
     END_PLUGIN_EVENT_MAP()
 
     /** BEGIN EVENTDEF -- DON'T CHANGE THIS LINE **/
@@ -63,9 +54,13 @@ public:
     virtual bool onMouseMove(FB::MouseMoveEvent *evt, FB::PluginWindow *);
     virtual bool onWindowAttached(FB::AttachedEvent *evt, FB::PluginWindow *);
     virtual bool onWindowDetached(FB::DetachedEvent *evt, FB::PluginWindow *);
-    virtual bool onWindowResized(FB::ResizedEvent *evt, FB::PluginWindow *);
-    virtual bool onWindowRefresh(FB::RefreshEvent *evt, FB::PluginWindow *);
     /** END EVENTDEF -- DON'T CHANGE THIS LINE **/
+    
+private:
+    static talk_base::scoped_ptr<webrtc::PeerConnectionFactory> m_pPeerConnectionFactory;
+    static talk_base::scoped_ptr<talk_base::Thread> m_pWorkerThread;
+    static cricket::MediaEngineInterface* m_pMediaEngine;
+    static cricket::DeviceManagerInterface* m_pDeviceManager;
 };
 
 
