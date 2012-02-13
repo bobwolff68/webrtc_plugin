@@ -15,9 +15,12 @@
 #include "WPLCall.h"
 #include "talk/session/phone/mediaengine.h"
 #include "talk/session/phone/webrtcvoiceengine.h"
+
+#include "talk/session/phone/webrtcvideoengine.h"
+
 #include "talk/p2p/client/basicportallocator.h"
 
-#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+#if(defined(GOCAST_ENABLE_VIDEO) && !defined(GOCAST_WINDOWS))
 #include "talk/session/phone/webrtcvideoengine.h"
 #endif
 
@@ -27,7 +30,7 @@ namespace GoCast
     cricket::MediaEngineInterface* MediaEngineFactory::Create()
     {
 
-#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+#if(defined(GOCAST_ENABLE_VIDEO) && !defined(GOCAST_WINDOWS))
         return new cricket::CompositeMediaEngine
         <cricket::WebRtcVoiceEngine,
         cricket::WebRtcVideoEngine>();
@@ -45,12 +48,12 @@ namespace GoCast
     }
     
     Call::Call(ThreadSafeMessageQueue* pMsgQ,
-               ThreadSafeMessageQueue* pEvtQ):
-    m_pMsgQ(pMsgQ),
-    m_pEvtQ(pEvtQ)
+               ThreadSafeMessageQueue* pEvtQ)
+    : m_pMsgQ(pMsgQ)
+    , m_pEvtQ(pEvtQ)
     
-#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))    
-    ,m_pLocalRenderer(NULL)
+#if(defined(GOCAST_ENABLE_VIDEO) && !defined(GOCAST_WINDOWS))    
+    , m_pLocalRenderer(NULL)
 #endif
     
     {
@@ -81,7 +84,7 @@ namespace GoCast
         }
         
         
-#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+#if(defined(GOCAST_ENABLE_VIDEO) && !defined(GOCAST_WINDOWS))
         if(false == bAudioOnly && true == m_AVParticipants.empty())
         {
 
@@ -163,7 +166,7 @@ namespace GoCast
             m_AVParticipants.erase(peerId);
             ListParticipants();
             
-#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+#if(defined(GOCAST_ENABLE_VIDEO) && !defined(GOCAST_WINDOWS))
             if(NULL != m_pLocalRenderer && true == m_AVParticipants.empty())
             {
                 m_pMediaEngine->SetLocalRenderer(NULL);
@@ -267,6 +270,22 @@ namespace GoCast
             return false;
         }
         
+        //SetVideoOptions here
+        cricket::Device camDevice;
+        if(false == m_pDeviceManager->GetVideoCaptureDevice("", &camDevice)) {
+            std::cerr << __FUNCTION__
+            << ": Unable to get capture device"
+            << std::endl;
+            return false;
+        }
+        
+        if(false == m_pMediaEngine->SetVideoCaptureDevice(&camDevice)) {
+            std::cerr << __FUNCTION__
+            << ": Unable to set capture device"
+            << std::endl;
+            return false;
+        }
+        
         return true;
     }
     
@@ -276,7 +295,7 @@ namespace GoCast
         m_pPeerConnectionFactory.reset();
     }
     
-#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_LINUX))
+#if(defined(GOCAST_ENABLE_VIDEO) && !defined(GOCAST_WINDOWS))
     bool Call::SetRemoteVideoRenderer(const int peerId, const std::string& streamId)
     {
         if(!HasParticipant(peerId))

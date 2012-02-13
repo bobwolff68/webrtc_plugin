@@ -19,6 +19,10 @@
 #include "WebrtcPluginAPI.h"
 #include "WebrtcPlugin.h"
 
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_MAC))
+#include "Mac/WPLVideoRenderer.h"
+#endif
+
 pthread_mutex_t pluginWinMutex;
 FB::PluginWindow* pThePluginWindow = NULL;
 
@@ -153,3 +157,17 @@ bool WebrtcPlugin::onWindowResized(FB::ResizedEvent *evt, FB::PluginWindow *pWin
     return false;
 }
 
+bool WebrtcPlugin::onWindowRefresh(FB::RefreshEvent *evt, FB::PluginWindow *pWin)
+{
+    bool ret = false;
+    
+    pthread_mutex_lock(&pluginWinMutex);
+    
+#if(defined(GOCAST_ENABLE_VIDEO) && defined(GOCAST_MAC))
+    ret = GoCast::VideoRenderer::OnRefreshRenderArea(evt, pWin);
+#endif
+    
+    pthread_mutex_unlock(&pluginWinMutex);
+    
+    return ret;
+}

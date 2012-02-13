@@ -1,6 +1,6 @@
 #/**********************************************************\ 
 # Auto-generated Mac project definition file for the
-# WebrtcPlugin project
+# WebrtcPeerConnection project
 #\**********************************************************/
 
 # Mac template platform definition CMake file
@@ -18,8 +18,6 @@ add_definitions(
     -DPOSIX
     -DOSX
     -DWEBRTC_MAC
-    -DGOCAST_ENABLE_VIDEO
-    -DGOCAST_MAC
 )
 
 
@@ -28,9 +26,6 @@ SOURCE_GROUP(Mac FILES ${PLATFORM})
 set (SOURCES
     ${SOURCES}
     ${PLATFORM}
-    ../../../include/ThreadSingle.h
-    WPLThreadSafeMessageQueue.h
-    WPLThreadSafeMessageQueue.cpp
     )
 
 set(PLIST "Mac/bundle_template/Info.plist")
@@ -66,5 +61,4 @@ target_link_libraries(${PROJECT_NAME}
     ${FWAPPLICATIONSERVICES}
     ${FWFOUNDATION}
     ${FWAPPKIT}
-    -lpthread
-    )
+)
