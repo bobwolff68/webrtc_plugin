@@ -237,3 +237,4 @@ void WebrtcPluginAPI::Start(const std::string& mediaType)
     m_pMainThread->startThread();
     m_pNotificationsThread->startThread();
 }
+
