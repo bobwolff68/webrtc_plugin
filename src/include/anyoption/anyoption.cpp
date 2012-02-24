@@ -108,6 +108,8 @@
 #define strcpy_s(A,B,C) strcpy(A,C)
 #define strncpy_s(A,B,C,D) strncpy(A,C,D)
 
+using namespace std;
+
 AnyOption::AnyOption()
 {
 	init();

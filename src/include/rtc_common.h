@@ -68,3 +68,4 @@ template<typename T> T ToLower(T &s)
 #define TOLOWERSTR(s) (ToLower<std::string>(s))
 
 #endif
+

@@ -16,6 +16,8 @@
 #include "shell.h"
 #include "rtc_common.h"
 
+using namespace std;
+
 Shell::Shell()
 {
 }
@@ -252,6 +254,8 @@ bool Shell::parseAttributes(const char* inputstr)
 		    outerQuote = '\'';
 		    innerQuote = '\"';
         }
+        
+        (void)innerQuote;   // Set but not used avoidance. This code was borrowed from another internal project hence the issue.
 
 		if (isDoubleQuote || isSingleQuote)
 		{
@@ -441,3 +445,4 @@ bool Shell::processCommand(string& cmd, string& subcmd)
 	assert(false);
 	return true;
 }
+

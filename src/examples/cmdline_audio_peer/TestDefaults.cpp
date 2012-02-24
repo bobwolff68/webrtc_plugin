@@ -61,3 +61,4 @@ std::string xGetPeerName()
     ret += computer_name;
     return ret;
 }
+

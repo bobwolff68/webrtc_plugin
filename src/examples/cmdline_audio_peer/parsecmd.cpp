@@ -27,6 +27,8 @@
 #define MAINSERVER_PORT_DEFAULT 8888
 #define STUNSERVER_DEFAULT "STUN stun.l.google.com:19302"
 
+using namespace std;
+
 string peername = "none";
 
 string mainserver = "localhost";
@@ -128,3 +130,4 @@ bool parsecmd(int argc, char**argv)
     
 	return true;
 }
+

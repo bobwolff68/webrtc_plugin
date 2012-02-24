@@ -25,8 +25,6 @@
 #include <assert.h>
 #include <errno.h>
 
-using namespace std;
-
 //!
 //! \def REPORT_ERROR(a,b) is used to give feedback on true error conditions. Currently this is done via
 //!      a simple printf(). In the future this needs to be made into a more formal throw of an exception.

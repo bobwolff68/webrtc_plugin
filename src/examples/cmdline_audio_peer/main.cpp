@@ -32,7 +32,7 @@ int main (int argc, const char * argv[])
     
     if (!parsecmd(argc, (char**)argv))
     {
-        std::cout << "Error parsing command line arguments." << endl;
+        std::cout << "Error parsing command line arguments." << std::endl;
         exit(-1);
     }
     
@@ -67,3 +67,4 @@ int main (int argc, const char * argv[])
     
     return 0;
 }
+

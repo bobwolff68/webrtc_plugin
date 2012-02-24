@@ -52,7 +52,7 @@ private:
         do
         {
             std::cout << "AudioClientTest::" << peername << " > " << std::flush;
-            cmd_ok = cmdshell.parseLine(cin, false);
+            cmd_ok = cmdshell.parseLine(std::cin, false);
             if (cmd_ok)
             {
                 ParsedMessage cmd = cmdshell.getPairs();
@@ -81,9 +81,10 @@ private:
         exitpairs["command"] = "QUIT";
         m_pQueue->PostMessage(exitpairs);
         
-//        std::cout << "Exiting Shell Thread - workerBee()" << endl;
+//        std::cout << "Exiting Shell Thread - workerBee()" << std::endl;
         return 0;
     }
 };
 
 #endif
+
