@@ -29,9 +29,13 @@ namespace GoCast
     {
         int pthreadRet = pthread_mutex_lock(&qMutex);
         assert(0 == pthreadRet);
-        cmdQ.push_back(msg);
-        pthreadRet = pthread_mutex_unlock(&qMutex);
-        assert(0 == pthreadRet);
+        // If we get a non-zero back from the mutex lock, don't push and don't unlock after...
+        if (pthreadRet==0)
+        {
+            cmdQ.push_back(msg);
+            pthreadRet = pthread_mutex_unlock(&qMutex);
+            assert(0 == pthreadRet);
+        }
     }
 
     ThreadSafeMessageQueue::ParsedMessage ThreadSafeMessageQueue::GetNextMessage(void)
@@ -39,16 +43,22 @@ namespace GoCast
         ParsedMessage nextMsg;
         int pthreadRet = pthread_mutex_lock(&qMutex);
         assert(0 == pthreadRet);
-        
-        if(!cmdQ.empty())
+        // If we get a non-zero back from the mutex lock, don't push and don't unlock after...
+        if (pthreadRet==0)
         {
-            nextMsg = cmdQ.front();
-            cmdQ.pop_front();
+            if(!cmdQ.empty())
+            {
+                nextMsg = cmdQ.front();
+                cmdQ.pop_front();
+            }
+            
+            pthreadRet = pthread_mutex_unlock(&qMutex);
+            assert(0 == pthreadRet);
         }
-        
-        pthreadRet = pthread_mutex_unlock(&qMutex);
-        assert(0 == pthreadRet);
+        else
+            nextMsg["bad"] = "bad";
         
         return nextMsg;
     }
 }
+

@@ -24,8 +24,6 @@
 
 #include <string.h>
 
-using namespace std;
-
 /**
 	Command line processor for an interactive shell. Commands are of the form:
         CMD [[name=value] ...]
@@ -48,7 +46,7 @@ public:
             prompts to be sent back between every command being processed. Process in batch.
 	@returns returns true in all cases except when EXIT or QUIT is found.
  */
-    bool parseLine(istream& input, bool isScript=false);
+    bool parseLine(std::istream& input, bool isScript=false);
 	/**
 		Enable a file to be used as the stream input in parseLine().
 		@param fname File name to be used as the script input.
@@ -59,7 +57,7 @@ public:
     /**
         Ability for calling entity to get back the name value pairs from outside the object.
      */
-    map<string, string>& getPairs(void) { return namevalues; };
+    std::map<std::string, std::string>& getPairs(void) { return namevalues; };
 
 protected:
 /// \brief parseAttributes must take a stringstream and process its name=value pairs. This must
@@ -79,11 +77,11 @@ protected:
 		@returns true if everything including the command execution goes well. false if required parameters are missing.
                 false if command fails to execute.
 	 */
-	bool processCommand(string& cmd, string& subcmd);
+	bool processCommand(std::string& cmd, std::string& subcmd);
 
 private:
     /** The definition of what we use to store all name/value pairs */
-	typedef map<string, string> attrNameValuePairs;
+	typedef std::map<std::string, std::string> attrNameValuePairs;
 	/**
 		The list of names and value combination parsed from the command line.
 	 */
@@ -92,3 +90,4 @@ private:
 };
 
 #endif /* SHELL_H_ */
+
