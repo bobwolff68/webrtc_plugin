@@ -1,0 +1,103 @@
+<!--
+    Auto-generated test-site
+-->
+<html>
+<head>
+<title>test page for object fbcontrol</title>
+</head>
+    <script type="text/javascript">
+        function plugin0()
+        {
+            return document.getElementById('plugin0');
+        }
+        
+        function plugin1()
+        {
+            return document.getElementById('plugin1');
+        }
+        
+        plugin = plugin0;
+
+        function addEvent(obj, name, func)
+        {
+            if (window.addEventListener) {
+                obj.addEventListener(name, func, false); 
+            } else {
+                obj.attachEvent("on"+name, func);
+            }
+        }
+        
+        function load()
+        {
+            addEvent(plugin(), 'test', function(){
+                alert("Received a test event from the plugin.")
+            });
+        }
+
+        function pluginLoaded() {
+            console.log("Plugin loaded!");
+        }
+
+        function plugin1Loaded() {
+            console.log("Plugin1 loaded!");
+            plugin0().onlogmessage = function(message) { console.log(message); }
+            plugin0().initLocalResources("stun.l.google.com",19302,
+                                         function(msg) {
+                                             console.log(msg);
+                                             plugin0().startLocalVideo();
+                                                                                      
+                                             plugin1().onlogmessage = function(logMsg) {
+                                                                        console.log(logMsg);
+                                                                      }
+                                             plugin1().onaddstream = function(streamId, bVideo) {};
+                                             plugin1().onremovestream = function(streamId, bVideo) {};
+                                             plugin1().onsignalingmessage = function(message) {
+                                                                                var msgs = message.split("~");
+                                                                                plugin1().processSignalingMessage(msgs[1]);
+                                                                            };
+                                             plugin1().init("fakejid@fakedomain.com");
+                                             plugin1().addStream("audioLocal", false);
+                                             plugin1().addStream("videoLocal", true);
+                                             plugin1().connect();
+                                         },
+                                         function(msg) {
+                                             console.log(msg);
+                                         }
+                                         );
+        }
+
+        function addTestEvent()
+        {
+            addEvent(plugin(), 'echo', function(txt,count){
+                alert(txt+count);
+            });
+        }
+        
+        function testEvent()
+        {
+            plugin().testEvent();
+        }
+        
+        function pluginValid()
+        {
+            if(plugin().valid){
+                alert(plugin().echo("This plugin seems to be working!"));
+            } else {
+                alert("Plugin is not working :(");
+            }
+        }        
+    </script>
+<body onload="load()">
+<object id="plugin0" type="application/x-gocastplayer" width="161" height="120">
+    <param name="onload" value="pluginLoaded" />
+</object><br />
+<object id="plugin1" type="application/x-gocastplayer" width="161" height="120">
+    <param name="onload" value="plugin1Loaded" />
+</object><br />
+
+<p>
+<a href="#" onclick="javascript:pluginValid()">Click me!</a> <br />
+<a href="#" onclick="javascript:addTestEvent()">Activate click counter</a> <br />
+<a href="#" onclick="javascript:testEvent()">Fire a test event</a> <br />
+</body>
+</html>
