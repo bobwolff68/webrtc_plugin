@@ -695,7 +695,7 @@ GoCastJS.PeerConnection.prototype.RemoveStream = function(stream, negotiationCal
  * Create an offer session description.
  * @memberof GoCastJS.PeerConnection
  * @param {Function} success   - function(sdp) {}, called when an offer is generated.
- * @param {Function} failure   - function(reason) {}, Called when peerconnection is unable to generate an offer.
+ * @param {Function} failure   - function(reason) {}, called when peerconnection is unable to generate an offer.
  * @param {Object} constraints - {sdpconstraints: {mandatory: {OfferToReceiveAudio: 'true|false', OfferToReceiveVideo: 'true|false'}}}
  */
 GoCastJS.PeerConnection.prototype.CreateOffer = function(success, failure, constraints) {
@@ -717,7 +717,7 @@ GoCastJS.PeerConnection.prototype.CreateOffer = function(success, failure, const
  * Create an answer session description.
  * @memberof GoCastJS.PeerConnection
  * @param {Function} success   - function(sdp) {}, called when an answer is generated.
- * @param {Function} failure   - function(reason) {}, Called when peerconnection is unable to generate an answer.
+ * @param {Function} failure   - function(reason) {}, called when peerconnection is unable to generate an answer.
  * @param {Object} constraints - {sdpconstraints: {mandatory: {OfferToReceiveAudio: 'true|false', OfferToReceiveVideo: 'true|false'}}}
  */
 GoCastJS.PeerConnection.prototype.CreateAnswer = function(success, failure, constraints) {
@@ -735,19 +735,15 @@ GoCastJS.PeerConnection.prototype.CreateAnswer = function(success, failure, cons
     }
 };
 
-//!
-//! function: GoCastJS.PeerConnection.SetLocalDescription(action,
-//!                                                       sdp,
-//!                                                       success,
-//!                                                       failure)
-//!
-//! arguments:
-//!     action <string> : 'offer' (if offer) or 'answer' (if Ôanswer)
-//!     sdp    <string> : sdp to be used as local peer's description
-//!     success <function()>        : success callback
-//!     failure <function(message)> : failure callback with message
-//!
-GoCastJS.PeerConnection.prototype.SetLocalDescription = function(action,
+/**
+ * Set session description for local media.
+ * @memberof GoCastJS.PeerConnection
+ * @param {String} action    - 'offer' or 'answer'.
+ * @param {String} sdp       - Session description to be set.
+ * @param {Function} success   - function() {}, called when local sdp is set.
+ * @param {Function} failure   - function(reason) {}, called when there is an error while setting local sdp.
+ */
+ GoCastJS.PeerConnection.prototype.SetLocalDescription = function(action,
                                                                  sdp,
                                                                  success,
                                                                  failure) {
@@ -766,18 +762,14 @@ GoCastJS.PeerConnection.prototype.SetLocalDescription = function(action,
     }
 };
 
-//!
-//! function: GoCastJS.PeerConnection.SetRemoteDescription(action,
-//!                                                        sdp,
-//!                                                        success,
-//!                                                        failure)
-//!
-//! arguments:
-//!     action <string> : 'offer' (if offer) or 'answer' (if answer)
-//!     sdp    <string> : sdp to be used as remote peer's description
-//!     success <function()>        : success callback
-//!     failure <function(message)> : failure callback with message
-//!
+/**
+ * Set session description for remote media.
+ * @memberof GoCastJS.PeerConnection
+ * @param {String} action    - 'offer' or 'answer'.
+ * @param {String} sdp       - Session description to be set.
+ * @param {Function} success   - function() {}, called when remote sdp is set.
+ * @param {Function} failure   - function(reason) {}, called when there is an error while setting remote sdp.
+ */
 GoCastJS.PeerConnection.prototype.SetRemoteDescription = function(action,
                                                                   sdp,
                                                                   success,
@@ -797,12 +789,11 @@ GoCastJS.PeerConnection.prototype.SetRemoteDescription = function(action,
     }
 };
 
-//!
-//! function: GoCastJS.PeerConnection.AddIceCandidate(sdp)
-//!
-//! arguments:
-//!     sdp <string> : sdp of remote peer's ice candidate
-//!
+/**
+ * Add remote ice candidate.
+ * @memberof GoCastJS.PeerConnection
+ * @param {String} sdp    - Session description of the ice candidate.
+ */
 GoCastJS.PeerConnection.prototype.AddIceCandidate = function(sdp) {
     var candidate = JSON.parse(sdp), candidate1 = {};
 
@@ -840,11 +831,10 @@ GoCastJS.PeerConnection.prototype.AddIceCandidate = function(sdp) {
     }
 };
 
-//!
-//! function: GoCastJS.PeerConnection.Deinit()
-//!
-//! NOTE: preferably should be called on an init-ed player instance
-//!
+/**
+ * Destroy a peerconnection.
+ * @memberof GoCastJS.PeerConnection
+ */
 GoCastJS.PeerConnection.prototype.Deinit = function() {
     if ('gcp' === this.apitype) {
         if (false === this.player.deinit()) {
@@ -856,15 +846,11 @@ GoCastJS.PeerConnection.prototype.Deinit = function() {
     }
 };
 
-//!
-//! function: GoCastJS.PeerConnection.Width([width])
-//!
-//! arguments:
-//!     width <int> (optional) : new width value for the plugin instance
-//!
-//! returns:
-//!     current width value of the plugin instance
-//!
+/**
+ * Set width of the video window associated with a peerconnection.
+ * @memberof GoCastJS.PeerConnection
+ * @param {Number} width - if provided, sets the width, otherwise returns the current width.
+ */
 GoCastJS.PeerConnection.prototype.Width = function(width) {
     if ('undefined' !== typeof(width) && null !== width) {
         this.player.width = width;
@@ -872,15 +858,11 @@ GoCastJS.PeerConnection.prototype.Width = function(width) {
     return this.player.width;
 };
 
-//!
-//! function: GoCastJS.PeerConnection.Height([height])
-//!
-//! arguments:
-//!     height <int> (optional) : new height value for the plugin instance
-//!
-//! returns:
-//!     current height value of the plugin instance
-//!
+/**
+ * Set height of the video window associated with a peerconnection.
+ * @memberof GoCastJS.PeerConnection
+ * @param {Number} height - if provided, sets the height, otherwise returns the current height.
+ */
 GoCastJS.PeerConnection.prototype.Height = function(height) {
     if ('undefined' !== typeof(height) && null !== height) {
         this.player.height = height;
@@ -888,13 +870,13 @@ GoCastJS.PeerConnection.prototype.Height = function(height) {
     return this.player.height;
 };
 
-//!
-//! function: GoCastJS.PluginLog(localplayer, logCallback)
-//!
-//! arguments:
-//!     localplayer <HtmlObject>        : plugin instance for local preview
-//!     logCallback <function(entries)> : callback with array of log entries
-//!
+/**
+ * Get plugin logs for debugging purposes.
+ * @memberof GoCastJS
+ * @param {DomElement} localplayer - GoCastPlayer instance used for local video.
+ * @param {Function} logCallback   - function(entries) {}, called when localplayer produces log entries.
+ * @param {String} apitype         - GoCastJS.PluginLog() works only with apitype == 'gcp'.
+ */
 GoCastJS.PluginLog = function(localplayer, logCallback, apitype) {
     if ('gcp' === apitype) {
         if ('undefined' === localplayer || null === localplayer) {
