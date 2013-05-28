@@ -574,15 +574,23 @@ GoCastJS.PeerConnection = function(options) {
     };
 
     if ('native' === apitype) {
-        this.peerconn.onstatechange = function() {
-            if(self.peerconn) {
-                if (26 === parseInt($.browser.version)) {
+        if (27 <= parseInt($.browser.version)) {
+            this.peerconn.onsignalingstatechange = function() {
+                if(self.peerconn) {
                     onstatechange(self.peerconn.signalingState);
-                } else {
-                    onstatechange(self.peerconn.readyState);
                 }
-            }
-        };
+            };
+        } else {
+            this.peerconn.onstatechange = function() {
+                if(self.peerconn) {
+                    if (26 === parseInt($.browser.version)) {
+                        onstatechange(self.peerconn.signalingState);
+                    } else {
+                        onstatechange(self.peerconn.readyState);
+                    }
+                }
+            };
+        }
     } else if ('gcp' === apitype) {
         this.player.onstatechange = onstatechange;
     }
@@ -617,15 +625,23 @@ GoCastJS.PeerConnection = function(options) {
     };
 
     if ('native' === apitype) {
-        this.peerconn.onicechange = function() {
-            if (self.peerconn) {
-                if (26 === parseInt($.browser.version)) {
+        if (27 <= parseInt($.browser.version)) {
+            this.peerconn.oniceconnectionstatechange = function() {
+                if (self.peerconn) {
                     onicechange(self.peerconn.iceConnectionState);
-                } else {
-                    onicechange(self.peerconn.iceState);
                 }
-            }
-        };
+            };
+        } else {
+            this.peerconn.onicechange = function() {
+                if (self.peerconn) {
+                    if (26 === parseInt($.browser.version)) {
+                        onicechange(self.peerconn.iceConnectionState);
+                    } else {
+                        onicechange(self.peerconn.iceState);
+                    }
+                }
+            };
+        }
     } else if ('gcp' === apitype) {
         this.player.onicechange = onicechange;
     }
