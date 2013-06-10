@@ -907,6 +907,66 @@ GoCastJS.PeerConnection.prototype.Height = function(height) {
 };
 
 /**
+ * Get peerconnection network statistics.
+ * @memberof GoCastJS.PeerConnection
+ * @param {Function} onstats - function(stats) {} - callback with stats array.
+ */
+GoCastJS.PeerConnection.prototype.GetStats = function(onstats) {
+    var dumpstats = function(statobj) {
+            var ret = {}, statnames;
+
+            if (statobj.id) {
+                ret.id = statobj.id;
+            }
+            if (statobj.type) {
+                ret.type = statobj.type;
+            }
+            if (statobj.timestamp) {
+                ret.timestamp = statobj.timestamp;
+            }
+            if (statobj.names) {
+                statnames = statobj.names();
+                for (var i=0; i<statnames.length; i++) {
+                    ret[statnames[i]] = statobj.stat(statnames[i]);
+                }
+            } else if (statobj.stat('audioOutputLevel')) {
+                ret.audioOutputLevel = statobj.stat('audioOutputLevel');
+            }
+
+            return ret;
+        };
+
+    onstats = onstats || function(stats) {};
+    if ('native' === this.apitype && this.peerconn.getStats) {
+        this.peerconn.getStats(function(stats) {
+            var statlist = stats.result(),
+                statsarr = [], ret;
+
+            for (var i=0; i<statlist.length; i++) {
+                if (!statlist[i].local || statlist[i].local === statlist[i]) {
+                    statsarr.push(dumpstats(statlist[i]));
+                } else {
+                    if (statlist[i].local) {
+                        ret = dumpstats(statlist[i]);
+                        ret.local = true;
+                        statsarr.push(ret);
+                    }
+                    if (statlist.remote) {
+                        ret = dumpstats(statlist[i]);
+                        ret.remote = true;
+                        statsarr.push(ret);                    
+                    }
+                }
+            }
+
+            onstats(statsarr);
+        });
+    } else {
+        onstats([]);
+    }
+}
+
+/**
  * Get plugin logs for debugging purposes.
  * @memberof GoCastJS
  * @param {DomElement} localplayer - GoCastPlayer instance used for local video.
