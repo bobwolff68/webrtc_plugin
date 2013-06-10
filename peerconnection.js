@@ -715,16 +715,26 @@ GoCastJS.PeerConnection.prototype.RemoveStream = function(stream, negotiationCal
  * @param {Object} constraints - {sdpconstraints: {mandatory: {OfferToReceiveAudio: 'true|false', OfferToReceiveVideo: 'true|false'}}}
  */
 GoCastJS.PeerConnection.prototype.CreateOffer = function(success, failure, constraints) {
+    var acodec = constraints.sdpconstraints.mandatory.AudioCodec;
+
     success = success || function(sdp) {};
     failure = failure || function(error) {};
 
     if ('gcp' === this.apitype) {
         this.player.createOffer(success, failure, constraints || {});
     } else if ('native' === this.apitype) {
+        delete constraints.sdpconstraints.mandatory.AudioCodec;
         this.peerconn.createOffer(function(sdp) {
-            success(sdp.sdp);
+            if ('opus' === acodec) {
+                success(sdp.sdp.replace(/a=rtpmap:[0-9]+\s(ISAC|PCMU|PCMA|CN|telephone\-event)\/[0-9]+\r\n/g, ''));
+            } else if ('ISAC' === acodec) {
+                success(sdp.sdp.replace(/a=rtpmap:[0-9]+\s(opus|PCMU|PCMA|CN|telephone\-event)\/[0-9]+(\/[0-9]+)?\r\n/g, '')
+                               .replace(/a=fmtp:[0-9]+\sminptime=[0-9]+\r\n/g, ''));
+            } else {
+                success(sdp.sdp);
+            }
         }, function() {
-            failure('setLocalDescription failed.');
+            failure('CreateOffer() failed.');
         }, constraints.sdpconstraints);
     }
 };
@@ -737,16 +747,26 @@ GoCastJS.PeerConnection.prototype.CreateOffer = function(success, failure, const
  * @param {Object} constraints - {sdpconstraints: {mandatory: {OfferToReceiveAudio: 'true|false', OfferToReceiveVideo: 'true|false'}}}
  */
 GoCastJS.PeerConnection.prototype.CreateAnswer = function(success, failure, constraints) {
+    var acodec = constraints.sdpconstraints.mandatory.AudioCodec;
+
     success = success || function(sdp) {};
     failure = failure || function(error) {};
 
     if ('gcp' === this.apitype) {
         this.player.createAnswer(success, failure, constraints || {});
     } else if ('native' === this.apitype) {
+        delete constraints.sdpconstraints.mandatory.AudioCodec;
         this.peerconn.createAnswer(function(sdp) {
-            success(sdp.sdp);
+            if ('opus' === acodec) {
+                success(sdp.sdp.replace(/a=rtpmap:[0-9]+\s(ISAC|PCMU|PCMA|CN|telephone\-event)\/[0-9]+\r\n/g, ''));
+            } else if ('ISAC' === acodec) {
+                success(sdp.sdp.replace(/a=rtpmap:[0-9]+\s(opus|PCMU|PCMA|CN|telephone\-event)\/[0-9]+(\/[0-9]+)?\r\n/g, '')
+                               .replace(/a=fmtp:[0-9]+\sminptime=[0-9]+\r\n/g, ''));
+            } else {
+                success(sdp.sdp);
+            }
         }, function() {
-            failure('setLocalDescription failed.');
+            failure('CreateAnswer() failed.');
         }, constraints.sdpconstraints);
     }
 };
