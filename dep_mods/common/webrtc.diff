@@ -1,0 +1,328 @@
+Index: libjingle/trunk/third_party/webrtc/voice_engine/transmit_mixer.cc
+===================================================================
+--- libjingle/trunk/third_party/webrtc/voice_engine/transmit_mixer.cc	(revision 3501)
++++ libjingle/trunk/third_party/webrtc/voice_engine/transmit_mixer.cc	(working copy)
+@@ -366,7 +366,8 @@
+                                        _audioFrame.data_,
+                                        _audioFrame.samples_per_channel_,
+                                        _audioFrame.sample_rate_hz_,
+-                                       _audioFrame.num_channels_ == 2);
++                                       _audioFrame.num_channels_ == 2,
++                                       _audioLevel.Level());
+       }
+     }
+ 
+Index: libjingle/trunk/third_party/webrtc/voice_engine/include/voe_external_media.h
+===================================================================
+--- libjingle/trunk/third_party/webrtc/voice_engine/include/voe_external_media.h	(revision 3501)
++++ libjingle/trunk/third_party/webrtc/voice_engine/include/voe_external_media.h	(working copy)
+@@ -53,7 +53,8 @@
+     // samples in interleaved stereo format (L0,R0,L1,R1,...).
+     virtual void Process(const int channel, const ProcessingTypes type,
+                          WebRtc_Word16 audio10ms[], const int length,
+-                         const int samplingFreq, const bool isStereo) = 0;
++                         const int samplingFreq, const bool isStereo,
++                         const int level = 0) = 0;
+ 
+ protected:
+     virtual ~VoEMediaProcess() {}
+Index: libjingle/trunk/third_party/webrtc/build/merge_libs.gyp
+===================================================================
+--- libjingle/trunk/third_party/webrtc/build/merge_libs.gyp	(revision 3501)
++++ libjingle/trunk/third_party/webrtc/build/merge_libs.gyp	(working copy)
+@@ -10,7 +10,8 @@
+   'includes': ['common.gypi',],
+   'variables': {
+     'merge_libs_dependencies': [
+-      '../video_engine/video_engine.gyp:video_engine_core',
++      #'../video_engine/video_engine.gyp:video_engine_core',
++      '../../../talk/libjingle.gyp:libjingle_peerconnection',
+     ],
+   },
+   'targets': [
+Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_recursive_lock.mm
+===================================================================
+--- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_recursive_lock.mm	(revision 3501)
++++ libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_recursive_lock.mm	(working copy)
+@@ -5,7 +5,7 @@
+ 
+ #import "video_capture_recursive_lock.h"
+ 
+-@implementation VideoCaptureRecursiveLock
++@implementation VideoCaptureRecursiveLock1
+ 
+ @synthesize locked = _locked;
+ 
+Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info_objc.h
+===================================================================
+--- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info_objc.h	(revision 3501)
++++ libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info_objc.h	(working copy)
+@@ -21,7 +21,7 @@
+ #include "video_capture_qtkit_utility.h"
+ #include "video_capture_qtkit_info.h"
+ 
+-@interface VideoCaptureMacQTKitInfoObjC : NSObject{
++@interface VideoCaptureMacQTKitInfoObjC1 : NSObject{
+     bool                                _OSSupportedInfo;
+     NSArray*                            _captureDevicesInfo;
+     NSAutoreleasePool*                    _poolInfo;
+Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info_objc.mm
+===================================================================
+--- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info_objc.mm	(revision 3501)
++++ libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info_objc.mm	(working copy)
+@@ -18,7 +18,7 @@
+ 
+ #pragma mark **** hidden class interface
+ 
+-@implementation VideoCaptureMacQTKitInfoObjC
++@implementation VideoCaptureMacQTKitInfoObjC1
+ 
+ // ****************** over-written OS methods ***********************
+ #pragma mark **** over-written OS methods
+@@ -41,6 +41,9 @@
+ /// ***** Objective-C. Similar to C++ destructor
+ /// ***** Returns nothing
+ - (void)dealloc {
++    if(_captureDevicesInfo) {
++        [_captureDevicesInfo release];
++    }
+     [super dealloc];
+ }
+ 
+Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info.h
+===================================================================
+--- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info.h	(revision 3501)
++++ libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info.h	(working copy)
+@@ -18,7 +18,7 @@
+ #include "map_wrapper.h"
+ 
+ 
+-@class VideoCaptureMacQTKitInfoObjC;
++@class VideoCaptureMacQTKitInfoObjC1;
+ 
+ namespace webrtc
+ {
+@@ -87,7 +87,7 @@
+     virtual WebRtc_Word32 CreateCapabilityMap(
+         const char* deviceUniqueIdUTF8);
+ 
+-    VideoCaptureMacQTKitInfoObjC*    _captureInfo;
++    VideoCaptureMacQTKitInfoObjC1*    _captureInfo;
+ };
+ }  // namespace videocapturemodule
+ }  // namespace webrtc
+Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_objc.h
+===================================================================
+--- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_objc.h	(revision 3501)
++++ libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_objc.h	(working copy)
+@@ -27,7 +27,7 @@
+ 
+ #include "video_capture_qtkit.h"
+ 
+-@interface VideoCaptureMacQTKitObjC : NSObject{
++@interface VideoCaptureMacQTKitObjC1 : NSObject{
+     // class properties
+     bool                                    _capturing;
+     int                                    _counter;
+@@ -41,7 +41,7 @@
+     
+     // WebRTC Custom classes
+     webrtc::videocapturemodule::VideoCaptureMacQTKit* _owner;
+-    VideoCaptureRecursiveLock*            _rLock;
++    VideoCaptureRecursiveLock1*            _rLock;
+     
+     // QTKit variables
+     QTCaptureSession*                    _captureSession;
+@@ -50,7 +50,6 @@
+     NSArray*                            _captureDevices;
+     int                                    _captureDeviceCount;
+     int                                    _captureDeviceIndex;
+-    NSString*                            _captureDeviceName;
+     char                                _captureDeviceNameUTF8[1024];
+     char                                _captureDeviceNameUniqueID[1024];
+     char                                _captureDeviceNameProductID[1024];
+@@ -58,10 +57,6 @@
+     NSNumber*                            _val;
+     NSDictionary*                        _videoSettings;
+     NSString*                            _captureQuality;
+-    
+-    // other
+-    NSAutoreleasePool*                    _pool;
+-
+ }
+ /**************************************************************************
+  *
+Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info.mm
+===================================================================
+--- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info.mm	(revision 3501)
++++ libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_info.mm	(working copy)
+@@ -22,7 +22,7 @@
+ VideoCaptureMacQTKitInfo::VideoCaptureMacQTKitInfo(const WebRtc_Word32 id) :
+     DeviceInfoImpl(id)
+ {
+-    _captureInfo = [[VideoCaptureMacQTKitInfoObjC alloc] init];
++    _captureInfo = [[VideoCaptureMacQTKitInfoObjC1 alloc] init];
+ }
+ 
+ VideoCaptureMacQTKitInfo::~VideoCaptureMacQTKitInfo()
+Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_objc.mm
+===================================================================
+--- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_objc.mm	(revision 3501)
++++ libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit_objc.mm	(working copy)
+@@ -22,7 +22,7 @@
+ using namespace webrtc;
+ using namespace videocapturemodule;
+ 
+-@implementation VideoCaptureMacQTKitObjC
++@implementation VideoCaptureMacQTKitObjC1
+ 
+ #pragma mark **** over-written OS methods
+ 
+@@ -49,8 +49,37 @@
+     if(_captureSession)
+     {
+         [_captureSession stopRunning];
++    }
++    
++    if(_captureDecompressedVideoOutput)
++    {
++        [_captureDecompressedVideoOutput release];
++    }
++    
++    if(_captureVideoDeviceInput)
++    {
++        if([[_captureVideoDeviceInput device] isOpen])
++        {
++            [[_captureVideoDeviceInput device] close];
++        }
++        [_captureVideoDeviceInput release];
++    }
++    
++    if(_captureSession)
++    {
+         [_captureSession release];
+     }
++
++    if(_captureDevices)
++    {
++        [_captureDevices release];
++    }
++
++    if(_rLock)
++    {
++        [_rLock release];
++    }
++    
+     [super dealloc];
+ }
+ 
+@@ -279,8 +308,6 @@
+         return [NSNumber numberWithInt:0];
+     }
+ 
+-    _pool = [[NSAutoreleasePool alloc]init];
+-
+     memset(_captureDeviceNameUTF8, 0, 1024);
+     _counter = 0;
+     _framesDelivered = 0;
+@@ -291,8 +318,7 @@
+     _frameRate = DEFAULT_FRAME_RATE;
+     _frameWidth = DEFAULT_FRAME_WIDTH;
+     _frameHeight = DEFAULT_FRAME_HEIGHT;
+-    _captureDeviceName = [[NSString alloc] initWithFormat:@""];
+-    _rLock = [[VideoCaptureRecursiveLock alloc] init];
++    _rLock = [[VideoCaptureRecursiveLock1 alloc] init];
+     _captureSession = [[QTCaptureSession alloc] init];
+     _captureDecompressedVideoOutput = [[QTCaptureDecompressedVideoOutput alloc]
+                                         init];
+@@ -359,18 +385,9 @@
+         return [NSNumber numberWithInt:-1];
+     }
+ 
+-    QTCaptureDevice* videoDevice =
+-        (QTCaptureDevice*)[_captureDevices objectAtIndex:0];
+-
+     bool success = NO;
+     NSError*    error;
+ 
+-    success = [videoDevice open:&error];
+-    if(!success)
+-    {
+-        return [NSNumber numberWithInt:-1];
+-    }
+-
+     [_captureDecompressedVideoOutput setPixelBufferAttributes:
+         [NSDictionary dictionaryWithObjectsAndKeys:
+             [NSNumber numberWithDouble:_frameWidth], (id)kCVPixelBufferWidthKey,
+Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit.h
+===================================================================
+--- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit.h	(revision 3501)
++++ libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit.h	(working copy)
+@@ -21,8 +21,8 @@
+ 
+ 
+ // Forward declaraion
+-@class VideoCaptureMacQTKitObjC;
+-@class VideoCaptureMacQTKitInfoObjC;
++@class VideoCaptureMacQTKitObjC1;
++@class VideoCaptureMacQTKitInfoObjC1;
+ 
+ namespace webrtc
+ {
+@@ -65,8 +65,8 @@
+     WebRtc_Word32 SetCameraOutput();
+ 
+ private:
+-    VideoCaptureMacQTKitObjC*        _captureDevice;
+-    VideoCaptureMacQTKitInfoObjC*    _captureInfo;
++    VideoCaptureMacQTKitObjC1*        _captureDevice;
++    VideoCaptureMacQTKitInfoObjC1*    _captureInfo;
+     bool                    _isCapturing;
+     WebRtc_Word32            _id;
+     WebRtc_Word32            _captureWidth;
+Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit.mm
+===================================================================
+--- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit.mm	(revision 3501)
++++ libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_qtkit.mm	(working copy)
+@@ -70,12 +70,12 @@
+     _deviceUniqueId = new char[nameLength+1];
+     memcpy(_deviceUniqueId, iDeviceUniqueIdUTF8,nameLength+1);
+ 
+-    _captureDevice = [[VideoCaptureMacQTKitObjC alloc] init];
++    _captureDevice = [[VideoCaptureMacQTKitObjC1 alloc] init];
+     if(NULL == _captureDevice)
+     {
+         WEBRTC_TRACE(webrtc::kTraceError, webrtc::kTraceVideoCapture, id,
+                      "Failed to create an instance of "
+-                     "VideoCaptureMacQTKitObjC");
++                     "VideoCaptureMacQTKitObjC1");
+         return -1;
+     }
+ 
+@@ -92,11 +92,11 @@
+         return 0;
+     }
+ 
+-    _captureInfo = [[VideoCaptureMacQTKitInfoObjC alloc]init];
++    _captureInfo = [[VideoCaptureMacQTKitInfoObjC1 alloc]init];
+     if(nil == _captureInfo)
+     {
+         WEBRTC_TRACE(webrtc::kTraceError, webrtc::kTraceVideoCapture, id,
+-        "Failed to create an instance of VideoCaptureMacQTKitInfoObjC");
++        "Failed to create an instance of VideoCaptureMacQTKitInfoObjC1");
+         return -1;
+     }
+ 
+Index: libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_recursive_lock.h
+===================================================================
+--- libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_recursive_lock.h	(revision 3501)
++++ libjingle/trunk/third_party/webrtc/modules/video_capture/mac/qtkit/video_capture_recursive_lock.h	(working copy)
+@@ -18,7 +18,7 @@
+ 
+ #import <Foundation/Foundation.h>
+ 
+-@interface VideoCaptureRecursiveLock : NSRecursiveLock <NSLocking> {
++@interface VideoCaptureRecursiveLock1 : NSRecursiveLock <NSLocking> {
+     BOOL _locked;
+ }
+ 

@@ -1,0 +1,74 @@
+<pkmkdoc spec="1.12"><properties><title>GoCastPlayer</title><build>/Users/rwolff/GoCastPlayer2.2.0.pkg</build><certificate>Developer ID Application: Stuart Gannes</certificate><organization>it.GoCast</organization><userSees ui="easy"/><min-target os="3"/><domain anywhere="true"/></properties><distribution><versions min-spec="1.000000"/><scripts></scripts></distribution><description>This installer will add the GoCast Player browser plug-in to your computer. This will enable you to have video and voice conversations on the web.</description><contents><choice title="GCP" id="choice3" starts_selected="true" starts_enabled="true" starts_hidden="true"><pkgref id="it.GoCast.gocastplayer.GCP.pkg"/></choice></contents><resources bg-scale="proportional" bg-align="topleft"><locale lang="en"><resource mime-type="text/rtf" kind="embedded" type="license"><![CDATA[{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf510
+{\fonttbl\f0\froman\fcharset0 Times-Roman;}
+{\colortbl;\red255\green255\blue255;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}.}{\leveltext\leveltemplateid1\'02\'00.;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listlevel\levelnfc4\levelnfcn4\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{lower-alpha\}.}{\leveltext\leveltemplateid2\'02\'01.;}{\levelnumbers\'01;}\fi-360\li1440\lin1440 }{\listname ;}\listid1}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}}
+\deftab720
+\pard\pardeftab720\sa320
+
+\f0\b\fs48 \cf0 GoCast SOFTWARE End User License Agreement\
+\pard\pardeftab720\sa240
+
+\b0\fs24 \cf0 IMPORTANT: THIS SOFTWARE END USER LICENSE AGREEMENT ("EULA") IS A LEGAL AGREEMENT BETWEEN YOU AND GoCast. READ IT CAREFULLY BEFORE INSTALLING OR USING THE SOFTWARE.\
+BY INSTALLING AND USING THE SOFTWARE, YOU ARE CONFIRMING YOUR ACCEPTANCE OF THE SOFTWARE AND AGREEING TO BECOME BOUND BY THE TERMS OF THIS AGREEMENT. IF YOU DO NOT AGREE TO BE BOUND BY THESE TERMS, THEN DO NOT INSTALL OR USE THE SOFTWARE.\
+\pard\tx220\tx720\pardeftab720\li720\fi-720
+\ls1\ilvl0\cf0 {\listtext	1.	}License Grants\
+\pard\tx940\tx1440\pardeftab720\li1440\fi-1440
+\ls1\ilvl1\cf0 {\listtext	a.	}You may install and use the Software on a single computer subject to the conditions as set forth in Section 2.\
+{\listtext	b.	}Your license rights under this EULA are non-exclusive.\
+\pard\tx220\tx720\pardeftab720\li720\fi-720
+\ls1\ilvl0\cf0 {\listtext	2.	}License Restrictions\
+\pard\tx940\tx1440\pardeftab720\li1440\fi-1440
+\ls1\ilvl1\cf0 {\listtext	a.	}You may not copy, distribute or transfer any part of the Software.\
+{\listtext	b.	}You agree to prevent unauthorized copying of the Software.\
+{\listtext	c.	}You may not alter, merge, modify, adapt or translate the Software, or decompile, reverse engineer, disassemble, or otherwise reduce the Software to a human-perceivable form.\
+{\listtext	d.	}You may not rent, lease, sell, or sublicense the Software.\
+{\listtext	e.	}You may not modify the Software or create derivative works based upon the Software.\
+{\listtext	f.	}You may not export the Software into any country prohibited by the United States Export Administration Act and the regulations there under.\
+{\listtext	g.	}The Software may include portions offered on terms in addition to those set out here, as set out in a license accompanying those portions.\
+{\listtext	h.	}In the event that you fail to comply with this EULA, GoCast may terminate the license and you must destroy all copies of the Software (with all other rights of both parties and all other provisions of this EULA surviving any such termination).\
+{\listtext	i.	}You may not utilize the Service or any portion thereof as a means to track or monitor the location and activities of any individual without their express consent and authorization;\
+{\listtext	j.	}You may not reproduce, duplicate, copy, sell, resell or exploit for any commercial purposes, the Service or any portion thereof, including without limitation any content other than Your personal digital content displayed in connection with the Services;\
+{\listtext	k.	}You may not transmit content that is, without limitation: unlawful, threatening, abusive, harassing, defamatory, libelous, deceptive, or fraudulent; invasive of another's privacy; is tortious, or contains explicit or graphic descriptions, or accounts of, sexual acts, or illegally exploits or solicits personal information from a minor;\
+{\listtext	l.	}You may not victimize, harass, degrade, or intimidate an individual or group of individuals on the basis of religion, gender, sexual orientation, race, ethnicity, age, or disability;\
+{\listtext	m.	}You may not propagate software that contains viruses or any other computer code, files or programs that interrupt, destroy or limit the functionality of any computer software or hardware or telecommunications equipment, or otherwise permit the unauthorized use of a computer or computer network;\
+{\listtext	n.	}You may not encourage conduct that would constitute a criminal offense, or that gives rise to civil liability;\
+{\listtext	o.	}You may not engage in any activity that otherwise interferes with the use and enjoyment of the Service by others, including without limitation: using the Service in any way that may damage, disable, overburden, or impair GoCast\'92s servers or networks; harvesting personal information about other Service users for any reason; transmitting, directly or indirectly, any unsolicited bulk communications (including e-mails and instant messages).\
+\pard\tx220\tx720\pardeftab720\li720\fi-720
+\ls1\ilvl0\cf0 {\listtext	3.	}Upgrades\uc0\u8232 If this copy of the Software is an upgrade from an earlier version of the Software, it is provided to you on a license exchange basis. You agree by your installation and use of such copy of the Software to voluntarily terminate your earlier EULA and that you will not continue to use the earlier version of the Software.\
+{\listtext	4.	}Ownership\uc0\u8232 The Software is licensed, not sold, to you for use only under the terms and conditions of this Agreement, and GoCast reserves all rights not expressly granted to you in this Agreement. GoCast retains all right, title and interest, including all copyright and intellectual property rights, in and to, the Software, and all copies thereof. All rights not specifically granted in this EULA, including Federal and International Copyrights, are reserved by GoCast.\
+{\listtext	5.	}PRE-RELEASE SERVICE\uc0\u8232 ANY SERVICE OR PORTIONS OF THE SERVICE LABELLED AS \'93BETA\'94, \'93PRE-RELEASE\'94, OR ARE OTHERWISE DESCRIBED AS EXPERIMENTAL, UNTESTED OR NOT FULLY FUNCTIONAL (\'93PRE-RELEASE PRODUCT(S)\'94) ARE PROVIDED TO YOU \'93AS IS\'94, WITH NO WARRANTY, INDEMNITY, OR SUPPORT WHATSOEVER, EXPRESS OR IMPLIED, FROM GoCast. The Sections of this EULA entitled \'93Limited Warranty\'94 and \'93Customer Remedies\'94 specifically do not apply to Pre-Release Service or software.\u8232 If you provide any information, advice, opinion, or recommendations to GoCast regarding the Service or any portion of the Service to GoCast (\'93Feedback\'94), you grant to GoCast a worldwide, non-exclusive, royalty-free, irrevocable license to use, copy, make copies, distribute, display, perform and otherwise commercialize the Feedback at GoCast\'92s sole discretion. Unless specifically provided by a separate agreement, GoCast will have no obligation to exercise this license or to provide payment or other form of compensation for the Feedback.\
+{\listtext	6.	}Collection of System and Personal Information\uc0\u8232 GoCast Services provided under this EULA may employ applications and tools to retrieve information about You and Your device (e.g., your Content, device ID, location, etc.) to enable provisioning and support of Service features (e.g., Content synchronization, Service improvements, etc.). Some of this information may be personally identifiable information and include sensitive data stored in files on Your device. This information is essential to enable GoCast to improve Service quality and to provide You with the Service features You subscribed to; for these reasons there is no opt-out available for this information collection. By using the Service and accepting these terms You agree to the backup and storage of this data by GoCast and its service providers. You agree that GoCast and its service providers may copy and store such data (including personally identifiable and sensitive data which you made part of your Content or provided in Your Account) in the United States, Europe, or other countries or jurisdictions outside of Your own as part of the Service.\
+{\listtext	7.	}Warranties and limitation of liability\uc0\u8232 TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, GOCAST EXPRESSLY DISCLAIMS ANY WARRANTY FOR THE SOFTWARE. THE SOFTWARE AND ANY RELATED DOCUMENTATION ARE PROVIDED "AS IS", "WITH ALL FAULTS", WITHOUT WARRANTY OF ANY KIND. GOCAST DISCLAIMS ANY AND ALL EXPRESS OR IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. THE ENTIRE RISK ARISING OUT OF USING THE SOFTWARE REMAINS WITH YOU. GOCAST'S ENTIRE LIABILITY AND YOUR EXCLUSIVE REMEDY SHALL BE LIMITED TO THE COST OF THE SOFTWARE OR A REPLACEMENT COPY OF THE SOFTWARE. TO THE EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL GOCAST OR ITS LICENSORS BE LIABLE FOR ANY DAMAGES WHATSOEVER (INCLUDING WITHOUT LIMITATION, INDIRECT, CONSEQUENTIAL OR INCIDENTAL DAMAGES, LOST PROFITS, BUSINESS INTERRUPTION OR LOST INFORMATION) ARISING OUT OF THE USE OR INABILITY TO USE THE SOFTWARE, EVEN IF GOCAST HAS BEEN ADVISED OF THE POSSIBILITY OF DAMAGES.\
+{\listtext	8.	}U.S. government restricted rights legend\uc0\u8232 The Software is provided with "RESTRICTED RIGHTS." Use, duplication, or disclosure by the Government is subject to restrictions as set forth in FAR52.227-14 and DFAR252.227-7013 et seq. or its successor. Use of the Software by the Government constitutes acknowledgment of GoCast's proprietary rights therein. Contractor or Manufacturer is GoCast, 1003 Elwell Ct, Palo Alto, CA 94303.\
+{\listtext	9.	}General\uc0\u8232 This EULA shall be governed by the internal laws of the State of California, without giving effect to principles of conflict of laws. You hereby consent to the exclusive jurisdiction and venue of the state courts sitting in Santa Clara County, California or the federal courts in the Northern District of California to resolve any disputes arising under this EULA. In each case this EULA shall be construed and enforced without regard to the United Nations Convention on the International Sale of Goods. \u8232 GoCast may, in its sole discretion, modify portions of this Agreement at any time. GoCast may notify you of any changes by posting notice of such modifications on GoCast's web site(s) or sending notice via e-mail, postal mail or other means. Your continued use of the Software following notice of such modifications shall be deemed to be your acceptance of any such modifications to the Agreement. If you do not agree to any such modifications, you must immediately stop using the Software.\
+}]]></resource><resource mime-type="text/rtf" kind="embedded" type="readme"><![CDATA[{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf510
+{\fonttbl\f0\fnil\fcharset0 LucidaGrande;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs26 \cf0 Currently there are a few limitations to note:\
+\
+Choosing video camera and microphone must be done in the 'settings' area (see the gear-icon in the upper right corner of the user interface after entering a room for the first time). Most Mac users will not need to change the defaults, however.}]]></resource><resource mime-type="text/rtf" kind="embedded" type="welcome"><![CDATA[{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf510
+{\fonttbl\f0\fnil\fcharset0 LucidaGrande;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs26 \cf0 We will install the browser plug-in for GoCast Player at this time.\
+\
+You may find that you need to restart your browser in order to use the newly installed plug-in the first time.\
+\
+
+\b NEW FEATURES
+\b0 \
+* Enhanced video quality\
+* Improved audio performance and quality - OPUS\
+* Great firewall support using STUN/ICE and now TURN}]]></resource><resource mime-type="text/rtf" kind="embedded" type="conclusion"><![CDATA[{\rtf1\ansi\ansicpg1252\cocoartf1138\cocoasubrtf510
+{\fonttbl\f0\fnil\fcharset0 LucidaGrande;}
+{\colortbl;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural
+
+\f0\fs26 \cf0 \
+Congratulations. Enjoy using GoCast Player.\
+\
+Don't forget - you may have to restart your browser to use the plug-in the first time.}]]></resource></locale></resources><requirements><requirement id="tosv" operator="ge" value="'10.6.0'"><message>This plug-in requires version 10.6 or higher of OS X.</message></requirement><requirement id="sosv" operator="ge" value="'10.6.0'"><message-title>OS version is incompatible</message-title><message>This plug-in requires version 10.6 or higher of OS X.</message></requirement></requirements><flags/><postinstall><action id="com.apple.packagemaker.actions.createcookie"><value>/Library/Application Support/GoCast</value><type>absolute-path</type><item1-title>initfile.tmp</item1-title></action><action id="com.apple.packagemaker.actions.createcookie"><value>/Library/Application Support/GoCast/logs</value><type>absolute-path</type><item1-title>initlog.tmp</item1-title></action></postinstall><item type="file">01gcp.xml</item><mod>description</mod><mod>properties.title</mod><mod>properties.userDomain</mod><mod>properties.customizeOption</mod><mod>postinstallActions.actions</mod><mod>properties.systemDomain</mod><mod>properties.anywhereDomain</mod></pkmkdoc>

@@ -1,2 +1,4 @@
-third_party/webrtc
+/deps/
+/build/
+/out/
 /*.DS_Store

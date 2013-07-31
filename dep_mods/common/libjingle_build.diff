@@ -1,0 +1,13 @@
+Index: libjingle/trunk/build/common.gypi
+===================================================================
+--- libjingle/trunk/build/common.gypi	(revision 176094)
++++ libjingle/trunk/build/common.gypi	(working copy)
+@@ -2374,7 +2374,7 @@
+           '-pipe',
+         ],
+         'cflags_cc': [
+-          '-fno-rtti',
++          '-frtti',
+           '-fno-threadsafe-statics',
+           # Make inline functions have hidden visiblity by default.
+           # Surprisingly, not covered by -fvisibility=hidden.

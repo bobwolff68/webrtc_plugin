@@ -1,0 +1,633 @@
+Index: libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.cc
+===================================================================
+--- libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.cc	(revision 284)
++++ libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.cc	(working copy)
+@@ -65,9 +65,9 @@
+ };
+ 
+ static const CodecPref kCodecPrefs[] = {
++  { "OPUS",   48000,  2, 111, true },
+   { "ISAC",   16000,  1, 103, true },
+   { "ISAC",   32000,  1, 104, true },
+-  { "OPUS",   48000,  2, 111, true },
+   { "CELT",   32000,  1, 109, true },
+   { "CELT",   32000,  2, 110, true },
+   { "G722",   16000,  1, 9,   false },
+@@ -869,6 +869,35 @@
+   return true;
+ }
+ 
++bool WebRtcVoiceEngine::GetOutputMute(int *level) {
++  bool enabled;
++  if (voe_wrapper_->volume()->GetSystemOutputMute(enabled) == -1) {
++    LOG_RTCERR1(GetSystemOutputMute, enabled);
++    return false;
++  }
++  *level = enabled ? 0 : 1;
++  return true;
++}
++
++bool WebRtcVoiceEngine::GetInputVolume(int* level) {
++  unsigned int ulevel;
++  if (voe_wrapper_->volume()->GetMicVolume(ulevel) == -1) {
++    LOG_RTCERR1(GetMicVolume, level);
++    return false;
++  }
++  *level = ulevel;
++  return true;
++}
++
++bool WebRtcVoiceEngine::SetInputVolume(int level) {
++  ASSERT(level >= 0 && level <= 255);
++  if (voe_wrapper_->volume()->SetMicVolume(level) == -1) {
++    LOG_RTCERR1(SetMicVolume, level);
++    return false;
++  }
++  return true;
++}
++
+ bool WebRtcVoiceEngine::SetOutputVolume(int level) {
+   ASSERT(level >= 0 && level <= 255);
+   if (voe_wrapper_->volume()->SetSpeakerVolume(level) == -1) {
+@@ -1300,6 +1329,8 @@
+   bool success = false;
+   uint32* processor_ssrc = NULL;
+   bool found_channel = FindChannelNumFromSsrc(ssrc, direction, &channel_id);
++    
++  found_channel = found_channel || !ssrc;
+   if (voice_processor == NULL || !found_channel) {
+     LOG(LS_WARNING) << "Media Processing Registration Failed. ssrc: " << ssrc
+         << " foundChannel: " << found_channel;
+@@ -1317,7 +1348,7 @@
+       }
+       SignalRxMediaFrame.connect(voice_processor,
+                                  &VoiceProcessor::OnFrame);
+-    } else {
++    } else if (direction == MPD_TX) {
+       processing_type = webrtc::kRecordingPerChannel;
+       if (SignalTxMediaFrame.is_empty()) {
+         register_with_webrtc = true;
+@@ -1325,6 +1356,13 @@
+       }
+       SignalTxMediaFrame.connect(voice_processor,
+                                  &VoiceProcessor::OnFrame);
++    } else {
++      processing_type = webrtc::kRecordingPreprocessing;
++      if (SignalCapMediaFrame.is_empty()) {
++        register_with_webrtc = true;
++      }
++      SignalCapMediaFrame.connect(voice_processor,
++                                  &VoiceProcessor::OnFrame);
+     }
+   }
+   if (register_with_webrtc) {
+@@ -1336,7 +1374,7 @@
+                                         *this) != -1) {
+       LOG(LS_INFO) << "Media Processing Registration Succeeded. channel:"
+                    << channel_id;
+-      *processor_ssrc = ssrc;
++      if(processor_ssrc) *processor_ssrc = ssrc;
+       success = true;
+     } else {
+       LOG_RTCERR2(RegisterExternalMediaProcessing,
+@@ -1365,10 +1403,13 @@
+     signal = &SignalRxMediaFrame;
+     processing_type = webrtc::kPlaybackAllChannelsMixed;
+     processor_ssrc = &rx_processor_ssrc_;
+-  } else {
++  } else if (channel_direction == MPD_TX) {
+     signal = &SignalTxMediaFrame;
+     processing_type = webrtc::kRecordingPerChannel;
+     processor_ssrc = &tx_processor_ssrc_;
++  } else {
++    signal = &SignalCapMediaFrame;
++    processing_type = webrtc::kRecordingPreprocessing;
+   }
+ 
+   int deregister_id = -1;
+@@ -1380,6 +1421,7 @@
+       bool found_channel = FindChannelNumFromSsrc(ssrc,
+                                                   channel_direction,
+                                                   &channel_id);
++      found_channel = found_channel || !ssrc;
+       if (signal->is_empty() && found_channel) {
+         deregister_id = channel_id;
+       }
+@@ -1389,7 +1431,7 @@
+     if (voe()->media() &&
+         voe()->media()->DeRegisterExternalMediaProcessing(deregister_id,
+         processing_type) != -1) {
+-      *processor_ssrc = 0;
++      if (processor_ssrc) *processor_ssrc = 0;
+       LOG(LS_INFO) << "Media Processing DeRegistration Succeeded. channel:"
+                    << deregister_id;
+     } else {
+@@ -1418,6 +1460,9 @@
+   if (!UnregisterProcessorChannel(MPD_TX, ssrc, voice_processor, direction)) {
+     success = false;
+   }
++  if (!UnregisterProcessorChannel(MPD_RX_AND_TX, ssrc, voice_processor, direction)) {
++    success = false;
++  }
+   return success;
+ }
+ 
+@@ -1428,13 +1473,16 @@
+                                 WebRtc_Word16 audio10ms[],
+                                 const int length,
+                                 const int sampling_freq,
+-                                const bool is_stereo) {
++                                const bool is_stereo,
++                                const int level) {
+     talk_base::CritScope cs(&signal_media_critical_);
+-    AudioFrame frame(audio10ms, length, sampling_freq, is_stereo);
++    AudioFrame frame(audio10ms, length, sampling_freq, is_stereo, level);
+     if (type == webrtc::kPlaybackAllChannelsMixed) {
+       SignalRxMediaFrame(rx_processor_ssrc_, MPD_RX, &frame);
+     } else if (type == webrtc::kRecordingPerChannel) {
+       SignalTxMediaFrame(tx_processor_ssrc_, MPD_TX, &frame);
++    } else if (type == webrtc::kRecordingPreprocessing) {
++      SignalCapMediaFrame(0, MPD_RX_AND_TX, &frame);
+     } else {
+       LOG(LS_WARNING) << "Media Processing invoked unexpectedly."
+                       << " channel: " << channel << " type: " << type
+@@ -2305,15 +2353,10 @@
+ }
+ 
+ bool WebRtcVoiceMediaChannel::MuteStream(uint32 ssrc, bool muted) {
+-  if (send_ssrc_ != ssrc && ssrc != 0) {
+-    LOG(LS_WARNING) << "The specified ssrc " << ssrc << " is not in use.";
++  if (engine()->voe()->volume()->SetSystemInputMute(muted) == -1) {
++    LOG_RTCERR1(SetSystemInputMute, muted);
+     return false;
+   }
+-  if (engine()->voe()->volume()->SetInputMute(voe_channel(),
+-      muted) == -1) {
+-    LOG_RTCERR2(SetInputMute, voe_channel(), muted);
+-    return false;
+-  }
+   return true;
+ }
+ 
+Index: libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.h
+===================================================================
+--- libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.h	(revision 284)
++++ libjingle/trunk/talk/media/webrtc/webrtcvoiceengine.h	(working copy)
+@@ -145,7 +145,10 @@
+   bool SetDelayOffset(int offset);
+   bool SetDevices(const Device* in_device, const Device* out_device);
+   bool GetOutputVolume(int* level);
++  bool GetOutputMute(int* level);
+   bool SetOutputVolume(int level);
++  bool GetInputVolume(int* level);
++  bool SetInputVolume(int level);
+   int GetInputLevel();
+   bool SetLocalMonitor(bool enable);
+ 
+@@ -168,7 +171,8 @@
+                        WebRtc_Word16 audio10ms[],
+                        const int length,
+                        const int sampling_freq,
+-                       const bool is_stereo);
++                       const bool is_stereo,
++                       const int level = 0);
+ 
+   // For tracking WebRtc channels. Needed because we have to pause them
+   // all when switching devices.
+@@ -242,6 +246,7 @@
+   // SignalXXMediaFrame will be invoked for every audio packet.
+   FrameSignal SignalRxMediaFrame;
+   FrameSignal SignalTxMediaFrame;
++  FrameSignal SignalCapMediaFrame;
+ 
+   static const int kDefaultLogSeverity = talk_base::LS_WARNING;
+ 
+Index: libjingle/trunk/talk/media/webrtc/webrtcvideocapturer.cc
+===================================================================
+--- libjingle/trunk/talk/media/webrtc/webrtcvideocapturer.cc	(revision 284)
++++ libjingle/trunk/talk/media/webrtc/webrtcvideocapturer.cc	(working copy)
+@@ -190,8 +190,7 @@
+   }
+   factory_->DestroyDeviceInfo(info);
+   if (supported.empty()) {
+-    LOG(LS_ERROR) << "Failed to find usable formats for id: " << device.id;
+-    return false;
++    LOG(LS_WARNING) << "Failed to find usable formats for id: " << device.id;
+   }
+ 
+   module_ = factory_->Create(0, vcm_id);
+@@ -203,7 +202,9 @@
+   // It is safe to change member attributes now.
+   module_->AddRef();
+   SetId(device.id);
+-  SetSupportedFormats(supported);
++  if (!supported.empty()) {
++    SetSupportedFormats(supported);
++  }
+   return true;
+ }
+ 
+Index: libjingle/trunk/talk/media/base/mediaengine.h
+===================================================================
+--- libjingle/trunk/talk/media/base/mediaengine.h	(revision 284)
++++ libjingle/trunk/talk/media/base/mediaengine.h	(working copy)
+@@ -129,6 +129,12 @@
+   // Device configuration
+   // Gets the current speaker volume, as a value between 0 and 255.
+   virtual bool GetOutputVolume(int* level) = 0;
++  // Gets the current speaker mute status.
++  virtual bool GetOutputMute(int* level) = 0;
++  // Gets the current mic volume, as a value between 0 and 255.
++  virtual bool GetInputVolume(int* level) = 0;
++  // Sets the current mic volume, as a value between 0 and 255.
++  virtual bool SetInputVolume(int level) = 0;
+   // Sets the current speaker volume, as a value between 0 and 255.
+   virtual bool SetOutputVolume(int level) = 0;
+ 
+@@ -236,6 +242,15 @@
+   virtual bool GetOutputVolume(int* level) {
+     return voice_.GetOutputVolume(level);
+   }
++  virtual bool GetOutputMute(int* level) {
++    return voice_.GetOutputMute(level);
++  }
++  virtual bool GetInputVolume(int* level) {
++    return voice_.GetInputVolume(level);
++  }
++  virtual bool SetInputVolume(int level) {
++    return voice_.SetInputVolume(level);
++  }
+   virtual bool SetOutputVolume(int level) {
+     return voice_.SetOutputVolume(level);
+   }
+Index: libjingle/trunk/talk/media/base/audioframe.h
+===================================================================
+--- libjingle/trunk/talk/media/base/audioframe.h	(revision 284)
++++ libjingle/trunk/talk/media/base/audioframe.h	(working copy)
+@@ -36,19 +36,22 @@
+       : audio10ms_(NULL),
+         length_(0),
+         sampling_frequency_(8000),
+-        stereo_(false) {
++        stereo_(false),
++        level(0) {
+   }
+-  AudioFrame(int16* audio, size_t audio_length, int sample_freq, bool stereo)
++  AudioFrame(int16* audio, size_t audio_length, int sample_freq, bool stereo, int level = 0)
+       : audio10ms_(audio),
+         length_(audio_length),
+         sampling_frequency_(sample_freq),
+-        stereo_(stereo) {
++        stereo_(stereo),
++        level(level) {
+   }
+ 
+   int16* GetData() { return audio10ms_; }
+   size_t GetSize() const { return length_; }
+   int GetSamplingFrequency() const { return sampling_frequency_; }
+   bool GetStereo() const { return stereo_; }
++  int Level() const { return level; }
+ 
+  private:
+   // TODO(janahan): currently the data is not owned by this class.
+@@ -57,6 +60,7 @@
+   size_t length_;
+   int sampling_frequency_;
+   bool stereo_;
++  int level;
+ };
+ 
+ }  // namespace cricket
+Index: libjingle/trunk/talk/app/webrtc/peerconnectioninterface.h
+===================================================================
+--- libjingle/trunk/talk/app/webrtc/peerconnectioninterface.h	(revision 284)
++++ libjingle/trunk/talk/app/webrtc/peerconnectioninterface.h	(working copy)
+@@ -84,6 +84,7 @@
+ 
+ namespace cricket {
+ class PortAllocator;
++class ChannelManager;
+ }
+ 
+ namespace webrtc {
+@@ -387,6 +388,9 @@
+   virtual talk_base::scoped_refptr<LocalAudioTrackInterface>
+       CreateLocalAudioTrack(const std::string& label,
+                             AudioDeviceModule* audio_device) = 0;
++    
++  // Returns the channel manager.
++  virtual cricket::ChannelManager* channel_manager() = 0;
+ 
+  protected:
+   // Dtor and ctor protected as objects shouldn't be created or deleted via
+Index: libjingle/trunk/talk/app/webrtc/localvideosource.cc
+===================================================================
+--- libjingle/trunk/talk/app/webrtc/localvideosource.cc	(revision 284)
++++ libjingle/trunk/talk/app/webrtc/localvideosource.cc	(working copy)
+@@ -67,7 +67,7 @@
+ // Default resolution. If no constraint is specified, this is the resolution we
+ // will use.
+ static const cricket::VideoFormatPod kDefaultResolution =
+-    {640, 480, FPS_TO_INTERVAL(30), cricket::FOURCC_ANY};
++    {160, 120, FPS_TO_INTERVAL(15), cricket::FOURCC_ANY};
+ 
+ // List of formats used if the camera don't support capability enumeration.
+ static const cricket::VideoFormatPod kVideoFormats[] = {
+@@ -76,7 +76,22 @@
+   {640, 360, FPS_TO_INTERVAL(30), cricket::FOURCC_ANY},
+   {640, 480, FPS_TO_INTERVAL(30), cricket::FOURCC_ANY},
+   {320, 240, FPS_TO_INTERVAL(30), cricket::FOURCC_ANY},
+-  {320, 180, FPS_TO_INTERVAL(30), cricket::FOURCC_ANY}
++  {320, 180, FPS_TO_INTERVAL(30), cricket::FOURCC_ANY},
++  {160, 120, FPS_TO_INTERVAL(30), cricket::FOURCC_ANY},
++  {1280, 720, FPS_TO_INTERVAL(24), cricket::FOURCC_ANY},
++  {960, 720, FPS_TO_INTERVAL(24), cricket::FOURCC_ANY},
++  {640, 360, FPS_TO_INTERVAL(24), cricket::FOURCC_ANY},
++  {640, 480, FPS_TO_INTERVAL(24), cricket::FOURCC_ANY},
++  {320, 240, FPS_TO_INTERVAL(24), cricket::FOURCC_ANY},
++  {320, 180, FPS_TO_INTERVAL(24), cricket::FOURCC_ANY},
++  {160, 120, FPS_TO_INTERVAL(24), cricket::FOURCC_ANY},
++  {1280, 720, FPS_TO_INTERVAL(15), cricket::FOURCC_ANY},
++  {960, 720, FPS_TO_INTERVAL(15), cricket::FOURCC_ANY},
++  {640, 360, FPS_TO_INTERVAL(15), cricket::FOURCC_ANY},
++  {640, 480, FPS_TO_INTERVAL(15), cricket::FOURCC_ANY},
++  {320, 240, FPS_TO_INTERVAL(15), cricket::FOURCC_ANY},
++  {320, 180, FPS_TO_INTERVAL(15), cricket::FOURCC_ANY},
++  {160, 120, FPS_TO_INTERVAL(15), cricket::FOURCC_ANY}
+ };
+ 
+ MediaSourceInterface::SourceState
+Index: libjingle/trunk/talk/app/webrtc/webrtcsession.cc
+===================================================================
+--- libjingle/trunk/talk/app/webrtc/webrtcsession.cc	(revision 284)
++++ libjingle/trunk/talk/app/webrtc/webrtcsession.cc	(working copy)
+@@ -839,11 +839,6 @@
+     return;
+   }
+   uint32 ssrc = 0;
+-  if (!VERIFY(GetAudioSsrcByName(BaseSession::local_description(),
+-                                 name, &ssrc))) {
+-    LOG(LS_ERROR) << "SetAudioSend: SSRC does not exist.";
+-    return;
+-  }
+   voice_channel_->MuteStream(ssrc, !enable);
+   if (enable)
+     voice_channel_->SetChannelOptions(options);
+Index: libjingle/trunk/talk/app/webrtc/mediastreamsignaling.cc
+===================================================================
+--- libjingle/trunk/talk/app/webrtc/mediastreamsignaling.cc	(revision 284)
++++ libjingle/trunk/talk/app/webrtc/mediastreamsignaling.cc	(working copy)
+@@ -93,6 +93,13 @@
+   std::string value;
+   size_t mandatory_constraints_satisfied = 0;
+ 
++  if(FindConstraint(constraints,
++                    "AudioCodec",
++                    &value,
++                    &mandatory_constraints_satisfied)) {
++    options->preffered_acodec_name = value;
++  }
++    
+   if (FindConstraint(constraints,
+                      MediaConstraintsInterface::kOfferToReceiveAudio,
+                      &value, &mandatory_constraints_satisfied)) {
+Index: libjingle/trunk/talk/session/media/channelmanager.cc
+===================================================================
+--- libjingle/trunk/talk/session/media/channelmanager.cc	(revision 284)
++++ libjingle/trunk/talk/session/media/channelmanager.cc	(working copy)
+@@ -79,6 +79,9 @@
+   MSG_ADDVIDEORENDERER = 31,
+   MSG_REMOVEVIDEORENDERER = 32,
+   MSG_GETSTARTCAPTUREFORMAT = 33,
++  MSG_GETINPUTVOLUME = 34,
++  MSG_SETINPUTVOLUME = 35,
++  MSG_GETOUTPUTMUTE = 36,
+ };
+ 
+ static const int kNotSetOutputVolume = -1;
+@@ -659,12 +662,44 @@
+   return true;
+ }
+ 
++bool ChannelManager::GetOutputMute(bool *enabled) {
++  VolumeLevel volume;
++  if (!Send(MSG_GETOUTPUTMUTE, &volume) || !volume.result) {
++    return false;
++  }
++
++  *enabled = (bool)(volume.level == 0);
++  return true;        
++}
++
++bool ChannelManager::GetInputVolume(int *level) {
++  VolumeLevel volume;
++  if (!Send(MSG_GETINPUTVOLUME, &volume) || !volume.result) {
++    return false;
++  }
++
++  *level = volume.level;
++  return true;        
++}
++
+ bool ChannelManager::GetOutputVolume_w(int* level) {
+   ASSERT(worker_thread_ == talk_base::Thread::Current());
+   ASSERT(initialized_);
+   return media_engine_->GetOutputVolume(level);
+ }
+ 
++bool ChannelManager::GetOutputMute_w(int* level) {
++  ASSERT(worker_thread_ == talk_base::Thread::Current());
++  ASSERT(initialized_);
++  return media_engine_->GetOutputMute(level);
++}
++
++bool ChannelManager::GetInputVolume_w(int* level) {
++  ASSERT(worker_thread_ == talk_base::Thread::Current());
++  ASSERT(initialized_);
++  return media_engine_->GetInputVolume(level);
++}
++
+ bool ChannelManager::SetOutputVolume(int level) {
+   bool ret = level >= 0 && level <= 255;
+   if (initialized_) {
+@@ -679,12 +714,32 @@
+   return ret;
+ }
+ 
++bool ChannelManager::SetInputVolume(int level) {
++  bool ret = level >= 0 && level <= 255;
++  if (initialized_) {
++    VolumeLevel volume(level);
++    ret &= Send(MSG_SETINPUTVOLUME, &volume) && volume.result;
++  }
++    
++  if (ret) {
++    audio_input_volume_ = level;
++  }
++
++  return ret;
++}
++
+ bool ChannelManager::SetOutputVolume_w(int level) {
+   ASSERT(worker_thread_ == talk_base::Thread::Current());
+   ASSERT(initialized_);
+   return media_engine_->SetOutputVolume(level);
+ }
+ 
++bool ChannelManager::SetInputVolume_w(int level) {
++  ASSERT(worker_thread_ == talk_base::Thread::Current());
++  ASSERT(initialized_);
++  return media_engine_->SetInputVolume(level);
++}
++
+ bool ChannelManager::IsSameCapturer(const std::string& capturer_name,
+                                     VideoCapturer* capturer) {
+   if (capturer == NULL) {
+@@ -1069,11 +1124,26 @@
+       p->result = GetOutputVolume_w(&p->level);
+       break;
+     }
++    case MSG_GETOUTPUTMUTE: {
++      VolumeLevel* p = static_cast<VolumeLevel*>(data);
++      p->result = GetOutputMute_w(&p->level);
++      break;
++    }
++    case MSG_GETINPUTVOLUME: {
++      VolumeLevel* p = static_cast<VolumeLevel*>(data);
++      p->result = GetInputVolume_w(&p->level);
++      break;
++    }
+     case MSG_SETOUTPUTVOLUME: {
+       VolumeLevel* p = static_cast<VolumeLevel*>(data);
+       p->result = SetOutputVolume_w(p->level);
+       break;
+     }
++    case MSG_SETINPUTVOLUME: {
++      VolumeLevel* p = static_cast<VolumeLevel*>(data);
++      p->result = SetInputVolume_w(p->level);
++      break;
++    }
+     case MSG_SETLOCALMONITOR: {
+       LocalMonitor* p = static_cast<LocalMonitor*>(data);
+       p->result = SetLocalMonitor_w(p->enable);
+Index: libjingle/trunk/talk/session/media/channelmanager.h
+===================================================================
+--- libjingle/trunk/talk/session/media/channelmanager.h	(revision 284)
++++ libjingle/trunk/talk/session/media/channelmanager.h	(working copy)
+@@ -136,6 +136,9 @@
+                        const std::string& wave_out_device, int opts);
+   bool GetOutputVolume(int* level);
+   bool SetOutputVolume(int level);
++  bool GetOutputMute(bool* enabled);
++  bool GetInputVolume(int* level);
++  bool SetInputVolume(int level);
+   bool IsSameCapturer(const std::string& capturer_name,
+                       VideoCapturer* capturer);
+   bool GetVideoOptions(std::string* cam_device);
+@@ -241,6 +244,9 @@
+                          const Device* out_dev);
+   bool GetOutputVolume_w(int* level);
+   bool SetOutputVolume_w(int level);
++  bool GetOutputMute_w(int* level);
++  bool GetInputVolume_w(int* level);
++  bool SetInputVolume_w(int level);
+   bool SetLocalMonitor_w(bool enable);
+   bool SetVideoOptions_w(const Device* cam_device);
+   bool SetDefaultVideoEncoderConfig_w(const VideoEncoderConfig& config);
+@@ -293,6 +299,7 @@
+   int audio_options_;
+   int audio_delay_offset_;
+   int audio_output_volume_;
++  int audio_input_volume_;
+   std::string camera_device_;
+   VideoEncoderConfig default_video_encoder_config_;
+   VideoRenderer* local_renderer_;
+Index: libjingle/trunk/talk/session/media/mediasession.cc
+===================================================================
+--- libjingle/trunk/talk/session/media/mediasession.cc	(revision 284)
++++ libjingle/trunk/talk/session/media/mediasession.cc	(working copy)
+@@ -619,6 +619,7 @@
+     bool add_legacy_stream,
+     StreamParamsVec* current_streams,
+     MediaContentDescriptionImpl<C>* offer) {
++    
+   offer->AddCodecs(codecs);
+   offer->SortCodecs();
+ 
+@@ -836,7 +837,7 @@
+   VideoCodecs video_codecs;
+   DataCodecs data_codecs;
+   GetCodecsToOffer(current_description, &audio_codecs, &video_codecs,
+-                   &data_codecs);
++                   &data_codecs, options);
+ 
+   // Handle m=audio.
+   if (options.has_audio) {
+@@ -1146,7 +1147,8 @@
+     const SessionDescription* current_description,
+     AudioCodecs* audio_codecs,
+     VideoCodecs* video_codecs,
+-    DataCodecs* data_codecs) const {
++    DataCodecs* data_codecs,
++    const MediaSessionOptions& options) const {
+   UsedPayloadTypes used_pltypes;
+   audio_codecs->clear();
+   video_codecs->clear();
+@@ -1182,6 +1184,25 @@
+   FindCodecsToOffer<AudioCodec>(audio_codecs_, audio_codecs, &used_pltypes);
+   FindCodecsToOffer<VideoCodec>(video_codecs_, video_codecs, &used_pltypes);
+   FindCodecsToOffer<DataCodec>(data_codecs_, data_codecs, &used_pltypes);
++    
++  //If a preferred audio codec is specified, remove every other codec
++  //from the list except that
++  if(!options.preffered_acodec_name.empty()) {
++    std::vector<AudioCodec> acodecs;
++    for(size_t i=0; i<audio_codecs->size(); i++) {
++      if(options.preffered_acodec_name == audio_codecs->at(i).name) {
++        acodecs.push_back(audio_codecs->at(i));
++      }
++    }
++    
++    if(!acodecs.empty()) {
++      audio_codecs->clear();
++      while(!acodecs.empty()) {
++        audio_codecs->push_back(acodecs.back());
++        acodecs.pop_back();
++      }
++    }
++  }
+ }
+ 
+ bool MediaSessionDescriptionFactory::AddTransportOffer(
+Index: libjingle/trunk/talk/session/media/mediasession.h
+===================================================================
+--- libjingle/trunk/talk/session/media/mediasession.h	(revision 284)
++++ libjingle/trunk/talk/session/media/mediasession.h	(working copy)
+@@ -86,7 +86,8 @@
+       rtcp_mux_enabled(true),
+       bundle_enabled(false),
+       video_bandwidth(kAutoBandwidth),
+-      data_bandwidth(kDataMaxBandwidth) {
++      data_bandwidth(kDataMaxBandwidth),
++      preffered_acodec_name("") {
+   }
+ 
+   // Add a stream with MediaType type and id name.
+@@ -106,6 +107,7 @@
+   // bps. -1 == auto.
+   int video_bandwidth;
+   int data_bandwidth;
++  std::string preffered_acodec_name;
+   TransportOptions transport_options;
+ 
+   struct Stream {
+@@ -370,7 +372,8 @@
+   void GetCodecsToOffer(const SessionDescription* current_description,
+                         AudioCodecs* audio_codecs,
+                         VideoCodecs* video_codecs,
+-                        DataCodecs* data_codecs) const;
++                        DataCodecs* data_codecs,
++                        const MediaSessionOptions& options) const;
+   bool AddTransportOffer(
+       const std::string& content_name,
+       const TransportOptions& transport_options,
